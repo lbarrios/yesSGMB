@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"github.com/lbarrios/yesSGMB/cartridge"
+	"fmt"
 )
 
 func main() {
@@ -14,6 +15,6 @@ func main() {
 	// Loading the cartridge data
 	_, err := cartridge.NewCartridge(*romFile)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Sprintf("ERROR: %s",err))
 	}
 }

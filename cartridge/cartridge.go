@@ -1,9 +1,6 @@
-/*
-This package implements the Cartridge type, that abstracts the GameBoy cartridge.
-It basically reads a rom from a file, and loads it in memory.
-
-The format of the header can be found here: http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
-*/
+// package cartridge implements the Cartridge type, that abstracts the GameBoy cartridge
+// it basically reads a rom from a file, and loads it in memory
+// the format of the header can be found here: http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
 package cartridge
 
 import (
@@ -17,7 +14,7 @@ import (
 
 type cartridge struct {
 	Filename            string
-	fileContent         []byte
+	data                []byte
 	nintendoLogo        []byte
 	Title               string
 	manufacturerCode    string
@@ -30,11 +27,38 @@ type cartridge struct {
 	romBanks            int
 	romSize             int
 	ramSize             int
-	japaneseFlag        bool
+	destinationCode     byte
+	isJapanese          bool
 	versionNumber       int
 	headerChecksum      byte
 	globalChecksum      []byte
 }
+
+const (
+	nintendoLogoStart          = 0x0104
+	nintendoLogoEnd            = 0x0133 + 1
+	titleStart                 = 0x0134
+	titleEnd                   = 0x0142 + 1
+	manufacturerCodeStart      = 0x013F
+	manufacturerCodeEnd        = 0x0142 + 1
+	colorFlagPosition          = 0x143
+	cgbCompatibleColorFlag     = 0x80
+	cgbOnlyColorFlag           = 0xC0
+	oldLicenseeCodePosition    = 0x014B
+	newLicenseeCodeFlag        = 0x33
+	newLicenseeCodeStart       = 0x0144
+	newLicenseeCodeEnd         = 0x0145 + 1
+	sgbFlagPosition            = 0x146
+	typePosition               = 0x0147
+	romBanksPosition           = 0x0148
+	ramSizePosition            = 0x0149
+	destinationCodePosition    = 0x014A
+	isJapaneseDestinationValue = 0x00
+	versionNumberPosition      = 0x014C
+	headerChecksumPosition     = 0x014D
+	globalChecksumStart        = 0x014E
+	globalChecksumEnd          = 0x014F + 1
+)
 
 func NewCartridge(filename string) (*cartridge, error) {
 	c := new(cartridge)
@@ -43,39 +67,53 @@ func NewCartridge(filename string) (*cartridge, error) {
 		return nil, err
 	}
 
+	if err := c.ParseHeader(); err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
+
+func (c *cartridge) ParseHeader() (error) {
+	// As the documentation states, the minimum cartridge ROM size is when the cartridge has zero rom banks
+	minimumRomSize := romSizeForBanks(0)
+	if len(c.data) < minimumRomSize {
+		return errors.New(fmt.Sprintf("The cartridge rom size is lower than the minimum expected (%dKB).", minimumRomSize/1024))
+	}
+
 	// Nintendo Logo
-	// These bytes define the bitmap of the Nintendo logo that is displayed when the gameboy gets turned on.
-	// The gameboys boot procedure verifies the content of this bitmap (after it has displayed it), and LOCKS ITSELF UP if these bytes are incorrect.
-	// A CGB verifies only the first 18h bytes of the bitmap, but others (for example a pocket gameboy) verify all 30h bytes.
-	c.nintendoLogo = c.fileContent[0x0104:0x0133+1]
+	// These bytes define the bitmap of the Nintendo logo that is displayed when the GameBoy gets turned on.
+	// The GameBoy boot procedure verifies the content of this bitmap (after it has displayed it), and LOCKS ITSELF UP if these bytes are incorrect.
+	// A CGB verifies only the first 18h bytes of the bitmap, but others (for example a Pocket GameBoy) verify all 30h bytes.
+	c.nintendoLogo = c.data[nintendoLogoStart:nintendoLogoEnd]
 	if ! bytes.Equal(c.nintendoLogo, originalNintendoLogo) {
 		log.Println(c.nintendoLogo)
 		log.Println(originalNintendoLogo)
-		return nil, errors.New("The cartridge is not original! It's a pirate copy, Nintendo is losing money!")
+		return errors.New("The cartridge is not original! It's a pirate copy, Nintendo is losing money!")
 	}
 
-	// Title - Will be at bytes 0x0134 to 0x0142; the empty chars are filled with 0's
-	c.Title = strings.Trim(string(c.fileContent[0x0134:0x0142+1]), "\0000")
+	// Title - The empty chars are filled with 0's
+	c.Title = strings.Trim(string(c.data[titleStart:titleEnd]), "\0000")
 	log.Printf("The game title is: %s", c.Title)
 
-	// GBC - Manufacturer Code will be at bytes 0x013F to 0x0142
-	c.manufacturerCode = string(c.fileContent[0x013F:0x0142+1])
+	// GBC - Manufacturer Code
+	c.manufacturerCode = string(c.data[manufacturerCodeStart:manufacturerCodeEnd])
 
 	// GBC - Color Flag
 	// 		80h - Game supports CGB functions, but works on old gameboys also.
 	// 		C0h - Game works on CGB only (physically the same as 80h).
-	c.colorFlag = c.fileContent[0x0143]
-	if c.colorFlag == 0xC0 {
-		return nil, errors.New("The cartridge is not compatible with GameBoy Classic; requires GameBoy Color")
+	c.colorFlag = c.data[colorFlagPosition]
+	if c.colorFlag == cgbOnlyColorFlag {
+		return errors.New("The cartridge is not compatible with GameBoy Classic; requires GameBoy Color")
 	}
 
 	// Licensee Code
 	// Specifies a two character ASCII licensee code, indicating the company or publisher of the game
-	// If 0x014B==0x33, then the New Licencee Code is used, at 0x0144 and 0x0145
-	if c.fileContent[0x014B] != 0x33 {
-		c.licensee = []byte{c.fileContent[0x014B]}
+	// If the old licensee code equals to 0x33, then the New Licencee Code is used
+	if c.data[oldLicenseeCodePosition] != newLicenseeCodeFlag {
+		c.licensee = []byte{c.data[oldLicenseeCodePosition]}
 	} else {
-		c.licensee = c.fileContent[0x0144:0x0145+1]
+		c.licensee = c.data[newLicenseeCodeStart:newLicenseeCodeEnd]
 	}
 	c.licenseeDescription = licenseeMap[fmt.Sprintf("%x", c.licensee)]
 	log.Printf("The game vendor is: %s=%s", fmt.Sprintf("%x", c.licensee), c.licenseeDescription)
@@ -83,35 +121,32 @@ func NewCartridge(filename string) (*cartridge, error) {
 	// SGB - Super GameBoy Flag
 	// 		00h = No SGB functions (Normal Gameboy or CGB only game)
 	//		03h = Game supports SGB functions
-	c.colorFlag = c.fileContent[0x0146]
+	c.sgbFlag = c.data[sgbFlagPosition]
 
 	// Cartridge Type
-	c.Type = c.fileContent[0x0147]
+	c.Type = c.data[typePosition]
 	if desc, ok := typeMap[c.Type]; !ok {
-		return nil, errors.New(fmt.Sprintf("Unknown cartridge type: %X", c.Type))
+		return errors.New(fmt.Sprintf("Unknown cartridge type: %X", c.Type))
 	} else {
 		c.TypeDescription = desc
 	}
 	log.Printf("The cartridge type is: %s", c.TypeDescription)
 
 	// ROM Banks and Size
-	c.romBanks = romBanksMap[c.fileContent[0x0148]]
-	if c.romBanks == 0 {
-		c.romSize = 32 * 1024
-	} else {
-		c.romSize = c.romBanks * 16 * 1024
-	}
+	c.romBanks = romBanksMap[c.data[romBanksPosition]]
+	c.romSize = romSizeForBanks(c.romBanks)
 	log.Printf("ROM size is %d KB", c.romSize/1024)
 
 	// RAM Size
-	c.ramSize = ramSizeMap[c.fileContent[0x0149]]
+	c.ramSize = ramSizeMap[c.data[ramSizePosition]]
 	log.Printf("RAM size is %d KB", c.ramSize/1024)
 
 	// Destination Code (ie Japanese or not)
-	c.japaneseFlag = (c.fileContent[0x0149] == 0x00)
+	c.destinationCode = c.data[destinationCodePosition]
+	c.isJapanese = c.destinationCode == isJapaneseDestinationValue
 
 	// Game Version Number
-	c.versionNumber = int(c.fileContent[0x014C])
+	c.versionNumber = int(c.data[versionNumberPosition])
 
 	// Header Checksum
 	// Contains an 8 bit checksum across the cartridge header bytes 0134-014C.
@@ -119,12 +154,12 @@ func NewCartridge(filename string) (*cartridge, error) {
 	// 		x=0:FOR i=0134h TO 014Ch:x=x-MEM[i]-1:NEXT
 	// The lower 8 bits of the result must be the same than the value in this entry.
 	// The GAME WON'T WORK if this checksum is incorrect.
-	c.headerChecksum = c.fileContent[0x014D]
+	c.headerChecksum = c.data[headerChecksumPosition]
 
 	// Global Checksum
-	c.globalChecksum = c.fileContent[0x014E:0x014F+1]
+	c.globalChecksum = c.data[globalChecksumStart:globalChecksumEnd]
 
-	return c, nil
+	return nil
 }
 
 func (c *cartridge) LoadROMFile(filename string) error {
@@ -134,13 +169,21 @@ func (c *cartridge) LoadROMFile(filename string) error {
 	if fileContent, err := ioutil.ReadFile(filename); err != nil {
 		return err
 	} else {
-		c.fileContent = fileContent
+		c.data = fileContent
 	}
 
 	log.Printf("File %s loaded.", filename)
-	//log.Printf("data as hex: %x", c.fileContent)
-
 	return nil
+}
+
+func romSizeForBanks(romBanks int) int {
+	var romSize int
+	if romBanks == 0 {
+		romSize = 32 * 1024
+	} else {
+		romSize = romBanks * 16 * 1024
+	}
+	return romSize
 }
 
 var typeMap = map[byte]string{

@@ -1,0 +1,7 @@
+# binaries
+yesSGMB
+roms_files/*
+test.gb
+
+# IDE
+.idea

@@ -21,5 +21,5 @@ func main() {
 		log.Fatalf("ERROR: %s", err)
 	}
 
-	_ := cpu.NewCPU()
+	cpu.NewCPU()
 }

@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"log"
 	"github.com/lbarrios/yesSGMB/cartridge"
+	"github.com/lbarrios/yesSGMB/cpu"
+	"log"
 )
 
 var (
@@ -17,6 +18,8 @@ func main() {
 	// Loading the cartridge data
 	_, err := cartridge.NewCartridge(*romFile)
 	if err != nil {
-		log.Fatalf("ERROR: %s",err)
+		log.Fatalf("ERROR: %s", err)
 	}
+
+	_ := cpu.NewCPU()
 }

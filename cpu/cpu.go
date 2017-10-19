@@ -68,7 +68,7 @@ const (
 	xZeroThreeSize  = 0 // 0x03
 	xZeroFourSize   = 0 // 0x04
 	xZeroFiveSize   = 0 // 0x05
-	xZeroSixSize    = 0 // 0x06
+	ld_b_nSize      = 8 // 0x06
 	xZeroSevenSize  = 0 // 0x07
 	xZeroEightSize  = 0 // 0x08
 	xZeroNineSize   = 0 // 0x09
@@ -76,7 +76,7 @@ const (
 	xZeroBSize      = 0 // 0x0B
 	xZeroCSize      = 0 // 0x0C
 	xZeroDSize      = 0 // 0x0D
-	xZeroESize      = 0 // 0x0E
+	ld_c_nSize      = 8 // 0x0E
 	xZeroFSize      = 0 // 0x0F
 	xOneZeroSize    = 0 // 0x10
 	xOneOneSize     = 0 // 0x11
@@ -84,7 +84,7 @@ const (
 	xOneThreeSize   = 0 // 0x13
 	xOneFourSize    = 0 // 0x14
 	xOneFiveSize    = 0 // 0x15
-	xOneSixSize     = 0 // 0x16
+	ld_d_nSize      = 8 // 0x16
 	xOneSevenSize   = 0 // 0x17
 	xOneEightSize   = 0 // 0x18
 	xOneNineSize    = 0 // 0x19
@@ -92,7 +92,7 @@ const (
 	xOneBSize       = 0 // 0x1B
 	xOneCSize       = 0 // 0x1C
 	xOneDSize       = 0 // 0x1D
-	xOneESize       = 0 // 0x1E
+	ld_e_nSize      = 8 // 0x1E
 	xOneFSize       = 0 // 0x1F
 	xTwoZeroSize    = 0 // 0x20
 	xTwoOneSize     = 0 // 0x21
@@ -100,7 +100,7 @@ const (
 	xTwoThreeSize   = 0 // 0x23
 	xTwoFourSize    = 0 // 0x24
 	xTwoFiveSize    = 0 // 0x25
-	xTwoSixSize     = 0 // 0x26
+	ld_h_nSize      = 8 // 0x26
 	xTwoSevenSize   = 0 // 0x27
 	xTwoEightSize   = 0 // 0x28
 	xTwoNineSize    = 0 // 0x29
@@ -108,7 +108,7 @@ const (
 	xTwoBSize       = 0 // 0x2B
 	xTwoCSize       = 0 // 0x2C
 	xTwoDSize       = 0 // 0x2D
-	xTwoESize       = 0 // 0x2E
+	ld_l_nSize      = 8 // 0x2E
 	xTwoFSize       = 0 // 0x2F
 	xThreeZeroSize  = 0 // 0x30
 	xThreeOneSize   = 0 // 0x31
@@ -126,13 +126,13 @@ const (
 	xThreeDSize     = 0 // 0x3D
 	xThreeESize     = 0 // 0x3E
 	xThreeFSize     = 0 // 0x3F
-	xFourZeroSize   = 0 // 0x40
-	xFourOneSize    = 0 // 0x41
-	xFourTwoSize    = 0 // 0x42
-	xFourThreeSize  = 0 // 0x43
-	xFourFourSize   = 0 // 0x44
-	xFourFiveSize   = 0 // 0x45
-	xFourSixSize    = 0 // 0x46
+	ld_b_bSize      = 4 // 0x40
+	ld_b_cSize      = 4 // 0x41
+	ld_b_dSize      = 4 // 0x42
+	ld_b_eSize      = 4 // 0x43
+	ld_b_hSize      = 4 // 0x44
+	ld_b_lSize      = 4 // 0x45
+	ld_b_hlSize     = 8 // 0x46
 	xFourSevenSize  = 0 // 0x47
 	xFourEightSize  = 0 // 0x48
 	xFourNineSize   = 0 // 0x49
@@ -182,14 +182,14 @@ const (
 	xSevenFiveSize  = 0 // 0x75
 	xSevenSixSize   = 0 // 0x76
 	xSevenSevenSize = 0 // 0x77
-	xSevenEightSize = 0 // 0x78
-	xSevenNineSize  = 0 // 0x79
-	xSevenASize     = 0 // 0x7A
-	xSevenBSize     = 0 // 0x7B
-	xSevenCSize     = 0 // 0x7C
-	xSevenDSize     = 0 // 0x7D
-	xSevenESize     = 0 // 0x7E
-	xSevenFSize     = 0 // 0x7F
+	ld_a_bSize      = 4 // 0x78
+	ld_a_cSize      = 4 // 0x79
+	ld_a_dSize      = 4 // 0x7A
+	ld_a_eSize      = 4 // 0x7B
+	ld_a_hSize      = 4 // 0x7C
+	ld_a_lSize      = 4 // 0x7D
+	ld_a_hlSize     = 8 // 0x7E
+	ld_a_aSize      = 4 // 0x7F
 	xEightZeroSize  = 0 // 0x80
 	xEightOneSize   = 0 // 0x81
 	xEightTwoSize   = 0 // 0x82
@@ -320,273 +320,422 @@ const (
 	xFFSize         = 0 // 0xFF
 )
 
-type instructions func(uint8) uint8
+type cycleCount int
+type instructions func() cycleCount
 
 var op = [0x100] instructions{
-	nop,  //0x00
-	TODO, //0x01
-	TODO, //0x02
-	TODO, //0x03
-	TODO, //0x04
-	TODO, //0x05
-	TODO, //0x06
-	TODO, //0x07
-	TODO, //0x08
-	TODO, //0x09
-	TODO, //0x0A
-	TODO, //0x0B
-	TODO, //0x0C
-	TODO, //0x0D
-	TODO, //0x0E
-	TODO, //0x0F
-	TODO, //0x10
-	TODO, //0x11
-	TODO, //0x12
-	TODO, //0x13
-	TODO, //0x14
-	TODO, //0x15
-	TODO, //0x16
-	TODO, //0x17
-	TODO, //0x18
-	TODO, //0x19
-	TODO, //0x1A
-	TODO, //0x1B
-	TODO, //0x1C
-	TODO, //0x1D
-	TODO, //0x1E
-	TODO, //0x1F
-	TODO, //0x20
-	TODO, //0x21
-	TODO, //0x22
-	TODO, //0x23
-	TODO, //0x24
-	TODO, //0x25
-	TODO, //0x26
-	TODO, //0x27
-	TODO, //0x28
-	TODO, //0x29
-	TODO, //0x2A
-	TODO, //0x2B
-	TODO, //0x2C
-	TODO, //0x2D
-	TODO, //0x2E
-	TODO, //0x2F
-	TODO, //0x30
-	TODO, //0x31
-	TODO, //0x32
-	TODO, //0x33
-	TODO, //0x34
-	TODO, //0x35
-	TODO, //0x36
-	TODO, //0x37
-	TODO, //0x38
-	TODO, //0x39
-	TODO, //0x3A
-	TODO, //0x3B
-	TODO, //0x3C
-	TODO, //0x3D
-	TODO, //0x3E
-	TODO, //0x3F
-	TODO, //0x40
-	TODO, //0x41
-	TODO, //0x42
-	TODO, //0x43
-	TODO, //0x44
-	TODO, //0x45
-	TODO, //0x46
-	TODO, //0x47
-	TODO, //0x48
-	TODO, //0x49
-	TODO, //0x4A
-	TODO, //0x4B
-	TODO, //0x4C
-	TODO, //0x4D
-	TODO, //0x4E
-	TODO, //0x4F
-	TODO, //0x50
-	TODO, //0x51
-	TODO, //0x52
-	TODO, //0x53
-	TODO, //0x54
-	TODO, //0x55
-	TODO, //0x56
-	TODO, //0x57
-	TODO, //0x58
-	TODO, //0x59
-	TODO, //0x5A
-	TODO, //0x5B
-	TODO, //0x5C
-	TODO, //0x5D
-	TODO, //0x5E
-	TODO, //0x5F
-	TODO, //0x60
-	TODO, //0x61
-	TODO, //0x62
-	TODO, //0x63
-	TODO, //0x64
-	TODO, //0x65
-	TODO, //0x66
-	TODO, //0x67
-	TODO, //0x68
-	TODO, //0x69
-	TODO, //0x6A
-	TODO, //0x6B
-	TODO, //0x6C
-	TODO, //0x6D
-	TODO, //0x6E
-	TODO, //0x6F
-	TODO, //0x70
-	TODO, //0x71
-	TODO, //0x72
-	TODO, //0x73
-	TODO, //0x74
-	TODO, //0x75
-	TODO, //0x76
-	TODO, //0x77
-	TODO, //0x78
-	TODO, //0x79
-	TODO, //0x7A
-	TODO, //0x7B
-	TODO, //0x7C
-	TODO, //0x7D
-	TODO, //0x7E
-	TODO, //0x7F
-	TODO, //0x80
-	TODO, //0x81
-	TODO, //0x82
-	TODO, //0x83
-	TODO, //0x84
-	TODO, //0x85
-	TODO, //0x86
-	TODO, //0x87
-	TODO, //0x88
-	TODO, //0x89
-	TODO, //0x8A
-	TODO, //0x8B
-	TODO, //0x8C
-	TODO, //0x8D
-	TODO, //0x8E
-	TODO, //0x8F
-	TODO, //0x90
-	TODO, //0x91
-	TODO, //0x92
-	TODO, //0x93
-	TODO, //0x94
-	TODO, //0x95
-	TODO, //0x96
-	TODO, //0x97
-	TODO, //0x98
-	TODO, //0x99
-	TODO, //0x9A
-	TODO, //0x9B
-	TODO, //0x9C
-	TODO, //0x9D
-	TODO, //0x9E
-	TODO, //0x9F
-	TODO, //0xA0
-	TODO, //0xA1
-	TODO, //0xA2
-	TODO, //0xA3
-	TODO, //0xA4
-	TODO, //0xA5
-	TODO, //0xA6
-	TODO, //0xA7
-	TODO, //0xA8
-	TODO, //0xA9
-	TODO, //0xAA
-	TODO, //0xAB
-	TODO, //0xAC
-	TODO, //0xAD
-	TODO, //0xAE
-	TODO, //0xAF
-	TODO, //0xB0
-	TODO, //0xB1
-	TODO, //0xB2
-	TODO, //0xB3
-	TODO, //0xB4
-	TODO, //0xB5
-	TODO, //0xB6
-	TODO, //0xB7
-	TODO, //0xB8
-	TODO, //0xB9
-	TODO, //0xBA
-	TODO, //0xBB
-	TODO, //0xBC
-	TODO, //0xBD
-	TODO, //0xBE
-	TODO, //0xBF
-	TODO, //0xC0
-	TODO, //0xC1
-	TODO, //0xC2
-	TODO, //0xC3
-	TODO, //0xC4
-	TODO, //0xC5
-	TODO, //0xC6
-	TODO, //0xC7
-	TODO, //0xC8
-	TODO, //0xC9
-	TODO, //0xCA
-	TODO, //0xCB
-	TODO, //0xCC
-	TODO, //0xCD
-	TODO, //0xCE
-	TODO, //0xCF
-	TODO, //0xD0
-	TODO, //0xD1
-	TODO, //0xD2
-	TODO, //0xD3
-	TODO, //0xD4
-	TODO, //0xD5
-	TODO, //0xD6
-	TODO, //0xD7
-	TODO, //0xD8
-	TODO, //0xD9
-	TODO, //0xDA
-	TODO, //0xDB
-	TODO, //0xDC
-	TODO, //0xDD
-	TODO, //0xDE
-	TODO, //0xDF
-	TODO, //0xE0
-	TODO, //0xE1
-	TODO, //0xE2
-	TODO, //0xE3
-	TODO, //0xE4
-	TODO, //0xE5
-	TODO, //0xE6
-	TODO, //0xE7
-	TODO, //0xE8
-	TODO, //0xE9
-	TODO, //0xEA
-	TODO, //0xEB
-	TODO, //0xEC
-	TODO, //0xED
-	TODO, //0xEE
-	TODO, //0xEF
-	TODO, //0xF0
-	TODO, //0xF1
-	TODO, //0xF2
-	TODO, //0xF3
-	TODO, //0xF4
-	TODO, //0xF5
-	TODO, //0xF6
-	TODO, //0xF7
-	TODO, //0xF8
-	TODO, //0xF9
-	TODO, //0xFA
-	TODO, //0xFB
-	TODO, //0xFC
-	TODO, //0xFD
-	TODO, //0xFE
-	TODO, //0xFF
+	nop,     //0x00
+	TODO,    //0x01
+	TODO,    //0x02
+	TODO,    //0x03
+	TODO,    //0x04
+	TODO,    //0x05
+	ld_b_n,  //0x06
+	TODO,    //0x07
+	TODO,    //0x08
+	TODO,    //0x09
+	TODO,    //0x0A
+	TODO,    //0x0B
+	TODO,    //0x0C
+	TODO,    //0x0D
+	ld_c_n,  //0x0E
+	TODO,    //0x0F
+	TODO,    //0x10
+	TODO,    //0x11
+	TODO,    //0x12
+	TODO,    //0x13
+	TODO,    //0x14
+	TODO,    //0x15
+	ld_d_n,  //0x16
+	TODO,    //0x17
+	TODO,    //0x18
+	TODO,    //0x19
+	TODO,    //0x1A
+	TODO,    //0x1B
+	TODO,    //0x1C
+	TODO,    //0x1D
+	ld_e_n,  //0x1E
+	TODO,    //0x1F
+	TODO,    //0x20
+	TODO,    //0x21
+	TODO,    //0x22
+	TODO,    //0x23
+	TODO,    //0x24
+	TODO,    //0x25
+	ld_h_n,  //0x26
+	TODO,    //0x27
+	TODO,    //0x28
+	TODO,    //0x29
+	TODO,    //0x2A
+	TODO,    //0x2B
+	TODO,    //0x2C
+	TODO,    //0x2D
+	ld_l_n,  //0x2E
+	TODO,    //0x2F
+	TODO,    //0x30
+	TODO,    //0x31
+	TODO,    //0x32
+	TODO,    //0x33
+	TODO,    //0x34
+	TODO,    //0x35
+	TODO,    //0x36
+	TODO,    //0x37
+	TODO,    //0x38
+	TODO,    //0x39
+	TODO,    //0x3A
+	TODO,    //0x3B
+	TODO,    //0x3C
+	TODO,    //0x3D
+	TODO,    //0x3E
+	TODO,    //0x3F
+	ld_b_b,  //0x40
+	ld_b_c,  //0x41
+	ld_b_d,  //0x42
+	ld_b_e,  //0x43
+	ld_b_h,  //0x44
+	ld_b_l,  //0x45
+	ld_b_hl, //0x46
+	TODO,    //0x47
+	TODO,    //0x48
+	TODO,    //0x49
+	TODO,    //0x4A
+	TODO,    //0x4B
+	TODO,    //0x4C
+	TODO,    //0x4D
+	TODO,    //0x4E
+	TODO,    //0x4F
+	TODO,    //0x50
+	TODO,    //0x51
+	TODO,    //0x52
+	TODO,    //0x53
+	TODO,    //0x54
+	TODO,    //0x55
+	TODO,    //0x56
+	TODO,    //0x57
+	TODO,    //0x58
+	TODO,    //0x59
+	TODO,    //0x5A
+	TODO,    //0x5B
+	TODO,    //0x5C
+	TODO,    //0x5D
+	TODO,    //0x5E
+	TODO,    //0x5F
+	TODO,    //0x60
+	TODO,    //0x61
+	TODO,    //0x62
+	TODO,    //0x63
+	TODO,    //0x64
+	TODO,    //0x65
+	TODO,    //0x66
+	TODO,    //0x67
+	TODO,    //0x68
+	TODO,    //0x69
+	TODO,    //0x6A
+	TODO,    //0x6B
+	TODO,    //0x6C
+	TODO,    //0x6D
+	TODO,    //0x6E
+	TODO,    //0x6F
+	TODO,    //0x70
+	TODO,    //0x71
+	TODO,    //0x72
+	TODO,    //0x73
+	TODO,    //0x74
+	TODO,    //0x75
+	TODO,    //0x76
+	TODO,    //0x77
+	ld_a_b,  //0x78
+	ld_a_c,  //0x79
+	ld_a_d,  //0x7A
+	ld_a_e,  //0x7B
+	ld_a_h,  //0x7C
+	ld_a_l,  //0x7D
+	ld_a_hl, //0x7E
+	ld_a_a,  //0x7F
+	TODO,    //0x80
+	TODO,    //0x81
+	TODO,    //0x82
+	TODO,    //0x83
+	TODO,    //0x84
+	TODO,    //0x85
+	TODO,    //0x86
+	TODO,    //0x87
+	TODO,    //0x88
+	TODO,    //0x89
+	TODO,    //0x8A
+	TODO,    //0x8B
+	TODO,    //0x8C
+	TODO,    //0x8D
+	TODO,    //0x8E
+	TODO,    //0x8F
+	TODO,    //0x90
+	TODO,    //0x91
+	TODO,    //0x92
+	TODO,    //0x93
+	TODO,    //0x94
+	TODO,    //0x95
+	TODO,    //0x96
+	TODO,    //0x97
+	TODO,    //0x98
+	TODO,    //0x99
+	TODO,    //0x9A
+	TODO,    //0x9B
+	TODO,    //0x9C
+	TODO,    //0x9D
+	TODO,    //0x9E
+	TODO,    //0x9F
+	TODO,    //0xA0
+	TODO,    //0xA1
+	TODO,    //0xA2
+	TODO,    //0xA3
+	TODO,    //0xA4
+	TODO,    //0xA5
+	TODO,    //0xA6
+	TODO,    //0xA7
+	TODO,    //0xA8
+	TODO,    //0xA9
+	TODO,    //0xAA
+	TODO,    //0xAB
+	TODO,    //0xAC
+	TODO,    //0xAD
+	TODO,    //0xAE
+	TODO,    //0xAF
+	TODO,    //0xB0
+	TODO,    //0xB1
+	TODO,    //0xB2
+	TODO,    //0xB3
+	TODO,    //0xB4
+	TODO,    //0xB5
+	TODO,    //0xB6
+	TODO,    //0xB7
+	TODO,    //0xB8
+	TODO,    //0xB9
+	TODO,    //0xBA
+	TODO,    //0xBB
+	TODO,    //0xBC
+	TODO,    //0xBD
+	TODO,    //0xBE
+	TODO,    //0xBF
+	TODO,    //0xC0
+	TODO,    //0xC1
+	TODO,    //0xC2
+	TODO,    //0xC3
+	TODO,    //0xC4
+	TODO,    //0xC5
+	TODO,    //0xC6
+	TODO,    //0xC7
+	TODO,    //0xC8
+	TODO,    //0xC9
+	TODO,    //0xCA
+	TODO,    //0xCB
+	TODO,    //0xCC
+	TODO,    //0xCD
+	TODO,    //0xCE
+	TODO,    //0xCF
+	TODO,    //0xD0
+	TODO,    //0xD1
+	TODO,    //0xD2
+	TODO,    //0xD3
+	TODO,    //0xD4
+	TODO,    //0xD5
+	TODO,    //0xD6
+	TODO,    //0xD7
+	TODO,    //0xD8
+	TODO,    //0xD9
+	TODO,    //0xDA
+	TODO,    //0xDB
+	TODO,    //0xDC
+	TODO,    //0xDD
+	TODO,    //0xDE
+	TODO,    //0xDF
+	TODO,    //0xE0
+	TODO,    //0xE1
+	TODO,    //0xE2
+	TODO,    //0xE3
+	TODO,    //0xE4
+	TODO,    //0xE5
+	TODO,    //0xE6
+	TODO,    //0xE7
+	TODO,    //0xE8
+	TODO,    //0xE9
+	TODO,    //0xEA
+	TODO,    //0xEB
+	TODO,    //0xEC
+	TODO,    //0xED
+	TODO,    //0xEE
+	TODO,    //0xEF
+	TODO,    //0xF0
+	TODO,    //0xF1
+	TODO,    //0xF2
+	TODO,    //0xF3
+	TODO,    //0xF4
+	TODO,    //0xF5
+	TODO,    //0xF6
+	TODO,    //0xF7
+	TODO,    //0xF8
+	TODO,    //0xF9
+	TODO,    //0xFA
+	TODO,    //0xFB
+	TODO,    //0xFC
+	TODO,    //0xFD
+	TODO,    //0xFE
+	TODO,    //0xFF
 }
 
-func TODO(op uint8) uint8 {
+func TODO() cycleCount {
 	// This function is not defined!
 	return 0
 }
 
-func nop(op uint8) uint8 {
+func nop() cycleCount {
 	// Does nothing
 	return nopSize
+}
+
+// 3.3. Instructions
+// The GameBoy CPU is based on a subset of the Z80 micro-
+// processor. A summary of these commands is given below.
+// If 'Flags affected' is not given for a command then
+// none are affected.
+
+// 3.3.1. 8-Bit Loads
+
+// 3.3.1.1. LD nn,n
+// Description:
+// 		Put value nn into n.
+// Use with:
+// 		nn = B,C,D,E,H,L,BC,DE,HL,SP
+// 		n = 8 bit immediate value
+
+func ld_b_n() cycleCount {
+	// Put value of register B into the parameter address
+	// TODO: implementar
+	return ld_b_nSize
+}
+
+func ld_c_n() cycleCount {
+	// Put value of register C into the parameter address
+	// TODO: implementar
+	return ld_c_nSize
+}
+
+func ld_d_n() cycleCount {
+	// Put value of register D into the parameter address
+	// TODO: implementar
+	return ld_d_nSize
+}
+
+func ld_e_n() cycleCount {
+	// Put value of register E into the parameter address
+	// TODO: implementar
+	return ld_e_nSize
+}
+
+func ld_h_n() cycleCount {
+	// Put value of register H into the parameter address
+	// TODO: implementar
+	return ld_h_nSize
+}
+
+func ld_l_n() cycleCount {
+	// Put value of register L into the parameter address
+	// TODO: implementar
+	return ld_l_nSize
+}
+
+// 3.3.1.2. LD r1,r2
+// Description:
+// 		Put value r2 into r1.
+// Use with:
+// 		r1 = A,B,C,D,E,H,L,(HL)
+//		r2 = A,B,C,D,E,H,L,(HL)
+
+func ld_a_a() cycleCount {
+	// Put value of register A into register A
+	// TODO: implementar
+	return ld_a_aSize
+}
+
+func ld_a_b() cycleCount {
+	// Put value of register B into register A
+	// TODO: implementar
+	return ld_a_bSize
+}
+
+func ld_a_c() cycleCount {
+	// Put value of register C into register A
+	// TODO: implementar
+	return ld_a_cSize
+}
+
+func ld_a_d() cycleCount {
+	// Put value of register D into register A
+	// TODO: implementar
+	return ld_a_dSize
+}
+
+func ld_a_e() cycleCount {
+	// Put value of register E into register A
+	// TODO: implementar
+	return ld_a_eSize
+}
+
+func ld_a_h() cycleCount {
+	// Put value of register H into register A
+	// TODO: implementar
+	return ld_a_hSize
+}
+
+func ld_a_l() cycleCount {
+	// Put value of register L into register A
+	// TODO: implementar
+	return ld_a_lSize
+}
+
+func ld_a_hl() cycleCount {
+	// Put value of register HL into register A
+	// TODO: implementar
+	return ld_a_hlSize
+}
+
+func ld_b_b() cycleCount {
+	// Put value of register B into register B
+	// TODO: implementar
+	return ld_b_bSize
+}
+
+func ld_b_c() cycleCount {
+	// Put value of register C into register B
+	// TODO: implementar
+	return ld_b_cSize
+}
+
+func ld_b_d() cycleCount {
+	// Put value of register D into register B
+	// TODO: implementar
+	return ld_b_dSize
+}
+
+func ld_b_e() cycleCount {
+	// Put value of register E into register B
+	// TODO: implementar
+	return ld_b_eSize
+}
+
+func ld_b_h() cycleCount {
+	// Put value of register H into register B
+	// TODO: implementar
+	return ld_b_hSize
+}
+
+func ld_b_l() cycleCount {
+	// Put value of register L into register B
+	// TODO: implementar
+	return ld_b_lSize
+}
+
+func ld_b_hl() cycleCount {
+	// Put value of register HL into register B
+	// TODO: implementar
+	return ld_b_hlSize
 }

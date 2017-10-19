@@ -116,7 +116,7 @@ const (
 	xThreeThreeSize = 0 // 0x33
 	xThreeFourSize  = 0 // 0x34
 	xThreeFiveSize  = 0 // 0x35
-	xThreeSixSize   = 0 // 0x36
+	ld_hl_nSize   = 12 // 0x36
 	xThreeSevenSize = 0 // 0x37
 	xThreeEightSize = 0 // 0x38
 	xThreeNineSize  = 0 // 0x39
@@ -134,52 +134,52 @@ const (
 	ld_b_lSize      = 4 // 0x45
 	ld_b_hlSize     = 8 // 0x46
 	xFourSevenSize  = 0 // 0x47
-	xFourEightSize  = 0 // 0x48
-	xFourNineSize   = 0 // 0x49
-	xFourASize      = 0 // 0x4A
-	xFourBSize      = 0 // 0x4B
-	xFourCSize      = 0 // 0x4C
-	xFourDSize      = 0 // 0x4D
-	xFourESize      = 0 // 0x4E
+	ld_c_bSize      = 4 // 0x48
+	ld_c_cSize      = 4 // 0x49
+	ld_c_dSize      = 4 // 0x4A
+	ld_c_eSize      = 4 // 0x4B
+	ld_c_hSize      = 4 // 0x4C
+	ld_c_lSize      = 4 // 0x4D
+	ld_c_hlSize     = 8 // 0x4E
 	xFourFSize      = 0 // 0x4F
-	xFiveZeroSize   = 0 // 0x50
-	xFiveOneSize    = 0 // 0x51
-	xFiveTwoSize    = 0 // 0x52
-	xFiveThreeSize  = 0 // 0x53
-	xFiveFourSize   = 0 // 0x54
-	xFiveFiveSize   = 0 // 0x55
-	xFiveSixSize    = 0 // 0x56
+	ld_d_bSize      = 4 // 0x50
+	ld_d_cSize      = 4 // 0x51
+	ld_d_dSize      = 4 // 0x52
+	ld_d_eSize      = 4 // 0x53
+	ld_d_hSize      = 4 // 0x54
+	ld_d_lSize      = 4 // 0x55
+	ld_d_hlSize     = 8 // 0x56
 	xFiveSevenSize  = 0 // 0x57
-	xFiveEightSize  = 0 // 0x58
-	xFiveNineSize   = 0 // 0x59
-	xFiveASize      = 0 // 0x5A
-	xFiveBSize      = 0 // 0x5B
-	xFiveCSize      = 0 // 0x5C
-	xFiveDSize      = 0 // 0x5D
-	xFiveESize      = 0 // 0x5E
+	ld_e_bSize      = 4 // 0x58
+	ld_e_cSize      = 4 // 0x59
+	ld_e_dSize      = 4 // 0x5A
+	ld_e_eSize      = 4 // 0x5B
+	ld_e_hSize      = 4 // 0x5C
+	ld_e_lSize      = 4 // 0x5D
+	ld_e_hlSize     = 8 // 0x5E
 	xFiveFSize      = 0 // 0x5F
-	xSixZeroSize    = 0 // 0x60
-	xSixOneSize     = 0 // 0x61
-	xSixTwoSize     = 0 // 0x62
-	xSixThreeSize   = 0 // 0x63
-	xSixFourSize    = 0 // 0x64
-	xSixFiveSize    = 0 // 0x65
-	xSixSixSize     = 0 // 0x66
+	ld_h_bSize      = 4 // 0x60
+	ld_h_cSize      = 4 // 0x61
+	ld_h_dSize      = 4 // 0x62
+	ld_h_eSize      = 4 // 0x63
+	ld_h_hSize      = 4 // 0x64
+	ld_h_lSize      = 4 // 0x65
+	ld_h_hlSize     = 8 // 0x66
 	xSixSevenSize   = 0 // 0x67
-	xSixEightSize   = 0 // 0x68
-	xSixNineSize    = 0 // 0x69
-	xSixASize       = 0 // 0x6A
-	xSixBSize       = 0 // 0x6B
-	xSixCSize       = 0 // 0x6C
-	xSixDSize       = 0 // 0x6D
-	xSixESize       = 0 // 0x6E
+	ld_l_bSize      = 4 // 0x68
+	ld_l_cSize      = 4 // 0x69
+	ld_l_dSize      = 4 // 0x6A
+	ld_l_eSize      = 4 // 0x6B
+	ld_l_hSize      = 4 // 0x6C
+	ld_l_lSize      = 4 // 0x6D
+	ld_l_hlSize     = 8 // 0x6E
 	xSixFSize       = 0 // 0x6F
-	xSevenZeroSize  = 0 // 0x70
-	xSevenOneSize   = 0 // 0x71
-	xSevenTwoSize   = 0 // 0x72
-	xSevenThreeSize = 0 // 0x73
-	xSevenFourSize  = 0 // 0x74
-	xSevenFiveSize  = 0 // 0x75
+	ld_hl_bSize     = 8 // 0x70
+	ld_hl_cSize     = 8 // 0x71
+	ld_hl_dSize     = 8 // 0x72
+	ld_hl_eSize     = 8 // 0x73
+	ld_hl_hSize     = 8 // 0x74
+	ld_hl_lSize     = 8 // 0x75
 	xSevenSixSize   = 0 // 0x76
 	xSevenSevenSize = 0 // 0x77
 	ld_a_bSize      = 4 // 0x78
@@ -378,7 +378,7 @@ var op = [0x100] instructions{
 	TODO,    //0x33
 	TODO,    //0x34
 	TODO,    //0x35
-	TODO,    //0x36
+	ld_hl_n,    //0x36
 	TODO,    //0x37
 	TODO,    //0x38
 	TODO,    //0x39
@@ -396,52 +396,52 @@ var op = [0x100] instructions{
 	ld_b_l,  //0x45
 	ld_b_hl, //0x46
 	TODO,    //0x47
-	TODO,    //0x48
-	TODO,    //0x49
-	TODO,    //0x4A
-	TODO,    //0x4B
-	TODO,    //0x4C
-	TODO,    //0x4D
-	TODO,    //0x4E
+	ld_c_b,  //0x48
+	ld_c_c,  //0x49
+	ld_c_d,  //0x4A
+	ld_c_e,  //0x4B
+	ld_c_h,  //0x4C
+	ld_c_l,  //0x4D
+	ld_c_hl, //0x4E
 	TODO,    //0x4F
-	TODO,    //0x50
-	TODO,    //0x51
-	TODO,    //0x52
-	TODO,    //0x53
-	TODO,    //0x54
-	TODO,    //0x55
-	TODO,    //0x56
+	ld_d_b,  //0x50
+	ld_d_c,  //0x51
+	ld_d_d,  //0x52
+	ld_d_e,  //0x53
+	ld_d_h,  //0x54
+	ld_d_l,  //0x55
+	ld_d_hl, //0x56
 	TODO,    //0x57
-	TODO,    //0x58
-	TODO,    //0x59
-	TODO,    //0x5A
-	TODO,    //0x5B
-	TODO,    //0x5C
-	TODO,    //0x5D
-	TODO,    //0x5E
+	ld_e_b,  //0x58
+	ld_e_c,  //0x59
+	ld_e_d,  //0x5A
+	ld_e_e,  //0x5B
+	ld_e_h,  //0x5C
+	ld_e_l,  //0x5D
+	ld_e_hl, //0x5E
 	TODO,    //0x5F
-	TODO,    //0x60
-	TODO,    //0x61
-	TODO,    //0x62
-	TODO,    //0x63
-	TODO,    //0x64
-	TODO,    //0x65
-	TODO,    //0x66
+	ld_h_b,  //0x60
+	ld_h_c,  //0x61
+	ld_h_d,  //0x62
+	ld_h_e,  //0x63
+	ld_h_h,  //0x64
+	ld_h_l,  //0x65
+	ld_h_hl, //0x66
 	TODO,    //0x67
-	TODO,    //0x68
-	TODO,    //0x69
-	TODO,    //0x6A
-	TODO,    //0x6B
-	TODO,    //0x6C
-	TODO,    //0x6D
-	TODO,    //0x6E
+	ld_l_b,  //0x68
+	ld_l_c,  //0x69
+	ld_l_d,  //0x6A
+	ld_l_e,  //0x6B
+	ld_l_h,  //0x6C
+	ld_l_l,  //0x6D
+	ld_l_hl, //0x6E
 	TODO,    //0x6F
-	TODO,    //0x70
-	TODO,    //0x71
-	TODO,    //0x72
-	TODO,    //0x73
-	TODO,    //0x74
-	TODO,    //0x75
+	ld_hl_b, //0x70
+	ld_hl_c, //0x71
+	ld_hl_d, //0x72
+	ld_hl_e, //0x73
+	ld_hl_l, //0x74
+	ld_hl_h, //0x75
 	TODO,    //0x76
 	TODO,    //0x77
 	ld_a_b,  //0x78
@@ -609,37 +609,37 @@ func nop() cycleCount {
 
 func ld_b_n() cycleCount {
 	// Put value of register B into the parameter address
-	// TODO: implementar
+	// TODO: to implement
 	return ld_b_nSize
 }
 
 func ld_c_n() cycleCount {
 	// Put value of register C into the parameter address
-	// TODO: implementar
+	// TODO: to implement
 	return ld_c_nSize
 }
 
 func ld_d_n() cycleCount {
 	// Put value of register D into the parameter address
-	// TODO: implementar
+	// TODO: to implement
 	return ld_d_nSize
 }
 
 func ld_e_n() cycleCount {
 	// Put value of register E into the parameter address
-	// TODO: implementar
+	// TODO: to implement
 	return ld_e_nSize
 }
 
 func ld_h_n() cycleCount {
 	// Put value of register H into the parameter address
-	// TODO: implementar
+	// TODO: to implement
 	return ld_h_nSize
 }
 
 func ld_l_n() cycleCount {
 	// Put value of register L into the parameter address
-	// TODO: implementar
+	// TODO: to implement
 	return ld_l_nSize
 }
 
@@ -652,90 +652,303 @@ func ld_l_n() cycleCount {
 
 func ld_a_a() cycleCount {
 	// Put value of register A into register A
-	// TODO: implementar
+	// TODO: to implement
 	return ld_a_aSize
 }
 
 func ld_a_b() cycleCount {
 	// Put value of register B into register A
-	// TODO: implementar
+	// TODO: to implement
 	return ld_a_bSize
 }
 
 func ld_a_c() cycleCount {
 	// Put value of register C into register A
-	// TODO: implementar
+	// TODO: to implement
 	return ld_a_cSize
 }
 
 func ld_a_d() cycleCount {
 	// Put value of register D into register A
-	// TODO: implementar
+	// TODO: to implement
 	return ld_a_dSize
 }
 
 func ld_a_e() cycleCount {
 	// Put value of register E into register A
-	// TODO: implementar
+	// TODO: to implement
 	return ld_a_eSize
 }
 
 func ld_a_h() cycleCount {
 	// Put value of register H into register A
-	// TODO: implementar
+	// TODO: to implement
 	return ld_a_hSize
 }
 
 func ld_a_l() cycleCount {
 	// Put value of register L into register A
-	// TODO: implementar
+	// TODO: to implement
 	return ld_a_lSize
 }
 
 func ld_a_hl() cycleCount {
 	// Put value of register HL into register A
-	// TODO: implementar
+	// TODO: to implement
 	return ld_a_hlSize
 }
 
 func ld_b_b() cycleCount {
 	// Put value of register B into register B
-	// TODO: implementar
+	// TODO: to implement
 	return ld_b_bSize
 }
 
 func ld_b_c() cycleCount {
 	// Put value of register C into register B
-	// TODO: implementar
+	// TODO: to implement
 	return ld_b_cSize
 }
 
 func ld_b_d() cycleCount {
 	// Put value of register D into register B
-	// TODO: implementar
+	// TODO: to implement
 	return ld_b_dSize
 }
 
 func ld_b_e() cycleCount {
 	// Put value of register E into register B
-	// TODO: implementar
+	// TODO: to implement
 	return ld_b_eSize
 }
 
 func ld_b_h() cycleCount {
 	// Put value of register H into register B
-	// TODO: implementar
+	// TODO: to implement
 	return ld_b_hSize
 }
 
 func ld_b_l() cycleCount {
 	// Put value of register L into register B
-	// TODO: implementar
+	// TODO: to implement
 	return ld_b_lSize
 }
 
 func ld_b_hl() cycleCount {
 	// Put value of register HL into register B
-	// TODO: implementar
+	// TODO: to implement
 	return ld_b_hlSize
+}
+
+func ld_c_b() cycleCount {
+	// Put value of register B into register C
+	// TODO: to implement
+	return ld_c_bSize
+}
+func ld_c_c() cycleCount {
+	// Put value of register C into register C
+	// TODO: to implement
+	return ld_c_cSize
+}
+func ld_c_d() cycleCount {
+	// Put value of register D into register C
+	// TODO: to implement
+	return ld_c_dSize
+}
+func ld_c_e() cycleCount {
+	// Put value of register E into register C
+	// TODO: to implement
+	return ld_c_eSize
+}
+func ld_c_h() cycleCount {
+	// Put value of register H into register C
+	// TODO: to implement
+	return ld_c_hSize
+}
+func ld_c_l() cycleCount {
+	// Put value of register L into register C
+	// TODO: to implement
+	return ld_c_lSize
+}
+func ld_c_hl() cycleCount {
+	// Put value of register HL into register C
+	// TODO: to implement
+	return ld_c_hlSize
+}
+func ld_d_b() cycleCount {
+	// Put value of register B into register D
+	// TODO: to implement
+	return ld_d_bSize
+}
+func ld_d_c() cycleCount {
+	// Put value of register C into register D
+	// TODO: to implement
+	return ld_d_cSize
+}
+func ld_d_d() cycleCount {
+	// Put value of register D into register D
+	// TODO: to implement
+	return ld_d_dSize
+}
+func ld_d_e() cycleCount {
+	// Put value of register E into register D
+	// TODO: to implement
+	return ld_d_eSize
+}
+func ld_d_h() cycleCount {
+	// Put value of register H into register D
+	// TODO: to implement
+	return ld_d_hSize
+}
+func ld_d_l() cycleCount {
+	// Put value of register L into register D
+	// TODO: to implement
+	return ld_d_lSize
+}
+func ld_d_hl() cycleCount {
+	// Put value of register HL into register D
+	// TODO: to implement
+	return ld_d_hlSize
+}
+func ld_e_b() cycleCount {
+	// Put value of register B into register E
+	// TODO: to implement
+	return ld_e_bSize
+}
+func ld_e_c() cycleCount {
+	// Put value of register C into register E
+	// TODO: to implement
+	return ld_e_cSize
+}
+func ld_e_d() cycleCount {
+	// Put value of register D into register E
+	// TODO: to implement
+	return ld_e_dSize
+}
+func ld_e_e() cycleCount {
+	// Put value of register E into register E
+	// TODO: to implement
+	return ld_e_eSize
+}
+func ld_e_h() cycleCount {
+	// Put value of register H into register E
+	// TODO: to implement
+	return ld_e_hSize
+}
+func ld_e_l() cycleCount {
+	// Put value of register L into register E
+	// TODO: to implement
+	return ld_e_lSize
+}
+func ld_e_hl() cycleCount {
+	// Put value of register HL into register E
+	// TODO: to implement
+	return ld_e_hlSize
+}
+func ld_h_b() cycleCount {
+	// Put value of register B into register H
+	// TODO: to implement
+	return ld_h_bSize
+}
+func ld_h_c() cycleCount {
+	// Put value of register C into register H
+	// TODO: to implement
+	return ld_h_cSize
+}
+func ld_h_d() cycleCount {
+	// Put value of register D into register H
+	// TODO: to implement
+	return ld_h_dSize
+}
+func ld_h_e() cycleCount {
+	// Put value of register H into register H
+	// TODO: to implement
+	return ld_h_eSize
+}
+func ld_h_h() cycleCount {
+	// Put value of register H into register H
+	// TODO: to implement
+	return ld_h_hSize
+}
+func ld_h_l() cycleCount {
+	// Put value of register L into register H
+	// TODO: to implement
+	return ld_h_lSize
+}
+func ld_h_hl() cycleCount {
+	// Put value of register HL into register H
+	// TODO: to implement
+	return ld_h_hlSize
+}
+func ld_l_b() cycleCount {
+	// Put value of register B into register L
+	// TODO: to implement
+	return ld_l_bSize
+}
+func ld_l_c() cycleCount {
+	// Put value of register C into register L
+	// TODO: to implement
+	return ld_l_cSize
+}
+func ld_l_d() cycleCount {
+	// Put value of register D into register L
+	// TODO: to implement
+	return ld_l_dSize
+}
+func ld_l_e() cycleCount {
+	// Put value of register E into register L
+	// TODO: to implement
+	return ld_l_eSize
+}
+func ld_l_h() cycleCount {
+	// Put value of register H into register L
+	// TODO: to implement
+	return ld_l_hSize
+}
+func ld_l_l() cycleCount {
+	// Put value of register L into register L
+	// TODO: to implement
+	return ld_l_lSize
+}
+func ld_l_hl() cycleCount {
+	// Put value of register HL into register L
+	// TODO: to implement
+	return ld_l_hlSize
+}
+func ld_hl_b() cycleCount {
+	// Put value of register B into register HL
+	// TODO: to implement
+	return ld_hl_bSize
+}
+func ld_hl_c() cycleCount {
+	// Put value of register C into register HL
+	// TODO: to implement
+	return ld_hl_cSize
+}
+func ld_hl_d() cycleCount {
+	// Put value of register D into register HL
+	// TODO: to implement
+	return ld_hl_dSize
+}
+func ld_hl_e() cycleCount {
+	// Put value of register E into register HL
+	// TODO: to implement
+	return ld_hl_eSize
+}
+func ld_hl_l() cycleCount {
+	// Put value of register L into register HL
+	// TODO: to implement
+	return ld_hl_lSize
+}
+func ld_hl_h() cycleCount {
+	// Put value of register H into register HL
+	// TODO: to implement
+	return ld_hl_hSize
+}
+
+func ld_hl_n() cycleCount {
+	// Put value of register ??? n ??? into HL
+	// TODO: to implement
+	// TODO: check what this OP does, as it
+	return ld_hl_nSize
 }

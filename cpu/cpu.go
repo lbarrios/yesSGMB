@@ -600,11 +600,11 @@ func nop(cpu *cpu) cycleCount {
 
 // 3.3.1. 8-Bit Loads
 
-// 3.3.1.1. LD nn,n
+// 3.3.1.1. LD r1,n
 // Description:
-// 		Put value nn into n.
+// 		Put value n into r1.
 // Use with:
-// 		nn = B,C,D,E,H,L,BC,DE,HL,SP
+// 		r1 = B,C,D,E,H,L
 // 		n = 8 bit immediate value
 
 func ld_b_n(cpu *cpu) cycleCount {

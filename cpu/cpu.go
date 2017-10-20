@@ -123,7 +123,7 @@ const (
 	xThreeSevenCycles = 0  // 0x37
 	xThreeEightCycles = 0  // 0x38
 	xThreeNineCycles  = 0  // 0x39
-	xThreeACycles     = 0  // 0x3A
+	ldAMemHLDCycles   = 8  // 0x3A
 	xThreeBCycles     = 0  // 0x3B
 	xThreeCCycles     = 0  // 0x3C
 	xThreeDCycles     = 0  // 0x3D
@@ -136,7 +136,7 @@ const (
 	ldBHCycles        = 4  // 0x44
 	ldBLCycles        = 4  // 0x45
 	ldBHlCycles       = 8  // 0x46
-	xFourSevenCycles  = 0  // 0x47
+	ldBACycles        = 4  // 0x47
 	ldCBCycles        = 4  // 0x48
 	ldCCCycles        = 4  // 0x49
 	ldCDCycles        = 4  // 0x4A
@@ -144,7 +144,7 @@ const (
 	ldCHCycles        = 4  // 0x4C
 	ldCLCycles        = 4  // 0x4D
 	ldCHlCycles       = 8  // 0x4E
-	xFourFCycles      = 0  // 0x4F
+	ldCACycles        = 4  // 0x4F
 	ldDBCycles        = 4  // 0x50
 	ldDCCycles        = 4  // 0x51
 	ldDDCycles        = 4  // 0x52
@@ -152,7 +152,7 @@ const (
 	ldDHCycles        = 4  // 0x54
 	ldDLCycles        = 4  // 0x55
 	ldDHlCycles       = 8  // 0x56
-	xFiveSevenCycles  = 0  // 0x57
+	ldDACycles        = 4  // 0x57
 	ldEBCycles        = 4  // 0x58
 	ldECCycles        = 4  // 0x59
 	ldEDCycles        = 4  // 0x5A
@@ -160,7 +160,7 @@ const (
 	ldEHCycles        = 4  // 0x5C
 	ldELCycles        = 4  // 0x5D
 	ldEHlCycles       = 8  // 0x5E
-	xFiveFCycles      = 0  // 0x5F
+	ldEACycles        = 4  // 0x5F
 	ldHBCycles        = 4  // 0x60
 	ldHCCycles        = 4  // 0x61
 	ldHDCycles        = 4  // 0x62
@@ -291,7 +291,7 @@ const (
 	xDFCycles         = 0  // 0xDF
 	xEZeroCycles      = 0  // 0xE0
 	xEOneCycles       = 0  // 0xE1
-	xETwoCycles       = 0  // 0xE2
+	ldStackCACycles   = 8  // 0xE2
 	xEThreeCycles     = 0  // 0xE3
 	xEFourCycles      = 0  // 0xE4
 	xEFiveCycles      = 0  // 0xE5
@@ -307,7 +307,7 @@ const (
 	xEFCycles         = 0  // 0xEF
 	xFZeroCycles      = 0  // 0xF0
 	xFOneCycles       = 0  // 0xF1
-	xFTwoCycles       = 0  // 0xF2
+	ldAStackCCycles   = 8  // 0xF2
 	xFThreeCycles     = 0  // 0xF3
 	xFFourCycles      = 0  // 0xF4
 	xFFiveCycles      = 0  // 0xF5
@@ -324,262 +324,262 @@ const (
 )
 
 var op = [0x100] instructions{
-	nop,      //0x00
-	TODO,     //0x01
-	TODO,     //0x02
-	TODO,     //0x03
-	TODO,     //0x04
-	TODO,     //0x05
-	ldBN,     //0x06
-	TODO,     //0x07
-	TODO,     //0x08
-	TODO,     //0x09
-	ldAMemBc, //0x0A
-	TODO,     //0x0B
-	TODO,     //0x0C
-	TODO,     //0x0D
-	ldCN,     //0x0E
-	TODO,     //0x0F
-	TODO,     //0x10
-	TODO,     //0x11
-	TODO,     //0x12
-	TODO,     //0x13
-	TODO,     //0x14
-	TODO,     //0x15
-	ldDN,     //0x16
-	TODO,     //0x17
-	TODO,     //0x18
-	TODO,     //0x19
-	ldAMemDe, //0x1A
-	TODO,     //0x1B
-	TODO,     //0x1C
-	TODO,     //0x1D
-	ldEN,     //0x1E
-	TODO,     //0x1F
-	TODO,     //0x20
-	TODO,     //0x21
-	TODO,     //0x22
-	TODO,     //0x23
-	TODO,     //0x24
-	TODO,     //0x25
-	ldHN,     //0x26
-	TODO,     //0x27
-	TODO,     //0x28
-	TODO,     //0x29
-	TODO,     //0x2A
-	TODO,     //0x2B
-	TODO,     //0x2C
-	TODO,     //0x2D
-	ldLN,     //0x2E
-	TODO,     //0x2F
-	TODO,     //0x30
-	TODO,     //0x31
-	TODO,     //0x32
-	TODO,     //0x33
-	TODO,     //0x34
-	TODO,     //0x35
-	ldMemHlN, //0x36
-	TODO,     //0x37
-	TODO,     //0x38
-	TODO,     //0x39
-	TODO,     //0x3A
-	TODO,     //0x3B
-	TODO,     //0x3C
-	TODO,     //0x3D
-	ldAN,     //0x3E
-	TODO,     //0x3F
-	ldBB,     //0x40
-	ldBC,     //0x41
-	ldBD,     //0x42
-	ldBE,     //0x43
-	ldBH,     //0x44
-	ldBL,     //0x45
-	ldBHl,    //0x46
-	TODO,     //0x47
-	ldCB,     //0x48
-	ldCC,     //0x49
-	ldCD,     //0x4A
-	ldCE,     //0x4B
-	ldCH,     //0x4C
-	ldCL,     //0x4D
-	ldCHl,    //0x4E
-	TODO,     //0x4F
-	ldDB,     //0x50
-	ldDC,     //0x51
-	ldDD,     //0x52
-	ldDE,     //0x53
-	ldDH,     //0x54
-	ldDL,     //0x55
-	ldDHl,    //0x56
-	TODO,     //0x57
-	ldEB,     //0x58
-	ldEC,     //0x59
-	ldED,     //0x5A
-	ldEE,     //0x5B
-	ldEH,     //0x5C
-	ldEL,     //0x5D
-	ldEHl,    //0x5E
-	TODO,     //0x5F
-	ldHB,     //0x60
-	ldHC,     //0x61
-	ldHD,     //0x62
-	ldHE,     //0x63
-	ldHH,     //0x64
-	ldHL,     //0x65
-	ldHHl,    //0x66
-	TODO,     //0x67
-	ldLB,     //0x68
-	ldLC,     //0x69
-	ldLD,     //0x6A
-	ldLE,     //0x6B
-	ldLH,     //0x6C
-	ldLL,     //0x6D
-	ldLHl,    //0x6E
-	TODO,     //0x6F
-	ldMemHlB, //0x70
-	ldMemHlC, //0x71
-	ldMemHlD, //0x72
-	ldMemHlE, //0x73
-	ldMemHlL, //0x74
-	ldMemHlH, //0x75
-	TODO,     //0x76
-	TODO,     //0x77
-	ldAB,     //0x78
-	ldAC,     //0x79
-	ldAD,     //0x7A
-	ldAE,     //0x7B
-	ldAH,     //0x7C
-	ldAL,     //0x7D
-	ldAMemHl, //0x7E
-	ldAA,     //0x7F
-	TODO,     //0x80
-	TODO,     //0x81
-	TODO,     //0x82
-	TODO,     //0x83
-	TODO,     //0x84
-	TODO,     //0x85
-	TODO,     //0x86
-	TODO,     //0x87
-	TODO,     //0x88
-	TODO,     //0x89
-	TODO,     //0x8A
-	TODO,     //0x8B
-	TODO,     //0x8C
-	TODO,     //0x8D
-	TODO,     //0x8E
-	TODO,     //0x8F
-	TODO,     //0x90
-	TODO,     //0x91
-	TODO,     //0x92
-	TODO,     //0x93
-	TODO,     //0x94
-	TODO,     //0x95
-	TODO,     //0x96
-	TODO,     //0x97
-	TODO,     //0x98
-	TODO,     //0x99
-	TODO,     //0x9A
-	TODO,     //0x9B
-	TODO,     //0x9C
-	TODO,     //0x9D
-	TODO,     //0x9E
-	TODO,     //0x9F
-	TODO,     //0xA0
-	TODO,     //0xA1
-	TODO,     //0xA2
-	TODO,     //0xA3
-	TODO,     //0xA4
-	TODO,     //0xA5
-	TODO,     //0xA6
-	TODO,     //0xA7
-	TODO,     //0xA8
-	TODO,     //0xA9
-	TODO,     //0xAA
-	TODO,     //0xAB
-	TODO,     //0xAC
-	TODO,     //0xAD
-	TODO,     //0xAE
-	TODO,     //0xAF
-	TODO,     //0xB0
-	TODO,     //0xB1
-	TODO,     //0xB2
-	TODO,     //0xB3
-	TODO,     //0xB4
-	TODO,     //0xB5
-	TODO,     //0xB6
-	TODO,     //0xB7
-	TODO,     //0xB8
-	TODO,     //0xB9
-	TODO,     //0xBA
-	TODO,     //0xBB
-	TODO,     //0xBC
-	TODO,     //0xBD
-	TODO,     //0xBE
-	TODO,     //0xBF
-	TODO,     //0xC0
-	TODO,     //0xC1
-	TODO,     //0xC2
-	TODO,     //0xC3
-	TODO,     //0xC4
-	TODO,     //0xC5
-	TODO,     //0xC6
-	TODO,     //0xC7
-	TODO,     //0xC8
-	TODO,     //0xC9
-	TODO,     //0xCA
-	TODO,     //0xCB
-	TODO,     //0xCC
-	TODO,     //0xCD
-	TODO,     //0xCE
-	TODO,     //0xCF
-	TODO,     //0xD0
-	TODO,     //0xD1
-	TODO,     //0xD2
-	TODO,     //0xD3
-	TODO,     //0xD4
-	TODO,     //0xD5
-	TODO,     //0xD6
-	TODO,     //0xD7
-	TODO,     //0xD8
-	TODO,     //0xD9
-	TODO,     //0xDA
-	TODO,     //0xDB
-	TODO,     //0xDC
-	TODO,     //0xDD
-	TODO,     //0xDE
-	TODO,     //0xDF
-	TODO,     //0xE0
-	TODO,     //0xE1
-	TODO,     //0xE2
-	TODO,     //0xE3
-	TODO,     //0xE4
-	TODO,     //0xE5
-	TODO,     //0xE6
-	TODO,     //0xE7
-	TODO,     //0xE8
-	TODO,     //0xE9
-	TODO,     //0xEA
-	TODO,     //0xEB
-	TODO,     //0xEC
-	TODO,     //0xED
-	TODO,     //0xEE
-	TODO,     //0xEF
-	TODO,     //0xF0
-	TODO,     //0xF1
-	TODO,     //0xF2
-	TODO,     //0xF3
-	TODO,     //0xF4
-	TODO,     //0xF5
-	TODO,     //0xF6
-	TODO,     //0xF7
-	TODO,     //0xF8
-	TODO,     //0xF9
-	ldAMemNn, //0xFA
-	TODO,     //0xFB
-	TODO,     //0xFC
-	TODO,     //0xFD
-	TODO,     //0xFE
-	TODO,     //0xFF
+	nop,       //0x00
+	TODO,      //0x01
+	TODO,      //0x02
+	TODO,      //0x03
+	TODO,      //0x04
+	TODO,      //0x05
+	ldBN,      //0x06
+	TODO,      //0x07
+	TODO,      //0x08
+	TODO,      //0x09
+	ldAMemBc,  //0x0A
+	TODO,      //0x0B
+	TODO,      //0x0C
+	TODO,      //0x0D
+	ldCN,      //0x0E
+	TODO,      //0x0F
+	TODO,      //0x10
+	TODO,      //0x11
+	TODO,      //0x12
+	TODO,      //0x13
+	TODO,      //0x14
+	TODO,      //0x15
+	ldDN,      //0x16
+	TODO,      //0x17
+	TODO,      //0x18
+	TODO,      //0x19
+	ldAMemDe,  //0x1A
+	TODO,      //0x1B
+	TODO,      //0x1C
+	TODO,      //0x1D
+	ldEN,      //0x1E
+	TODO,      //0x1F
+	TODO,      //0x20
+	TODO,      //0x21
+	TODO,      //0x22
+	TODO,      //0x23
+	TODO,      //0x24
+	TODO,      //0x25
+	ldHN,      //0x26
+	TODO,      //0x27
+	TODO,      //0x28
+	TODO,      //0x29
+	TODO,      //0x2A
+	TODO,      //0x2B
+	TODO,      //0x2C
+	TODO,      //0x2D
+	ldLN,      //0x2E
+	TODO,      //0x2F
+	TODO,      //0x30
+	TODO,      //0x31
+	TODO,      //0x32
+	TODO,      //0x33
+	TODO,      //0x34
+	TODO,      //0x35
+	ldMemHlN,  //0x36
+	TODO,      //0x37
+	TODO,      //0x38
+	TODO,      //0x39
+	ldAMemHLD, //0x3A
+	TODO,      //0x3B
+	TODO,      //0x3C
+	TODO,      //0x3D
+	ldAN,      //0x3E
+	TODO,      //0x3F
+	ldBB,      //0x40
+	ldBC,      //0x41
+	ldBD,      //0x42
+	ldBE,      //0x43
+	ldBH,      //0x44
+	ldBL,      //0x45
+	ldBHl,     //0x46
+	ldBA,      //0x47
+	ldCB,      //0x48
+	ldCC,      //0x49
+	ldCD,      //0x4A
+	ldCE,      //0x4B
+	ldCH,      //0x4C
+	ldCL,      //0x4D
+	ldCHl,     //0x4E
+	ldCA,      //0x4F
+	ldDB,      //0x50
+	ldDC,      //0x51
+	ldDD,      //0x52
+	ldDE,      //0x53
+	ldDH,      //0x54
+	ldDL,      //0x55
+	ldDHl,     //0x56
+	ldDA,      //0x57
+	ldEB,      //0x58
+	ldEC,      //0x59
+	ldED,      //0x5A
+	ldEE,      //0x5B
+	ldEH,      //0x5C
+	ldEL,      //0x5D
+	ldEHl,     //0x5E
+	ldEA,      //0x5F
+	ldHB,      //0x60
+	ldHC,      //0x61
+	ldHD,      //0x62
+	ldHE,      //0x63
+	ldHH,      //0x64
+	ldHL,      //0x65
+	ldHHl,     //0x66
+	TODO,      //0x67
+	ldLB,      //0x68
+	ldLC,      //0x69
+	ldLD,      //0x6A
+	ldLE,      //0x6B
+	ldLH,      //0x6C
+	ldLL,      //0x6D
+	ldLHl,     //0x6E
+	TODO,      //0x6F
+	ldMemHlB,  //0x70
+	ldMemHlC,  //0x71
+	ldMemHlD,  //0x72
+	ldMemHlE,  //0x73
+	ldMemHlL,  //0x74
+	ldMemHlH,  //0x75
+	TODO,      //0x76
+	TODO,      //0x77
+	ldAB,      //0x78
+	ldAC,      //0x79
+	ldAD,      //0x7A
+	ldAE,      //0x7B
+	ldAH,      //0x7C
+	ldAL,      //0x7D
+	ldAMemHl,  //0x7E
+	ldAA,      //0x7F
+	TODO,      //0x80
+	TODO,      //0x81
+	TODO,      //0x82
+	TODO,      //0x83
+	TODO,      //0x84
+	TODO,      //0x85
+	TODO,      //0x86
+	TODO,      //0x87
+	TODO,      //0x88
+	TODO,      //0x89
+	TODO,      //0x8A
+	TODO,      //0x8B
+	TODO,      //0x8C
+	TODO,      //0x8D
+	TODO,      //0x8E
+	TODO,      //0x8F
+	TODO,      //0x90
+	TODO,      //0x91
+	TODO,      //0x92
+	TODO,      //0x93
+	TODO,      //0x94
+	TODO,      //0x95
+	TODO,      //0x96
+	TODO,      //0x97
+	TODO,      //0x98
+	TODO,      //0x99
+	TODO,      //0x9A
+	TODO,      //0x9B
+	TODO,      //0x9C
+	TODO,      //0x9D
+	TODO,      //0x9E
+	TODO,      //0x9F
+	TODO,      //0xA0
+	TODO,      //0xA1
+	TODO,      //0xA2
+	TODO,      //0xA3
+	TODO,      //0xA4
+	TODO,      //0xA5
+	TODO,      //0xA6
+	TODO,      //0xA7
+	TODO,      //0xA8
+	TODO,      //0xA9
+	TODO,      //0xAA
+	TODO,      //0xAB
+	TODO,      //0xAC
+	TODO,      //0xAD
+	TODO,      //0xAE
+	TODO,      //0xAF
+	TODO,      //0xB0
+	TODO,      //0xB1
+	TODO,      //0xB2
+	TODO,      //0xB3
+	TODO,      //0xB4
+	TODO,      //0xB5
+	TODO,      //0xB6
+	TODO,      //0xB7
+	TODO,      //0xB8
+	TODO,      //0xB9
+	TODO,      //0xBA
+	TODO,      //0xBB
+	TODO,      //0xBC
+	TODO,      //0xBD
+	TODO,      //0xBE
+	TODO,      //0xBF
+	TODO,      //0xC0
+	TODO,      //0xC1
+	TODO,      //0xC2
+	TODO,      //0xC3
+	TODO,      //0xC4
+	TODO,      //0xC5
+	TODO,      //0xC6
+	TODO,      //0xC7
+	TODO,      //0xC8
+	TODO,      //0xC9
+	TODO,      //0xCA
+	TODO,      //0xCB
+	TODO,      //0xCC
+	TODO,      //0xCD
+	TODO,      //0xCE
+	TODO,      //0xCF
+	TODO,      //0xD0
+	TODO,      //0xD1
+	TODO,      //0xD2
+	TODO,      //0xD3
+	TODO,      //0xD4
+	TODO,      //0xD5
+	TODO,      //0xD6
+	TODO,      //0xD7
+	TODO,      //0xD8
+	TODO,      //0xD9
+	TODO,      //0xDA
+	TODO,      //0xDB
+	TODO,      //0xDC
+	TODO,      //0xDD
+	TODO,      //0xDE
+	TODO,      //0xDF
+	TODO,      //0xE0
+	TODO,      //0xE1
+	ldStackCA, //0xE2
+	TODO,      //0xE3
+	TODO,      //0xE4
+	TODO,      //0xE5
+	TODO,      //0xE6
+	TODO,      //0xE7
+	TODO,      //0xE8
+	TODO,      //0xE9
+	TODO,      //0xEA
+	TODO,      //0xEB
+	TODO,      //0xEC
+	TODO,      //0xED
+	TODO,      //0xEE
+	TODO,      //0xEF
+	TODO,      //0xF0
+	TODO,      //0xF1
+	ldAStackC, //0xF2
+	TODO,      //0xF3
+	TODO,      //0xF4
+	TODO,      //0xF5
+	TODO,      //0xF6
+	TODO,      //0xF7
+	TODO,      //0xF8
+	TODO,      //0xF9
+	ldAMemNn,  //0xFA
+	TODO,      //0xFB
+	TODO,      //0xFC
+	TODO,      //0xFD
+	TODO,      //0xFE
+	TODO,      //0xFF
 }
 
 func TODO(cpu *cpu) cycleCount {
@@ -953,7 +953,7 @@ func ldMemHlN(cpu *cpu) cycleCount {
 	return ldMemHlNCycles
 }
 
-// 3. LD A,n
+// 3.3.1.3. LD A,n
 // Description:
 // 		Put value n into A.
 // Use with:
@@ -961,25 +961,25 @@ func ldMemHlN(cpu *cpu) cycleCount {
 // 		nn = two byte immediate value. (LS byte first.)
 
 func ldAMemBc(cpu *cpu) cycleCount {
-	// Put the value into te position of memory indicated by register BC into register A
+	// Put the value into the position of memory indicated by register BC into register A
 	// TODO: to implement
 	return ldAMemBcCycles
 }
 
 func ldAMemDe(cpu *cpu) cycleCount {
-	// Put the value into te position of memory indicated by register BC into register A
+	// Put the value into the position of memory indicated by register BC into register A
 	// TODO: to implement
 	return ldAMemDeCycles
 }
 
 func ldAMemHl(cpu *cpu) cycleCount {
-	// Put the value into te position of memory indicated by register BC into register A
+	// Put the value into the position of memory indicated by register BC into register A
 	// TODO: to implement
 	return ldAMemHlCycles
 }
 
 func ldAMemNn(cpu *cpu) cycleCount {
-	// Put the value into te position of memory indicated by immediate value NN into register A
+	// Put the value into the position of memory indicated by immediate value NN into register A
 	// TODO: to implement
 	return ldAMemNnCycles
 }
@@ -988,4 +988,72 @@ func ldAN(cpu *cpu) cycleCount {
 	// Put the immediate value N into register A
 	// TODO: to implement
 	return ldANCycles
+}
+
+// 3.3.1.4. LD n,A
+// Description:
+// 		Put value A into n.
+// Use with:
+// 		n = A,B,C,D,E,H,L,(BC),(DE),(HL),(nn)
+// 		nn = two byte immediate value. (LS byte first.)
+
+func ldBA(cpu *cpu) cycleCount {
+	// Put the value of register A into register B
+	cpu.r.bc.b = cpu.r.af.a
+	return ldBACycles
+}
+
+func ldCA(cpu *cpu) cycleCount {
+	// Put the value of register A into register B
+	cpu.r.bc.c = cpu.r.af.a
+	return ldCACycles
+}
+func ldDA(cpu *cpu) cycleCount {
+	// Put the value of register A into register B
+	cpu.r.de.d = cpu.r.af.a
+	return ldDACycles
+}
+func ldEA(cpu *cpu) cycleCount {
+	// Put the value of register A into register B
+	cpu.r.de.e = cpu.r.af.a
+	return ldEACycles
+}
+
+// 3.3.1.5. LD A,(C)
+// Description:
+// 		Put value at address $FF00 + register C into A.
+// Same as: LD A,($FF00+C)
+
+func ldAStackC(cpu *cpu) cycleCount {
+	// Put the value from the position of memory (0xFF00+BC) into register A
+	// TODO: to implement
+	return ldAStackCCycles
+}
+
+// 3.3.1.6. LD (C),A
+// Description:
+//		Put A into address $FF00 + register C.
+
+func ldStackCA(cpu *cpu) cycleCount {
+	// Put the value from the register A into the position of memory (0xFF00+BC)
+	// TODO: to implement
+	return ldStackCACycles
+}
+
+// 3.3.1.7. LD A,(HLD)
+// Description: Same as: LDD A,(HL)
+
+// 3.3.1.8. LD A,(HL-)
+// Description: Same as: LDD A,(HL)
+
+// 3.3.1.9. LDD A,(HL)
+// Description:
+// 		Put value at address HL into A. Decrement HL.
+// Same as: LD A,(HL) - DEC HL
+
+func ldAMemHLD(cpu *cpu) cycleCount {
+	// Put the value from the position of memory in HL into the register A.
+	// Then, decrement HL.
+	// TODO: to implement
+	return ldAMemHLDCycles
 }

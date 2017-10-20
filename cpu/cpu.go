@@ -608,37 +608,37 @@ func nop(cpu *cpu) cycleCount {
 // 		n = 8 bit immediate value
 
 func ld_b_n(cpu *cpu) cycleCount {
-	// Put value of register B into the parameter address
+	// Put value of the immediate value n into register B
 	// TODO: to implement
 	return ld_b_nSize
 }
 
 func ld_c_n(cpu *cpu) cycleCount {
-	// Put value of register C into the parameter address
+	// Put value of the immediate value n into register C
 	// TODO: to implement
 	return ld_c_nSize
 }
 
 func ld_d_n(cpu *cpu) cycleCount {
-	// Put value of register D into the parameter address
+	// Put value of the immediate value n into register D
 	// TODO: to implement
 	return ld_d_nSize
 }
 
 func ld_e_n(cpu *cpu) cycleCount {
-	// Put value of register E into the parameter address
+	// Put value of the immediate value n into register E
 	// TODO: to implement
 	return ld_e_nSize
 }
 
 func ld_h_n(cpu *cpu) cycleCount {
-	// Put value of register H into the parameter address
+	// Put value of the immediate value n into register H
 	// TODO: to implement
 	return ld_h_nSize
 }
 
 func ld_l_n(cpu *cpu) cycleCount {
-	// Put value of register L into the parameter address
+	// Put value of the immediate value n into register L
 	// TODO: to implement
 	return ld_l_nSize
 }
@@ -813,32 +813,32 @@ func ld_d_hl(cpu *cpu) cycleCount {
 }
 func ld_e_b(cpu *cpu) cycleCount {
 	// Put value of register B into register E
-	// TODO: to implement
+	cpu.r.de.e = cpu.r.bc.b
 	return ld_e_bSize
 }
 func ld_e_c(cpu *cpu) cycleCount {
 	// Put value of register C into register E
-	// TODO: to implement
+	cpu.r.de.e = cpu.r.bc.c
 	return ld_e_cSize
 }
 func ld_e_d(cpu *cpu) cycleCount {
 	// Put value of register D into register E
-	// TODO: to implement
+	cpu.r.de.e = cpu.r.de.d
 	return ld_e_dSize
 }
 func ld_e_e(cpu *cpu) cycleCount {
 	// Put value of register E into register E
-	// TODO: to implement
+	cpu.r.de.e = cpu.r.de.e
 	return ld_e_eSize
 }
 func ld_e_h(cpu *cpu) cycleCount {
 	// Put value of register H into register E
-	// TODO: to implement
+	cpu.r.de.e = cpu.r.hl.h
 	return ld_e_hSize
 }
 func ld_e_l(cpu *cpu) cycleCount {
 	// Put value of register L into register E
-	// TODO: to implement
+	cpu.r.de.e = cpu.r.hl.l
 	return ld_e_lSize
 }
 func ld_e_hl(cpu *cpu) cycleCount {
@@ -848,32 +848,32 @@ func ld_e_hl(cpu *cpu) cycleCount {
 }
 func ld_h_b(cpu *cpu) cycleCount {
 	// Put value of register B into register H
-	// TODO: to implement
+	cpu.r.hl.h = cpu.r.bc.b
 	return ld_h_bSize
 }
 func ld_h_c(cpu *cpu) cycleCount {
 	// Put value of register C into register H
-	// TODO: to implement
+	cpu.r.hl.h = cpu.r.bc.c
 	return ld_h_cSize
 }
 func ld_h_d(cpu *cpu) cycleCount {
 	// Put value of register D into register H
-	// TODO: to implement
+	cpu.r.hl.h = cpu.r.de.d
 	return ld_h_dSize
 }
 func ld_h_e(cpu *cpu) cycleCount {
 	// Put value of register H into register H
-	// TODO: to implement
+	cpu.r.hl.h = cpu.r.de.e
 	return ld_h_eSize
 }
 func ld_h_h(cpu *cpu) cycleCount {
 	// Put value of register H into register H
-	// TODO: to implement
+	cpu.r.hl.h = cpu.r.hl.h
 	return ld_h_hSize
 }
 func ld_h_l(cpu *cpu) cycleCount {
 	// Put value of register L into register H
-	// TODO: to implement
+	cpu.r.hl.h = cpu.r.hl.l
 	return ld_h_lSize
 }
 func ld_h_hl(cpu *cpu) cycleCount {
@@ -883,32 +883,32 @@ func ld_h_hl(cpu *cpu) cycleCount {
 }
 func ld_l_b(cpu *cpu) cycleCount {
 	// Put value of register B into register L
-	// TODO: to implement
+	cpu.r.hl.l = cpu.r.bc.b
 	return ld_l_bSize
 }
 func ld_l_c(cpu *cpu) cycleCount {
 	// Put value of register C into register L
-	// TODO: to implement
+	cpu.r.hl.l = cpu.r.bc.c
 	return ld_l_cSize
 }
 func ld_l_d(cpu *cpu) cycleCount {
 	// Put value of register D into register L
-	// TODO: to implement
+	cpu.r.hl.l = cpu.r.de.d
 	return ld_l_dSize
 }
 func ld_l_e(cpu *cpu) cycleCount {
 	// Put value of register E into register L
-	// TODO: to implement
+	cpu.r.hl.l = cpu.r.de.e
 	return ld_l_eSize
 }
 func ld_l_h(cpu *cpu) cycleCount {
 	// Put value of register H into register L
-	// TODO: to implement
+	cpu.r.hl.l = cpu.r.hl.h
 	return ld_l_hSize
 }
 func ld_l_l(cpu *cpu) cycleCount {
 	// Put value of register L into register L
-	// TODO: to implement
+	cpu.r.hl.l = cpu.r.hl.l
 	return ld_l_lSize
 }
 func ld_l_hl(cpu *cpu) cycleCount {
@@ -948,8 +948,7 @@ func ld_hl_h(cpu *cpu) cycleCount {
 }
 
 func ld_hl_n(cpu *cpu) cycleCount {
-	// Put value of register ??? n ??? into the position of memory indicated by register HL
+	// Put value of register the immediate value n into the position of memory indicated by register HL
 	// TODO: to implement
-	// TODO: check what this OP does, as it
 	return ld_hl_nSize
 }

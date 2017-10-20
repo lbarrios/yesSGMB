@@ -75,7 +75,7 @@ const (
 	xZeroSevenCycles  = 0  // 0x07
 	xZeroEightCycles  = 0  // 0x08
 	xZeroNineCycles   = 0  // 0x09
-	ldAMemBc          = 8  // 0x0A
+	ldAMemBcCycles    = 8  // 0x0A
 	xZeroBCycles      = 0  // 0x0B
 	xZeroCCycles      = 0  // 0x0C
 	xZeroDCycles      = 0  // 0x0D
@@ -91,7 +91,7 @@ const (
 	xOneSevenCycles   = 0  // 0x17
 	xOneEightCycles   = 0  // 0x18
 	xOneNineCycles    = 0  // 0x19
-	ldAMemDE          = 8  // 0x1A
+	ldAMemDeCycles    = 8  // 0x1A
 	xOneBCycles       = 0  // 0x1B
 	xOneCCycles       = 0  // 0x1C
 	xOneDCycles       = 0  // 0x1D
@@ -127,7 +127,7 @@ const (
 	xThreeBCycles     = 0  // 0x3B
 	xThreeCCycles     = 0  // 0x3C
 	xThreeDCycles     = 0  // 0x3D
-	xThreeECycles     = 0  // 0x3E
+	ldANCycles        = 0  // 0x3E
 	xThreeFCycles     = 0  // 0x3F
 	ldBBCycles        = 4  // 0x40
 	ldBCCycles        = 4  // 0x41
@@ -192,7 +192,7 @@ const (
 	ldAHCycles        = 4  // 0x7C
 	ldALCycles        = 4  // 0x7D
 	ldAMemHlCycles    = 8  // 0x7E
-	ld_a_aCycles      = 4  // 0x7F
+	ldAACycles        = 4  // 0x7F
 	xEightZeroCycles  = 0  // 0x80
 	xEightOneCycles   = 0  // 0x81
 	xEightTwoCycles   = 0  // 0x82
@@ -315,7 +315,7 @@ const (
 	xFSevenCycles     = 0  // 0xF7
 	xFEightCycles     = 0  // 0xF8
 	xFNineCycles      = 0  // 0xF9
-	xFACycles         = 0  // 0xFA
+	ldAMemNnCycles    = 16 // 0xFA
 	xFBCycles         = 0  // 0xFB
 	xFCCycles         = 0  // 0xFC
 	xFDCycles         = 0  // 0xFD
@@ -334,7 +334,7 @@ var op = [0x100] instructions{
 	TODO,     //0x07
 	TODO,     //0x08
 	TODO,     //0x09
-	TODO,     //0x0A
+	ldAMemBc, //0x0A
 	TODO,     //0x0B
 	TODO,     //0x0C
 	TODO,     //0x0D
@@ -350,7 +350,7 @@ var op = [0x100] instructions{
 	TODO,     //0x17
 	TODO,     //0x18
 	TODO,     //0x19
-	TODO,     //0x1A
+	ldAMemDe, //0x1A
 	TODO,     //0x1B
 	TODO,     //0x1C
 	TODO,     //0x1D
@@ -386,7 +386,7 @@ var op = [0x100] instructions{
 	TODO,     //0x3B
 	TODO,     //0x3C
 	TODO,     //0x3D
-	TODO,     //0x3E
+	ldAN,     //0x3E
 	TODO,     //0x3F
 	ldBB,     //0x40
 	ldBC,     //0x41
@@ -450,8 +450,8 @@ var op = [0x100] instructions{
 	ldAE,     //0x7B
 	ldAH,     //0x7C
 	ldAL,     //0x7D
-	ldAHl,    //0x7E
-	ld_a_a,   //0x7F
+	ldAMemHl, //0x7E
+	ldAA,     //0x7F
 	TODO,     //0x80
 	TODO,     //0x81
 	TODO,     //0x82
@@ -574,7 +574,7 @@ var op = [0x100] instructions{
 	TODO,     //0xF7
 	TODO,     //0xF8
 	TODO,     //0xF9
-	TODO,     //0xFA
+	ldAMemNn, //0xFA
 	TODO,     //0xFB
 	TODO,     //0xFC
 	TODO,     //0xFD
@@ -650,10 +650,10 @@ func ldLN(cpu *cpu) cycleCount {
 // 		r1 = A,B,C,D,E,H,L,(HL)
 //		r2 = A,B,C,D,E,H,L,(HL)
 
-func ld_a_a(cpu *cpu) cycleCount {
+func ldAA(cpu *cpu) cycleCount {
 	// Put value of register A into register A
 	cpu.r.af.a = cpu.r.af.a
-	return ld_a_aCycles
+	return ldAACycles
 }
 
 func ldAB(cpu *cpu) cycleCount {
@@ -948,7 +948,7 @@ func ldMemHlH(cpu *cpu) cycleCount {
 }
 
 func ldMemHlN(cpu *cpu) cycleCount {
-	// Put value of register the immediate value n into the position of memory indicated by register HL
+	// Put the immediate value n into the position of memory indicated by register HL
 	// TODO: to implement
 	return ldMemHlNCycles
 }
@@ -959,3 +959,33 @@ func ldMemHlN(cpu *cpu) cycleCount {
 // Use with:
 // 		n = A,B,C,D,E,H,L,(BC),(DE),(HL),(nn),#
 // 		nn = two byte immediate value. (LS byte first.)
+
+func ldAMemBc(cpu *cpu) cycleCount {
+	// Put the value into te position of memory indicated by register BC into register A
+	// TODO: to implement
+	return ldAMemBcCycles
+}
+
+func ldAMemDe(cpu *cpu) cycleCount {
+	// Put the value into te position of memory indicated by register BC into register A
+	// TODO: to implement
+	return ldAMemDeCycles
+}
+
+func ldAMemHl(cpu *cpu) cycleCount {
+	// Put the value into te position of memory indicated by register BC into register A
+	// TODO: to implement
+	return ldAMemHlCycles
+}
+
+func ldAMemNn(cpu *cpu) cycleCount {
+	// Put the value into te position of memory indicated by immediate value NN into register A
+	// TODO: to implement
+	return ldAMemNnCycles
+}
+
+func ldAN(cpu *cpu) cycleCount {
+	// Put the immediate value N into register A
+	// TODO: to implement
+	return ldANCycles
+}

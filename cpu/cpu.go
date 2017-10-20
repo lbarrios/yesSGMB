@@ -41,7 +41,7 @@ type cycleCount int
 type instructions func(*cpu) cycleCount
 
 type cpu struct {
-	r  Registers
+	r Registers
 }
 
 func NewCPU() *cpu {
@@ -322,8 +322,6 @@ const (
 	xFESize         = 0  // 0xFE
 	xFFSize         = 0  // 0xFF
 )
-
-
 
 var op = [0x100] instructions{
 	nop,     //0x00
@@ -695,7 +693,7 @@ func ld_a_l(cpu *cpu) cycleCount {
 }
 
 func ld_a_hl(cpu *cpu) cycleCount {
-	// Put value of register HL into register A
+	// Put value of the position of memory indicated by register HL into register A
 	// TODO: how to implement this?
 	//cpu.r.af.a = cpu.r.hl
 	return ld_a_hlSize
@@ -738,7 +736,7 @@ func ld_b_l(cpu *cpu) cycleCount {
 }
 
 func ld_b_hl(cpu *cpu) cycleCount {
-	// Put value of register HL into register B
+	// Put value of the position of memory indicated by register HL into register B
 	// TODO: how to implement this?
 	return ld_b_hlSize
 }
@@ -774,7 +772,7 @@ func ld_c_l(cpu *cpu) cycleCount {
 	return ld_c_lSize
 }
 func ld_c_hl(cpu *cpu) cycleCount {
-	// Put value of register HL into register C
+	// Put value of the position of memory indicated by register HL into register C
 	// TODO: how to implement this?
 	return ld_c_hlSize
 }
@@ -809,7 +807,7 @@ func ld_d_l(cpu *cpu) cycleCount {
 	return ld_d_lSize
 }
 func ld_d_hl(cpu *cpu) cycleCount {
-	// Put value of register HL into register D
+	// Put value of the position of memory indicated by register HL into register D
 	// TODO: how to implement this?
 	return ld_d_hlSize
 }
@@ -844,7 +842,7 @@ func ld_e_l(cpu *cpu) cycleCount {
 	return ld_e_lSize
 }
 func ld_e_hl(cpu *cpu) cycleCount {
-	// Put value of register HL into register E
+	// Put value of the position of memory indicated by register HL into register E
 	// TODO: to implement
 	return ld_e_hlSize
 }
@@ -879,7 +877,7 @@ func ld_h_l(cpu *cpu) cycleCount {
 	return ld_h_lSize
 }
 func ld_h_hl(cpu *cpu) cycleCount {
-	// Put value of register HL into register H
+	// Put value of the position of memory indicated by register HL into register H
 	// TODO: to implement
 	return ld_h_hlSize
 }
@@ -914,43 +912,43 @@ func ld_l_l(cpu *cpu) cycleCount {
 	return ld_l_lSize
 }
 func ld_l_hl(cpu *cpu) cycleCount {
-	// Put value of register HL into register L
+	// Put value of the position of memory indicated by register HL into register L
 	// TODO: to implement
 	return ld_l_hlSize
 }
 func ld_hl_b(cpu *cpu) cycleCount {
-	// Put value of register B into register HL
+	// Put value of register B into the position of memory indicated by register HL
 	// TODO: to implement
 	return ld_hl_bSize
 }
 func ld_hl_c(cpu *cpu) cycleCount {
-	// Put value of register C into register HL
+	// Put value of register C into the position of memory indicated by register HL
 	// TODO: to implement
 	return ld_hl_cSize
 }
 func ld_hl_d(cpu *cpu) cycleCount {
-	// Put value of register D into register HL
+	// Put value of register D into the position of memory indicated by register HL
 	// TODO: to implement
 	return ld_hl_dSize
 }
 func ld_hl_e(cpu *cpu) cycleCount {
-	// Put value of register E into register HL
+	// Put value of register E into the position of memory indicated by register HL
 	// TODO: to implement
 	return ld_hl_eSize
 }
 func ld_hl_l(cpu *cpu) cycleCount {
-	// Put value of register L into register HL
+	// Put value of register L into the position of memory indicated by register HL
 	// TODO: to implement
 	return ld_hl_lSize
 }
 func ld_hl_h(cpu *cpu) cycleCount {
-	// Put value of register H into register HL
+	// Put value of register H into the position of memory indicated by register HL
 	// TODO: to implement
 	return ld_hl_hSize
 }
 
 func ld_hl_n(cpu *cpu) cycleCount {
-	// Put value of register ??? n ??? into HL
+	// Put value of register ??? n ??? into the position of memory indicated by register HL
 	// TODO: to implement
 	// TODO: check what this OP does, as it
 	return ld_hl_nSize

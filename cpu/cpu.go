@@ -16,27 +16,6 @@ type Flags struct {
 	_ bool // to complete 1 byte
 }
 
-type Registers struct {
-	af struct {
-		a byte  // high
-		f Flags // low - flags - not accessible by programmer
-	}
-	bc struct {
-		b byte // high
-		c byte // low
-	}
-	de struct {
-		d byte // high
-		e byte // low
-	}
-	hl struct {
-		h byte // high
-		l byte // low
-	}
-	sp int // stack pointer
-	pc int // program counter
-}
-
 type cycleCount int
 type instructions func(*cpu) cycleCount
 
@@ -314,7 +293,7 @@ const (
 	xFSixCycles       = 0  // 0xF6
 	xFSevenCycles     = 0  // 0xF7
 	xFEightCycles     = 0  // 0xF8
-	xFNineCycles      = 0  // 0xF9
+	ldSpHlCycles      = 0  // 0xF9
 	ldAMemNnCycles    = 16 // 0xFA
 	xFBCycles         = 0  // 0xFB
 	xFCCycles         = 0  // 0xFC
@@ -573,7 +552,7 @@ var op = [0x100] instructions{
 	TODO,      //0xF6
 	TODO,      //0xF7
 	TODO,      //0xF8
-	TODO,      //0xF9
+	ldSpHl,      //0xF9
 	ldAMemNn,  //0xFA
 	TODO,      //0xFB
 	TODO,      //0xFC
@@ -1173,7 +1152,7 @@ func ldSpNn(cpu *cpu) cycleCount {
 
 func ldSpHl(cpu *cpu) cycleCount {
 	// Put the value of the register HL into SP.
-	cpu.r.sp = cpu.r.hl
+	cpu.r.sp = cpu.r.hlAsInt()
 	return ldSpHlCycles
 }
 

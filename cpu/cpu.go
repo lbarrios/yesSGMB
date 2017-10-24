@@ -66,7 +66,7 @@ func (cpu *cpu) Reset() {
 
 const (
 	nopCycles         = 4  // 0x00
-	xZeroOneCycles    = 0  // 0x01
+	ldBcNnCycles      = 12 // 0x01
 	xZeroTwoCycles    = 0  // 0x02
 	xZeroThreeCycles  = 0  // 0x03
 	xZeroFourCycles   = 0  // 0x04
@@ -82,7 +82,7 @@ const (
 	ldCNCycles        = 8  // 0x0E
 	xZeroFCycles      = 0  // 0x0F
 	xOneZeroCycles    = 0  // 0x10
-	xOneOneCycles     = 0  // 0x11
+	ldDeNnCycles      = 12 // 0x11
 	xOneTwoCycles     = 0  // 0x12
 	xOneThreeCycles   = 0  // 0x13
 	xOneFourCycles    = 0  // 0x14
@@ -98,8 +98,8 @@ const (
 	ldENCycles        = 8  // 0x1E
 	xOneFCycles       = 0  // 0x1F
 	xTwoZeroCycles    = 0  // 0x20
-	xTwoOneCycles     = 0  // 0x21
-	xTwoTwoCycles     = 0  // 0x22
+	ldHlNnCycles      = 12 // 0x21
+	ldiMemHLACycles   = 8  // 0x22
 	xTwoThreeCycles   = 0  // 0x23
 	xTwoFourCycles    = 0  // 0x24
 	xTwoFiveCycles    = 0  // 0x25
@@ -107,15 +107,15 @@ const (
 	xTwoSevenCycles   = 0  // 0x27
 	xTwoEightCycles   = 0  // 0x28
 	xTwoNineCycles    = 0  // 0x29
-	xTwoACycles       = 0  // 0x2A
+	ldiAMemHLCycles   = 8  // 0x2A
 	xTwoBCycles       = 0  // 0x2B
 	xTwoCCycles       = 0  // 0x2C
 	xTwoDCycles       = 0  // 0x2D
 	ldLNCycles        = 8  // 0x2E
 	xTwoFCycles       = 0  // 0x2F
 	xThreeZeroCycles  = 0  // 0x30
-	xThreeOneCycles   = 0  // 0x31
-	xThreeTwoCycles   = 0  // 0x32
+	ldSpNnCycles      = 12 // 0x31
+	lddMemHLACycles   = 8  // 0x32
 	xThreeThreeCycles = 0  // 0x33
 	xThreeFourCycles  = 0  // 0x34
 	xThreeFiveCycles  = 0  // 0x35
@@ -123,7 +123,7 @@ const (
 	xThreeSevenCycles = 0  // 0x37
 	xThreeEightCycles = 0  // 0x38
 	xThreeNineCycles  = 0  // 0x39
-	ldAMemHLDCycles   = 8  // 0x3A
+	lddAMemHLCycles   = 8  // 0x3A
 	xThreeBCycles     = 0  // 0x3B
 	xThreeCCycles     = 0  // 0x3C
 	xThreeDCycles     = 0  // 0x3D
@@ -289,7 +289,7 @@ const (
 	xDDCycles         = 0  // 0xDD
 	xDECycles         = 0  // 0xDE
 	xDFCycles         = 0  // 0xDF
-	xEZeroCycles      = 0  // 0xE0
+	ldStackNACycles   = 12 // 0xE0
 	xEOneCycles       = 0  // 0xE1
 	ldStackCACycles   = 8  // 0xE2
 	xEThreeCycles     = 0  // 0xE3
@@ -305,7 +305,7 @@ const (
 	xEDCycles         = 0  // 0xED
 	xEECycles         = 0  // 0xEE
 	xEFCycles         = 0  // 0xEF
-	xFZeroCycles      = 0  // 0xF0
+	ldAStackNCycles   = 12 // 0xF0
 	xFOneCycles       = 0  // 0xF1
 	ldAStackCCycles   = 8  // 0xF2
 	xFThreeCycles     = 0  // 0xF3
@@ -325,7 +325,7 @@ const (
 
 var op = [0x100] instructions{
 	nop,       //0x00
-	TODO,      //0x01
+	ldBcNn,    //0x01
 	TODO,      //0x02
 	TODO,      //0x03
 	TODO,      //0x04
@@ -341,7 +341,7 @@ var op = [0x100] instructions{
 	ldCN,      //0x0E
 	TODO,      //0x0F
 	TODO,      //0x10
-	TODO,      //0x11
+	ldDeNn,    //0x11
 	TODO,      //0x12
 	TODO,      //0x13
 	TODO,      //0x14
@@ -357,8 +357,8 @@ var op = [0x100] instructions{
 	ldEN,      //0x1E
 	TODO,      //0x1F
 	TODO,      //0x20
-	TODO,      //0x21
-	TODO,      //0x22
+	ldHlNn,    //0x21
+	ldiMemHLA, //0x22
 	TODO,      //0x23
 	TODO,      //0x24
 	TODO,      //0x25
@@ -366,15 +366,15 @@ var op = [0x100] instructions{
 	TODO,      //0x27
 	TODO,      //0x28
 	TODO,      //0x29
-	TODO,      //0x2A
+	ldiAMemHL, //0x2A
 	TODO,      //0x2B
 	TODO,      //0x2C
 	TODO,      //0x2D
 	ldLN,      //0x2E
 	TODO,      //0x2F
 	TODO,      //0x30
-	TODO,      //0x31
-	TODO,      //0x32
+	ldSpNn,    //0x31
+	lddMemHLA, //0x32
 	TODO,      //0x33
 	TODO,      //0x34
 	TODO,      //0x35
@@ -382,7 +382,7 @@ var op = [0x100] instructions{
 	TODO,      //0x37
 	TODO,      //0x38
 	TODO,      //0x39
-	ldAMemHLD, //0x3A
+	lddAMemHL, //0x3A
 	TODO,      //0x3B
 	TODO,      //0x3C
 	TODO,      //0x3D
@@ -548,7 +548,7 @@ var op = [0x100] instructions{
 	TODO,      //0xDD
 	TODO,      //0xDE
 	TODO,      //0xDF
-	TODO,      //0xE0
+	ldStackNA, //0xE0
 	TODO,      //0xE1
 	ldStackCA, //0xE2
 	TODO,      //0xE3
@@ -564,7 +564,7 @@ var op = [0x100] instructions{
 	TODO,      //0xED
 	TODO,      //0xEE
 	TODO,      //0xEF
-	TODO,      //0xF0
+	ldAStackN, //0xF0
 	TODO,      //0xF1
 	ldAStackC, //0xF2
 	TODO,      //0xF3
@@ -1051,9 +1051,142 @@ func ldStackCA(cpu *cpu) cycleCount {
 // 		Put value at address HL into A. Decrement HL.
 // Same as: LD A,(HL) - DEC HL
 
-func ldAMemHLD(cpu *cpu) cycleCount {
+func lddAMemHL(cpu *cpu) cycleCount {
 	// Put the value from the position of memory in HL into the register A.
 	// Then, decrement HL.
 	// TODO: to implement
-	return ldAMemHLDCycles
+	return lddAMemHLCycles
 }
+
+// 3.3.1.10. LD (HLD), A
+// Description: Same as: LDD (HL),A
+
+// 3.3.1.11. LD (HLD), A
+// Description: Same as: LDD (HL),A
+
+// 3.3.1.12. LDD (HL), A
+// Description:
+// 		Put A into memory address HL. Decrement HL.
+// Same as: LD (HL),A - DEC HL
+
+func lddMemHLA(cpu *cpu) cycleCount {
+	// Put value of the register A into the memory address pointed by HL.
+	// Then, decrement HL.
+	// TODO: to implement
+	return lddMemHLACycles
+}
+
+// 3.3.1.13. LD A,(HLI)
+// Description: Same as: LDI A,(HL)
+
+// 3.3.1.14. LD A,(HL+)
+// Description: Same as: LDI A,(HL)
+
+// 3.3.1.15. LDI A,(HL)
+// Description:
+//		Put value at address HL into A. Increment HL.
+// Same as: LD A,(HL) - INC HL
+
+func ldiAMemHL(cpu *cpu) cycleCount {
+	// Put the value from the position of memory pointed by HL into the register A.
+	// Then, increment  HL.
+	// TODO: to implement
+	return ldiAMemHLCycles
+}
+
+// 3.3.1.16. LD (HLI),A
+// Description: Same as: LDI (HL),A
+
+// 3.3.1.17. LD (HL+),A
+// Description: Same as: LDI (HL),A
+
+// 3.3.1.18. LDI (HL),A
+// Description:
+//		Put A into memory address HL. Increment HL.
+// Same as: LD (HL),A - INC HL
+
+func ldiMemHLA(cpu *cpu) cycleCount {
+	// Put value of the register A into the memory address pointed by HL.
+	// Then, increment HL.
+	// TODO: to implement
+	return ldiMemHLACycles
+}
+
+// 3.3.1.19. LDH (n),A
+// Description:
+//		Put A into memory address $FF00+n.
+// Use with:
+//		n = one byte immediate value.
+func ldStackNA(cpu *cpu) cycleCount {
+	// Takes from the stack the value indexed by the immediate value N, and put it into register A.
+	//TODO: to implement
+	return ldStackNACycles
+}
+
+// 3.3.1.20. LDH A,(n)
+// Description:
+//		Put memory address $FF00+n into A.
+// Use with:
+//		n = one byte immediate value.
+func ldAStackN(cpu *cpu) cycleCount {
+	// Takes the value from the register A and put it into the stack the value indexed by the immediate value N.
+	//TODO: to implement
+	return ldAStackNCycles
+}
+
+// 3.3.2. 16-Bit Loads
+
+// 3.3.2.1. LD n,nn
+// Description:
+// 		Put value nn into n.
+// Use with:
+// 		n = BC,DE,HL,SP
+// 		nn = 16 bit immediate value
+
+func ldBcNn(cpu *cpu) cycleCount {
+	// Takes a 16-bit immediate value and put it into the register BC.
+	//TODO: to implement
+	return ldBcNnCycles
+}
+
+func ldDeNn(cpu *cpu) cycleCount {
+	// Takes a 16-bit immediate value and put it into the register DE.
+	//TODO: to implement
+	return ldDeNnCycles
+}
+
+func ldHlNn(cpu *cpu) cycleCount {
+	// Takes a 16-bit immediate value and put it into the register HL.
+	//TODO: to implement
+	return ldHlNnCycles
+}
+
+func ldSpNn(cpu *cpu) cycleCount {
+	// Takes a 16-bit immediate value and put it into the register SP.
+	//TODO: to implement
+	return ldSpNnCycles
+}
+
+// 3.3.2.2. LD SP,HL
+// Description:
+// 		Put HL into Stack Pointer (SP).
+
+func ldSpHl(cpu *cpu) cycleCount {
+	// Put the value of the register HL into SP.
+	cpu.r.sp = cpu.r.hl
+	return ldSpHlCycles
+}
+
+// 3.3.2.3. LD HL,SP+n
+// Description: Same as: LDHL SP,n.
+
+// 3.3.2.4. LDHL SP,n
+// Description:
+// 		Put SP + n effective address into HL.
+// Use with:
+// 		n = one byte signed immediate value.
+// Flags affected:
+// 		Z - Reset.
+// 		N - Reset.
+// 		H - Set or reset according to operation.
+// 		C - Set or reset according to operation.

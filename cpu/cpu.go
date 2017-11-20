@@ -52,7 +52,7 @@ const (
 	xZeroFiveCycles   = 0  // 0x05
 	ldBNCycles        = 8  // 0x06
 	xZeroSevenCycles  = 0  // 0x07
-	xZeroEightCycles  = 0  // 0x08
+	ldMemNnSpCycles   = 20 // 0x08
 	xZeroNineCycles   = 0  // 0x09
 	ldAMemBcCycles    = 8  // 0x0A
 	xZeroBCycles      = 0  // 0x0B
@@ -172,14 +172,14 @@ const (
 	ldALCycles        = 4  // 0x7D
 	ldAMemHlCycles    = 8  // 0x7E
 	ldAACycles        = 4  // 0x7F
-	xEightZeroCycles  = 0  // 0x80
-	xEightOneCycles   = 0  // 0x81
-	xEightTwoCycles   = 0  // 0x82
-	xEightThreeCycles = 0  // 0x83
-	xEightFourCycles  = 0  // 0x84
-	xEightFiveCycles  = 0  // 0x85
-	xEightSixCycles   = 0  // 0x86
-	xEightSevenCycles = 0  // 0x87
+	addABCycles  = 4  // 0x80
+	addACCycles   = 4  // 0x81
+	addADCycles   = 4  // 0x82
+	addAECycles = 4  // 0x83
+	addAHCycles  = 4  // 0x84
+	addALCycles  = 4  // 0x85
+	addAMemHlCycles   = 8  // 0x86
+	addAACycles = 4  // 0x87
 	xEightEightCycles = 0  // 0x88
 	xEightNineCycles  = 0  // 0x89
 	xEightACycles     = 0  // 0x8A
@@ -237,12 +237,12 @@ const (
 	xBECycles         = 0  // 0xBE
 	xBFCycles         = 0  // 0xBF
 	xCZeroCycles      = 0  // 0xC0
-	xCOneCycles       = 0  // 0xC1
+	popBcCycles       = 12 // 0xC1
 	xCTwoCycles       = 0  // 0xC2
 	xCThreeCycles     = 0  // 0xC3
 	xCFourCycles      = 0  // 0xC4
-	xCFiveCycles      = 0  // 0xC5
-	xCSixCycles       = 0  // 0xC6
+	pushBcCycles      = 16 // 0xC5
+	addANnCycles       = 8  // 0xC6
 	xCSevenCycles     = 0  // 0xC7
 	xCEightCycles     = 0  // 0xC8
 	xCNineCycles      = 0  // 0xC9
@@ -253,11 +253,11 @@ const (
 	xCECycles         = 0  // 0xCE
 	xCFCycles         = 0  // 0xCF
 	xDZeroCycles      = 0  // 0xD0
-	xDOneCycles       = 0  // 0xD1
+	popDeCycles       = 12 // 0xD1
 	xDTwoCycles       = 0  // 0xD2
 	xDThreeCycles     = 0  // 0xD3
 	xDFourCycles      = 0  // 0xD4
-	xDFiveCycles      = 0  // 0xD5
+	pushDeCycles      = 16 // 0xD5
 	xDSixCycles       = 0  // 0xD6
 	xDSevenCycles     = 0  // 0xD7
 	xDEightCycles     = 0  // 0xD8
@@ -269,11 +269,11 @@ const (
 	xDECycles         = 0  // 0xDE
 	xDFCycles         = 0  // 0xDF
 	ldStackNACycles   = 12 // 0xE0
-	xEOneCycles       = 0  // 0xE1
+	popHlCycles       = 12 // 0xE1
 	ldStackCACycles   = 8  // 0xE2
 	xEThreeCycles     = 0  // 0xE3
 	xEFourCycles      = 0  // 0xE4
-	xEFiveCycles      = 0  // 0xE5
+	pushHlCycles      = 16 // 0xE5
 	xESixCycles       = 0  // 0xE6
 	xESevenCycles     = 0  // 0xE7
 	xEEightCycles     = 0  // 0xE8
@@ -285,14 +285,14 @@ const (
 	xEECycles         = 0  // 0xEE
 	xEFCycles         = 0  // 0xEF
 	ldAStackNCycles   = 12 // 0xF0
-	xFOneCycles       = 0  // 0xF1
+	popAfCycles       = 12 // 0xF1
 	ldAStackCCycles   = 8  // 0xF2
 	xFThreeCycles     = 0  // 0xF3
 	xFFourCycles      = 0  // 0xF4
-	xFFiveCycles      = 0  // 0xF5
+	pushAfCycles      = 16 // 0xF5
 	xFSixCycles       = 0  // 0xF6
 	xFSevenCycles     = 0  // 0xF7
-	xFEightCycles     = 0  // 0xF8
+	ldHlSpNCycles     = 12 // 0xF8
 	ldSpHlCycles      = 0  // 0xF9
 	ldAMemNnCycles    = 16 // 0xFA
 	xFBCycles         = 0  // 0xFB
@@ -311,7 +311,7 @@ var op = [0x100] instructions{
 	TODO,      //0x05
 	ldBN,      //0x06
 	TODO,      //0x07
-	TODO,      //0x08
+	ldMemNnSp, //0x08
 	TODO,      //0x09
 	ldAMemBc,  //0x0A
 	TODO,      //0x0B
@@ -431,13 +431,13 @@ var op = [0x100] instructions{
 	ldAL,      //0x7D
 	ldAMemHl,  //0x7E
 	ldAA,      //0x7F
-	TODO,      //0x80
-	TODO,      //0x81
-	TODO,      //0x82
-	TODO,      //0x83
-	TODO,      //0x84
-	TODO,      //0x85
-	TODO,      //0x86
+	addAB,      //0x80
+	addAC,      //0x81
+	addAD,      //0x82
+	addAE,      //0x83
+	addAH,      //0x84
+	addAL,      //0x85
+	addAMemHl,      //0x86
 	TODO,      //0x87
 	TODO,      //0x88
 	TODO,      //0x89
@@ -496,12 +496,12 @@ var op = [0x100] instructions{
 	TODO,      //0xBE
 	TODO,      //0xBF
 	TODO,      //0xC0
-	TODO,      //0xC1
+	popBc,     //0xC1
 	TODO,      //0xC2
 	TODO,      //0xC3
 	TODO,      //0xC4
-	TODO,      //0xC5
-	TODO,      //0xC6
+	pushBc,    //0xC5
+	addANn,      //0xC6
 	TODO,      //0xC7
 	TODO,      //0xC8
 	TODO,      //0xC9
@@ -512,11 +512,11 @@ var op = [0x100] instructions{
 	TODO,      //0xCE
 	TODO,      //0xCF
 	TODO,      //0xD0
-	TODO,      //0xD1
+	popDe,     //0xD1
 	TODO,      //0xD2
 	TODO,      //0xD3
 	TODO,      //0xD4
-	TODO,      //0xD5
+	pushDe,    //0xD5
 	TODO,      //0xD6
 	TODO,      //0xD7
 	TODO,      //0xD8
@@ -528,11 +528,11 @@ var op = [0x100] instructions{
 	TODO,      //0xDE
 	TODO,      //0xDF
 	ldStackNA, //0xE0
-	TODO,      //0xE1
+	popHl,     //0xE1
 	ldStackCA, //0xE2
 	TODO,      //0xE3
 	TODO,      //0xE4
-	TODO,      //0xE5
+	pushHl,    //0xE5
 	TODO,      //0xE6
 	TODO,      //0xE7
 	TODO,      //0xE8
@@ -544,15 +544,15 @@ var op = [0x100] instructions{
 	TODO,      //0xEE
 	TODO,      //0xEF
 	ldAStackN, //0xF0
-	TODO,      //0xF1
+	popAf,     //0xF1
 	ldAStackC, //0xF2
 	TODO,      //0xF3
 	TODO,      //0xF4
-	TODO,      //0xF5
+	pushAf,    //0xF5
 	TODO,      //0xF6
 	TODO,      //0xF7
-	TODO,      //0xF8
-	ldSpHl,      //0xF9
+	ldHlSpN,   //0xF8
+	ldSpHl,    //0xF9
 	ldAMemNn,  //0xFA
 	TODO,      //0xFB
 	TODO,      //0xFC
@@ -1169,3 +1169,164 @@ func ldSpHl(cpu *cpu) cycleCount {
 // 		N - Reset.
 // 		H - Set or reset according to operation.
 // 		C - Set or reset according to operation.
+
+func ldHlSpN(cpu *cpu) cycleCount {
+	// Put the value addressed by Stack Pointer (SP) + N, into register HL
+	// cpu.r.hl = ??
+	return ldHlSpNCycles
+}
+
+// 3.3.2.5. LD (nn),SP
+// Description:
+// 		Put Stack Pointer (SP) at address n.
+// Use with:
+// 		nn = two byte immediate address.
+// Opcodes:
+// 		Instruction 	Parameters 	Opcode 	Cycles
+// 		LD 				(nn),SP 	08 		20
+
+func ldMemNnSp(cpu *cpu) cycleCount {
+	// Put the value of Stack Pointer into the memory position addressed by immediate value nn
+	return ldMemNnSpCycles
+}
+
+// 3.3.2.6. PUSH nn
+// Description:
+// 		Push register pair nn onto stack. Decrement Stack Pointer (SP) twice.
+// Use with:
+// 		nn = AF,BC,DE,HL
+// Opcodes:
+// 		Instruction		Parameters 	Opcode  	Cycles
+// 		PUSH			AF			F5        	16
+// 		PUSH			BC			C5        	16
+// 		PUSH			DE			D5        	16
+// 		PUSH			HL			E5        	16
+
+func pushAf(cpu *cpu) cycleCount {
+	// Put the value of register AF into the stack.
+	// Then, decrement SP twice
+	return pushAfCycles
+}
+
+func pushBc(cpu *cpu) cycleCount {
+	// Put the value of register BC into the stack.
+	// Then, decrement SP twice
+	return pushBcCycles
+}
+
+func pushDe(cpu *cpu) cycleCount {
+	// Put the value of register DE into the stack.
+	// Then, decrement SP twice
+	return pushDeCycles
+}
+
+func pushHl(cpu *cpu) cycleCount {
+	// Put the value of register HL into the stack.
+	// Then, decrement SP twice
+	return pushHlCycles
+}
+
+// 3.3.2.7. POP nn
+// Description:
+// Pop two bytes off stack into register pair nn. Increment Stack Pointer (SP) twice.
+// Use with:
+// nn = AF,BC,DE,HL
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode		Cycles
+// 		POP				AF 				F1			12
+// 		POP 			BC 				C1			12
+// 		POP 			DE 				D1			12
+// 		POP 			HL				E1			12
+
+func popAf(cpu *cpu) cycleCount {
+	// Take two bytes from the stack into register AF
+	// Then, increment SP twice
+	return popAfCycles
+}
+
+func popBc(cpu *cpu) cycleCount {
+	// Take two bytes from the stack into register BC
+	// Then, increment SP twice
+	return popBcCycles
+}
+
+func popDe(cpu *cpu) cycleCount {
+	// Take two bytes from the stack into register DE
+	// Then, increment SP twice
+	return popDeCycles
+}
+
+func popHl(cpu *cpu) cycleCount {
+	// Take two bytes from the stack into register HL
+	// Then, increment SP twice
+	return popHlCycles
+}
+
+// 3.3.3. 8-Bit ALU
+
+// 3.3.3.1. ADD A,n
+// Description:
+// 		Add n to A.
+// Use with:
+// 		n = A,B,C,D,E,H,L,(HL),#
+// Flags affected:
+// 		Z - Set if result is zero.
+// 		N - Reset.
+// 		H - Set if carry from bit 3. C - Set if carry from bit 7.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode		Cycles
+//		ADD				A, A			87			4
+// 		ADD				A, B			80			4
+// 		ADD				A, C			81			4
+// 		ADD				A, D			82			4
+// 		ADD				A, E			83			4
+// 		ADD				A, H			84			4
+// 		ADD				A, L			85			4
+// 		ADD				A, (HL)			86			8
+// 		ADD				A, #			C6			8
+
+func addAA(cpu *cpu) cycleCount {
+	// Add the value of register A into register A
+	return addAACycles
+}
+
+func addAB(cpu *cpu) cycleCount {
+	// Add the value of register B into register A
+	return addABCycles
+}
+
+func addAC(cpu *cpu) cycleCount {
+	// Add the value of register C into register A
+	return addACCycles
+}
+
+func addAD(cpu *cpu) cycleCount {
+	// Add the value of register D into register A
+	return addADCycles
+}
+
+func addAE(cpu *cpu) cycleCount {
+	// Add the value of register E into register A
+	return addAECycles
+}
+
+func addAH(cpu *cpu) cycleCount {
+	// Add the value of register H into register A
+	return addAHCycles
+}
+
+func addAL(cpu *cpu) cycleCount {
+	// Add the value of register L into register A
+	return addALCycles
+}
+
+func addAMemHl(cpu *cpu) cycleCount {
+	// Add the value of the memory pointed by register HL into register A
+	return addAMemHlCycles
+}
+
+func addANn(cpu *cpu) cycleCount {
+	// Add the value of immediate value NN into register A
+	return addANnCycles
+}
+

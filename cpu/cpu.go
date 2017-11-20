@@ -172,14 +172,14 @@ const (
 	ldALCycles        = 4  // 0x7D
 	ldAMemHlCycles    = 8  // 0x7E
 	ldAACycles        = 4  // 0x7F
-	addABCycles  = 4  // 0x80
-	addACCycles   = 4  // 0x81
-	addADCycles   = 4  // 0x82
-	addAECycles = 4  // 0x83
-	addAHCycles  = 4  // 0x84
-	addALCycles  = 4  // 0x85
+	addABCycles       = 4  // 0x80
+	addACCycles       = 4  // 0x81
+	addADCycles       = 4  // 0x82
+	addAECycles       = 4  // 0x83
+	addAHCycles       = 4  // 0x84
+	addALCycles       = 4  // 0x85
 	addAMemHlCycles   = 8  // 0x86
-	addAACycles = 4  // 0x87
+	addAACycles       = 4  // 0x87
 	xEightEightCycles = 0  // 0x88
 	xEightNineCycles  = 0  // 0x89
 	xEightACycles     = 0  // 0x8A
@@ -188,14 +188,14 @@ const (
 	xEightDCycles     = 0  // 0x8D
 	xEightECycles     = 0  // 0x8E
 	xEightFCycles     = 0  // 0x8F
-	xNineZeroCycles   = 0  // 0x90
-	xNineOneCycles    = 0  // 0x91
-	xNineTwoCycles    = 0  // 0x92
-	xNineThreeCycles  = 0  // 0x93
-	xNineFourCycles   = 0  // 0x94
-	xNineFiveCycles   = 0  // 0x95
-	xNineSixCycles    = 0  // 0x96
-	xNineSevenCycles  = 0  // 0x97
+	subABCycles       = 4  // 0x90
+	subACCycles       = 4  // 0x91
+	subADCycles       = 4  // 0x92
+	subAECycles       = 4  // 0x93
+	subAHCycles       = 4  // 0x94
+	subALCycles       = 4  // 0x95
+	subAMemHlCycles   = 8  // 0x96
+	subAACycles       = 4  // 0x97
 	xNineEightCycles  = 0  // 0x98
 	xNineNineCycles   = 0  // 0x99
 	xNineACycles      = 0  // 0x9A
@@ -242,7 +242,7 @@ const (
 	xCThreeCycles     = 0  // 0xC3
 	xCFourCycles      = 0  // 0xC4
 	pushBcCycles      = 16 // 0xC5
-	addANnCycles       = 8  // 0xC6
+	addANnCycles      = 8  // 0xC6
 	xCSevenCycles     = 0  // 0xC7
 	xCEightCycles     = 0  // 0xC8
 	xCNineCycles      = 0  // 0xC9
@@ -258,7 +258,7 @@ const (
 	xDThreeCycles     = 0  // 0xD3
 	xDFourCycles      = 0  // 0xD4
 	pushDeCycles      = 16 // 0xD5
-	xDSixCycles       = 0  // 0xD6
+	subANnCycles      = 8  // 0xD6
 	xDSevenCycles     = 0  // 0xD7
 	xDEightCycles     = 0  // 0xD8
 	xDNineCycles      = 0  // 0xD9
@@ -431,13 +431,13 @@ var op = [0x100] instructions{
 	ldAL,      //0x7D
 	ldAMemHl,  //0x7E
 	ldAA,      //0x7F
-	addAB,      //0x80
-	addAC,      //0x81
-	addAD,      //0x82
-	addAE,      //0x83
-	addAH,      //0x84
-	addAL,      //0x85
-	addAMemHl,      //0x86
+	addAB,     //0x80
+	addAC,     //0x81
+	addAD,     //0x82
+	addAE,     //0x83
+	addAH,     //0x84
+	addAL,     //0x85
+	addAMemHl, //0x86
 	TODO,      //0x87
 	TODO,      //0x88
 	TODO,      //0x89
@@ -447,14 +447,14 @@ var op = [0x100] instructions{
 	TODO,      //0x8D
 	TODO,      //0x8E
 	TODO,      //0x8F
-	TODO,      //0x90
-	TODO,      //0x91
-	TODO,      //0x92
-	TODO,      //0x93
-	TODO,      //0x94
-	TODO,      //0x95
-	TODO,      //0x96
-	TODO,      //0x97
+	subAB,     //0x90
+	subAC,     //0x91
+	subAD,     //0x92
+	subAE,     //0x93
+	subAH,     //0x94
+	subAL,     //0x95
+	subAMemHl, //0x96
+	subAA,     //0x97
 	TODO,      //0x98
 	TODO,      //0x99
 	TODO,      //0x9A
@@ -501,7 +501,7 @@ var op = [0x100] instructions{
 	TODO,      //0xC3
 	TODO,      //0xC4
 	pushBc,    //0xC5
-	addANn,      //0xC6
+	addANn,    //0xC6
 	TODO,      //0xC7
 	TODO,      //0xC8
 	TODO,      //0xC9
@@ -517,7 +517,7 @@ var op = [0x100] instructions{
 	TODO,      //0xD3
 	TODO,      //0xD4
 	pushDe,    //0xD5
-	TODO,      //0xD6
+	subANn,    //0xD6
 	TODO,      //0xD7
 	TODO,      //0xD8
 	TODO,      //0xD9
@@ -1173,6 +1173,7 @@ func ldSpHl(cpu *cpu) cycleCount {
 func ldHlSpN(cpu *cpu) cycleCount {
 	// Put the value addressed by Stack Pointer (SP) + N, into register HL
 	// cpu.r.hl = ??
+	// TODO: to implement
 	return ldHlSpNCycles
 }
 
@@ -1187,6 +1188,7 @@ func ldHlSpN(cpu *cpu) cycleCount {
 
 func ldMemNnSp(cpu *cpu) cycleCount {
 	// Put the value of Stack Pointer into the memory position addressed by immediate value nn
+	// TODO: to implement
 	return ldMemNnSpCycles
 }
 
@@ -1205,24 +1207,28 @@ func ldMemNnSp(cpu *cpu) cycleCount {
 func pushAf(cpu *cpu) cycleCount {
 	// Put the value of register AF into the stack.
 	// Then, decrement SP twice
+	// TODO: to implement
 	return pushAfCycles
 }
 
 func pushBc(cpu *cpu) cycleCount {
 	// Put the value of register BC into the stack.
 	// Then, decrement SP twice
+	// TODO: to implement
 	return pushBcCycles
 }
 
 func pushDe(cpu *cpu) cycleCount {
 	// Put the value of register DE into the stack.
 	// Then, decrement SP twice
+	// TODO: to implement
 	return pushDeCycles
 }
 
 func pushHl(cpu *cpu) cycleCount {
 	// Put the value of register HL into the stack.
 	// Then, decrement SP twice
+	// TODO: to implement
 	return pushHlCycles
 }
 
@@ -1241,24 +1247,28 @@ func pushHl(cpu *cpu) cycleCount {
 func popAf(cpu *cpu) cycleCount {
 	// Take two bytes from the stack into register AF
 	// Then, increment SP twice
+	// TODO: to implement
 	return popAfCycles
 }
 
 func popBc(cpu *cpu) cycleCount {
 	// Take two bytes from the stack into register BC
 	// Then, increment SP twice
+	// TODO: to implement
 	return popBcCycles
 }
 
 func popDe(cpu *cpu) cycleCount {
 	// Take two bytes from the stack into register DE
 	// Then, increment SP twice
+	// TODO: to implement
 	return popDeCycles
 }
 
 func popHl(cpu *cpu) cycleCount {
 	// Take two bytes from the stack into register HL
 	// Then, increment SP twice
+	// TODO: to implement
 	return popHlCycles
 }
 
@@ -1272,7 +1282,8 @@ func popHl(cpu *cpu) cycleCount {
 // Flags affected:
 // 		Z - Set if result is zero.
 // 		N - Reset.
-// 		H - Set if carry from bit 3. C - Set if carry from bit 7.
+// 		H - Set if carry from bit 3.
+// 		C - Set if carry from bit 7.
 // Opcodes:
 // 		Instruction 	Parameters 		Opcode		Cycles
 //		ADD				A, A			87			4
@@ -1287,46 +1298,200 @@ func popHl(cpu *cpu) cycleCount {
 
 func addAA(cpu *cpu) cycleCount {
 	// Add the value of register A into register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a += cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addAACycles
 }
 
 func addAB(cpu *cpu) cycleCount {
 	// Add the value of register B into register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a += cpu.r.bc.b
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addABCycles
 }
 
 func addAC(cpu *cpu) cycleCount {
 	// Add the value of register C into register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a += cpu.r.bc.c
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addACCycles
 }
 
 func addAD(cpu *cpu) cycleCount {
 	// Add the value of register D into register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a += cpu.r.de.d
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addADCycles
 }
 
 func addAE(cpu *cpu) cycleCount {
 	// Add the value of register E into register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a += cpu.r.de.e
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addAECycles
 }
 
 func addAH(cpu *cpu) cycleCount {
 	// Add the value of register H into register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a += cpu.r.hl.h
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addAHCycles
 }
 
 func addAL(cpu *cpu) cycleCount {
 	// Add the value of register L into register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a += cpu.r.hl.l
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addALCycles
 }
 
 func addAMemHl(cpu *cpu) cycleCount {
 	// Add the value of the memory pointed by register HL into register A
+	// TODO: To implement
 	return addAMemHlCycles
 }
 
 func addANn(cpu *cpu) cycleCount {
 	// Add the value of immediate value NN into register A
+	// TODO: To implement
 	return addANnCycles
 }
 
+// 3.3.3.3. SUB n
+// Description:
+// 		Subtract n from A.
+// Use with:
+// 		n = A,B,C,D,E,H,L,(HL),#
+// Flags affected:
+// 		Z - Set if result is zero.
+// 		N - Set.
+// 		H - Set if no borrow from bit 4.
+// 		C - Set if no borrow.
+// Opcodes:
+// 		Instruction		Parameters		Opcode  	Cycles
+// 		SUB				A, A			97			4
+// 		SUB				A, B			90			4
+// 		SUB				A, C			91			4
+// 		SUB				A, D			92			4
+// 		SUB				A, E			93			4
+// 		SUB				A, H			94			4
+// 		SUB				A, L			95			4
+// 		SUB				A, (HL)			96			8
+// 		SUB				A, #			D6			8
+
+func subAA(cpu *cpu) cycleCount {
+	// Subtract the value of register A to register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a -= cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA & 0xf) > (cpu.r.af.a & 0xf))
+	cpu.r.setFlagC(oldA > cpu.r.af.a)
+	return subAACycles
+}
+
+func subAB(cpu *cpu) cycleCount {
+	// Subtract the value of register A to register B
+	var oldA = cpu.r.af.a
+	cpu.r.af.a -= cpu.r.bc.b
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA & 0xf) > (cpu.r.af.a & 0xf))
+	cpu.r.setFlagC(oldA > cpu.r.af.a)
+	return subABCycles
+}
+
+func subAC(cpu *cpu) cycleCount {
+	// Subtract the value of register C to register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a -= cpu.r.bc.c
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA & 0xf) > (cpu.r.af.a & 0xf))
+	cpu.r.setFlagC(oldA > cpu.r.af.a)
+	return subACCycles
+}
+
+func subAD(cpu *cpu) cycleCount {
+	// Subtract the value of register D to register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a -= cpu.r.de.d
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA & 0xf) > (cpu.r.af.a & 0xf))
+	cpu.r.setFlagC(oldA > cpu.r.af.a)
+	return subADCycles
+}
+
+func subAE(cpu *cpu) cycleCount {
+	// Subtract the value of register E to register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a -= cpu.r.de.e
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA & 0xf) > (cpu.r.af.a & 0xf))
+	cpu.r.setFlagC(oldA > cpu.r.af.a)
+	return subAECycles
+}
+
+func subAH(cpu *cpu) cycleCount {
+	// Subtract the value of register H to register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a -= cpu.r.hl.h
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA & 0xf) > (cpu.r.af.a & 0xf))
+	cpu.r.setFlagC(oldA > cpu.r.af.a)
+	return subAHCycles
+}
+
+func subAL(cpu *cpu) cycleCount {
+	// Subtract the value of register L to register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a -= cpu.r.hl.l
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA & 0xf) > (cpu.r.af.a & 0xf))
+	cpu.r.setFlagC(oldA > cpu.r.af.a)
+	return subALCycles
+}
+
+func subAMemHl(cpu *cpu) cycleCount {
+	// Subtract the value of the memory pointed by register HL to register A
+	// TODO: to implement
+	return subAMemHlCycles
+}
+
+func subANn(cpu *cpu) cycleCount {
+	// Subtract the value of the immediate value NN to register A
+	// TODO: to implement
+	return subANnCycles
+}

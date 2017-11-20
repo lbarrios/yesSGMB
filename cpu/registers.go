@@ -38,3 +38,23 @@ func (r Registers) hlAsInt() uint16 {
 	res += uint16(r.hl.l)
 	return res << 8
 }
+
+func (r *Registers) setFlagZ(condition bool) {
+	// Put true on FLAG Z if condition is true, else false
+	r.af.f.z = condition
+}
+
+func (r *Registers) setFlagN(condition bool) {
+	// Put true on FLAG N if condition is true, else false
+	r.af.f.n = condition
+}
+
+func (r *Registers) setFlagH(condition bool) {
+	// Put true on FLAG H if condition is true, else false
+	r.af.f.h = condition
+}
+
+func (r *Registers) setFlagC(condition bool) {
+	// Put true on FLAG C if condition is true, else false
+	r.af.f.c = condition
+}

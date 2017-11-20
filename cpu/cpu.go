@@ -1302,7 +1302,7 @@ func addAA(cpu *cpu) cycleCount {
 	cpu.r.af.a += cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
-	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
 	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addAACycles
 }
@@ -1313,7 +1313,7 @@ func addAB(cpu *cpu) cycleCount {
 	cpu.r.af.a += cpu.r.bc.b
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
-	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
 	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addABCycles
 }
@@ -1324,7 +1324,7 @@ func addAC(cpu *cpu) cycleCount {
 	cpu.r.af.a += cpu.r.bc.c
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
-	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
 	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addACCycles
 }
@@ -1335,7 +1335,7 @@ func addAD(cpu *cpu) cycleCount {
 	cpu.r.af.a += cpu.r.de.d
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
-	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
 	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addADCycles
 }
@@ -1346,7 +1346,7 @@ func addAE(cpu *cpu) cycleCount {
 	cpu.r.af.a += cpu.r.de.e
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
-	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
 	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addAECycles
 }
@@ -1357,7 +1357,7 @@ func addAH(cpu *cpu) cycleCount {
 	cpu.r.af.a += cpu.r.hl.h
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
-	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
 	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addAHCycles
 }
@@ -1368,7 +1368,7 @@ func addAL(cpu *cpu) cycleCount {
 	cpu.r.af.a += cpu.r.hl.l
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
-	cpu.r.setFlagH((cpu.r.af.a & (1 << 4)) == 1)
+	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
 	cpu.r.setFlagC((cpu.r.af.a < oldA))
 	return addALCycles
 }

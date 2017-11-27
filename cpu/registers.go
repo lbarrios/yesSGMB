@@ -58,3 +58,11 @@ func (r *Registers) setFlagC(condition bool) {
 	// Put true on FLAG C if condition is true, else false
 	r.af.f.c = condition
 }
+
+func (r Registers) flagAsInt(flag bool) uint8 {
+	if flag {
+		return 1
+	} else {
+		return 0
+	}
+}

@@ -1,4 +1,5 @@
 // package cpu implements the CPU and Registers type
+// the comments are based on http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
 package cpu
 
 import (
@@ -196,14 +197,14 @@ const (
 	subALCycles       = 4  // 0x95
 	subAMemHlCycles   = 8  // 0x96
 	subAACycles       = 4  // 0x97
-	xNineEightCycles  = 0  // 0x98
-	xNineNineCycles   = 0  // 0x99
-	xNineACycles      = 0  // 0x9A
-	xNineBCycles      = 0  // 0x9B
-	xNineCCycles      = 0  // 0x9C
-	xNineDCycles      = 0  // 0x9D
-	xNineECycles      = 0  // 0x9E
-	xNineFCycles      = 0  // 0x9F
+	sbcABCycles       = 4  // 0x98
+	sbcACCycles       = 4  // 0x99
+	sbcADCycles       = 4  // 0x9A
+	sbcAECycles       = 4  // 0x9B
+	sbcAHCycles       = 4  // 0x9C
+	sbcALCycles       = 4  // 0x9D
+	sbcAMemHlCycles   = 8  // 0x9E
+	sbcAACycles       = 4  // 0x9F
 	xAZeroCycles      = 0  // 0xA0
 	xAOneCycles       = 0  // 0xA1
 	xATwoCycles       = 0  // 0xA2
@@ -455,13 +456,13 @@ var op = [0x100] instructions{
 	subAL,     //0x95
 	subAMemHl, //0x96
 	subAA,     //0x97
-	TODO,      //0x98
-	TODO,      //0x99
-	TODO,      //0x9A
-	TODO,      //0x9B
-	TODO,      //0x9C
-	TODO,      //0x9D
-	TODO,      //0x9E
+	sbcAB,     //0x98
+	sbcAC,     //0x99
+	sbcAD,     //0x9A
+	sbcAE,     //0x9B
+	sbcAH,     //0x9C
+	sbcAL,     //0x9D
+	sbcAMemHl, //0x9E
 	TODO,      //0x9F
 	TODO,      //0xA0
 	TODO,      //0xA1
@@ -1495,3 +1496,98 @@ func subANn(cpu *cpu) cycleCount {
 	// TODO: to implement
 	return subANnCycles
 }
+
+// 3.3.3.4. SBC A,n
+// Description:
+//		Subtract n + Carry flag from A.
+// Use with:
+//		n = A,B,C,D,E,H,L,(HL),#
+// Flags affected:
+//		Z - Set if result is zero.
+//		N - Set.
+//		H - Set if no borrow from bit 4.
+//		C - Set if no borrow.
+// Opcodes:
+//		Instruction 	Parameters 		Opcode 	Cycles
+//		SBC 			A,A 			9F 		4
+//		SBC 			A,B 			98 		4
+//		SBC 			A,C 			99 		4
+//		SBC 			A,D 			9A 		4
+//		SBC 			A,E 			9B 		4
+//		SBC 			A,H 			9C 		4
+//		SBC 			A,L 			9D 		4
+//		SBC 			A,(HL) 			9E 		8
+//		SBC 			A,# 			?? 		?
+
+func sbcAA(cpu *cpu) cycleCount {
+	// Subtract from register A the value of register A plus carry flag
+	cpu.r.af.a -= byte(cpu.r.af.a)
+	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
+	// TODO: set flags
+	return sbcAACycles
+}
+
+func sbcAB(cpu *cpu) cycleCount {
+	// Subtract from register A the value of register B plus carry flag
+	cpu.r.af.a -= byte(cpu.r.bc.b)
+	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
+	// TODO: set flags
+	return sbcABCycles
+}
+
+func sbcAC(cpu *cpu) cycleCount {
+	// Subtract from register A the value of register C plus carry flag
+	cpu.r.af.a -= byte(cpu.r.bc.c)
+	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
+	// TODO: set flags
+	return sbcACCycles
+}
+
+func sbcAD(cpu *cpu) cycleCount {
+	// Subtract from register A the value of register D plus carry flag
+	cpu.r.af.a -= byte(cpu.r.de.d)
+	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
+	// TODO: set flags
+	return sbcADCycles
+}
+
+func sbcAE(cpu *cpu) cycleCount {
+	// Subtract from register A the value of register E plus carry flag
+	cpu.r.af.a -= byte(cpu.r.de.e)
+	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
+	// TODO: set flags
+	return sbcAECycles
+}
+
+func sbcAH(cpu *cpu) cycleCount {
+	// Subtract from register A the value of register H plus carry flag
+	cpu.r.af.a -= byte(cpu.r.hl.h)
+	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
+	// TODO: set flags
+	return sbcAHCycles
+}
+
+func sbcAL(cpu *cpu) cycleCount {
+	// Subtract from register A the value of register L plus carry flag
+	cpu.r.af.a -= byte(cpu.r.hl.l)
+	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
+	// TODO: set flags
+	return sbcALCycles
+}
+
+func sbcAMemHl(cpu *cpu) cycleCount {
+	// Subtract from register A the value of memory pointed by HL plus carry flag
+	//cpu.r.af.a -= ...
+	//TODO: to implement
+	return sbcAMemHlCycles
+}
+
+// There is missing documentation about this funcion
+/*
+func sbcAN(cpu *cpu) cycleCount {
+	// Subtract from register A the value of register # plus carry flag
+	// cpu.r.af.a -= ...
+	//TODO: to implement
+	return sbcANCycles
+}
+*/

@@ -221,14 +221,14 @@ const (
 	xADCycles         = 0  // 0xAD
 	xAECycles         = 0  // 0xAE
 	xAFCycles         = 0  // 0xAF
-	xBZeroCycles      = 0  // 0xB0
-	xBOneCycles       = 0  // 0xB1
-	xBTwoCycles       = 0  // 0xB2
-	xBThreeCycles     = 0  // 0xB3
-	xBFourCycles      = 0  // 0xB4
-	xBFiveCycles      = 0  // 0xB5
-	xBSixCycles       = 0  // 0xB6
-	xBSevenCycles     = 0  // 0xB7
+	orABCycles        = 4  // 0xB0
+	orACCycles        = 4  // 0xB1
+	orADCycles        = 4  // 0xB2
+	orAECycles        = 4  // 0xB3
+	orAHCycles        = 4  // 0xB4
+	orALCycles        = 4  // 0xB5
+	orAMemHlCycles    = 8  // 0xB6
+	orAACycles        = 4  // 0xB7
 	xBEightCycles     = 0  // 0xB8
 	xBNineCycles      = 0  // 0xB9
 	xBACycles         = 0  // 0xBA
@@ -291,7 +291,7 @@ const (
 	xFThreeCycles     = 0  // 0xF3
 	xFFourCycles      = 0  // 0xF4
 	pushAfCycles      = 16 // 0xF5
-	xFSixCycles       = 0  // 0xF6
+	orANCycles       = 8  // 0xF6
 	xFSevenCycles     = 0  // 0xF7
 	ldHlSpNCycles     = 12 // 0xF8
 	ldSpHlCycles      = 0  // 0xF9
@@ -480,14 +480,14 @@ var op = [0x100] instructions{
 	TODO,      //0xAD
 	TODO,      //0xAE
 	TODO,      //0xAF
-	TODO,      //0xB0
-	TODO,      //0xB1
-	TODO,      //0xB2
-	TODO,      //0xB3
-	TODO,      //0xB4
-	TODO,      //0xB5
-	TODO,      //0xB6
-	TODO,      //0xB7
+	orAB,      //0xB0
+	orAC,      //0xB1
+	orAD,      //0xB2
+	orAE,      //0xB3
+	orAH,      //0xB4
+	orAL,      //0xB5
+	orAMemHl,  //0xB6
+	orAN,      //0xB7
 	TODO,      //0xB8
 	TODO,      //0xB9
 	TODO,      //0xBA
@@ -550,7 +550,7 @@ var op = [0x100] instructions{
 	TODO,      //0xF3
 	TODO,      //0xF4
 	pushAf,    //0xF5
-	TODO,      //0xF6
+	orAN,      //0xF6
 	TODO,      //0xF7
 	ldHlSpN,   //0xF8
 	ldSpHl,    //0xF9
@@ -1696,4 +1696,110 @@ func andAN(cpu *cpu) cycleCount {
 	cpu.r.setFlagC(false)
 	// TODO: to implement
 	return andANCycles
+}
+
+// 3.3.3.6. OR n
+// Description:
+//	Logical OR n with register A, result in A.
+// Use with:
+// 	n = A,B,C,D,E,H,L,(HL),#
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Reset.
+// Opcodes:
+//		Instruction 	Parameters 		Opcode 		Cycles
+// 		OR 				A 				B7 			4
+// 		OR 				B 				B0 			4
+// 		OR 				C 				B1 			4
+// 		OR 				D 				B2 			4
+// 		OR 				E 				B3 			4
+// 		OR 				H 				B4 			4
+// 		OR 				L 				B5 			4
+// 		OR 				(HL) 			B6 			8
+// 		OR 				# 				F6 			8
+
+func orAA(cpu *cpu) cycleCount {
+	// Store into register A the result of (A | A) (bitwise OR)
+	cpu.r.af.a = cpu.r.af.a | cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return orAACycles
+}
+func orAB(cpu *cpu) cycleCount {
+	// Store into register A the result of (A | B) (bitwise OR)
+	cpu.r.af.a = cpu.r.af.a | cpu.r.bc.b
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return orABCycles
+}
+func orAC(cpu *cpu) cycleCount {
+	// Store into register A the result of (A | C) (bitwise OR)
+	cpu.r.af.a = cpu.r.af.a | cpu.r.bc.c
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return orACCycles
+}
+func orAD(cpu *cpu) cycleCount {
+	// Store into register A the result of (A | D) (bitwise OR)
+	cpu.r.af.a = cpu.r.af.a | cpu.r.de.d
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return orADCycles
+}
+func orAE(cpu *cpu) cycleCount {
+	// Store into register A the result of (A | E) (bitwise OR)
+	cpu.r.af.a = cpu.r.af.a | cpu.r.de.e
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return orAECycles
+}
+func orAH(cpu *cpu) cycleCount {
+	// Store into register A the result of (A | H) (bitwise OR)
+	cpu.r.af.a = cpu.r.af.a | cpu.r.hl.h
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return orAHCycles
+}
+func orAL(cpu *cpu) cycleCount {
+	// Store into register A the result of (A | L) (bitwise OR)
+	cpu.r.af.a = cpu.r.af.a | cpu.r.hl.l
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return orALCycles
+}
+func orAMemHl(cpu *cpu) cycleCount {
+	// Store into register A the result of (A | the memory position pointed by HL) (bitwise OR)
+	//cpu.r.af.a = cpu.r.af.a | cpu.r.
+	// TODO: to implement
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return orAMemHlCycles
+}
+func orAN(cpu *cpu) cycleCount {
+	// Store into register A the result of (A | an immediate value) (bitwise OR)
+	//cpu.r.af.a = cpu.r.af.a | cpu.r.
+	// TODO: to implement
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return orANCycles
 }

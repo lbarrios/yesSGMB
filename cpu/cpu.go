@@ -205,14 +205,14 @@ const (
 	sbcALCycles       = 4  // 0x9D
 	sbcAMemHlCycles   = 8  // 0x9E
 	sbcAACycles       = 4  // 0x9F
-	xAZeroCycles      = 0  // 0xA0
-	xAOneCycles       = 0  // 0xA1
-	xATwoCycles       = 0  // 0xA2
-	xAThreeCycles     = 0  // 0xA3
-	xAFourCycles      = 0  // 0xA4
-	xAFiveCycles      = 0  // 0xA5
-	xASixCycles       = 0  // 0xA6
-	xASevenCycles     = 0  // 0xA7
+	andABCycles       = 4  // 0xA0
+	andACCycles       = 4  // 0xA1
+	andADCycles       = 4  // 0xA2
+	andAECycles       = 4  // 0xA3
+	andAHCycles       = 4  // 0xA4
+	andALCycles       = 4  // 0xA5
+	andAMemHlCycles   = 8  // 0xA6
+	andAACycles       = 8  // 0xA7
 	xAEightCycles     = 0  // 0xA8
 	xANineCycles      = 0  // 0xA9
 	xAACycles         = 0  // 0xAA
@@ -275,7 +275,7 @@ const (
 	xEThreeCycles     = 0  // 0xE3
 	xEFourCycles      = 0  // 0xE4
 	pushHlCycles      = 16 // 0xE5
-	xESixCycles       = 0  // 0xE6
+	andANCycles       = 8  // 0xE6
 	xESevenCycles     = 0  // 0xE7
 	xEEightCycles     = 0  // 0xE8
 	xENineCycles      = 0  // 0xE9
@@ -464,14 +464,14 @@ var op = [0x100] instructions{
 	sbcAL,     //0x9D
 	sbcAMemHl, //0x9E
 	TODO,      //0x9F
-	TODO,      //0xA0
-	TODO,      //0xA1
-	TODO,      //0xA2
-	TODO,      //0xA3
-	TODO,      //0xA4
-	TODO,      //0xA5
-	TODO,      //0xA6
-	TODO,      //0xA7
+	andAB,     //0xA0
+	andAC,     //0xA1
+	andAD,     //0xA2
+	andAE,     //0xA3
+	andAH,     //0xA4
+	andAL,     //0xA5
+	andAMemHl, //0xA6
+	andAA,     //0xA7
 	TODO,      //0xA8
 	TODO,      //0xA9
 	TODO,      //0xAA
@@ -534,7 +534,7 @@ var op = [0x100] instructions{
 	TODO,      //0xE3
 	TODO,      //0xE4
 	pushHl,    //0xE5
-	TODO,      //0xE6
+	andAN,     //0xE6
 	TODO,      //0xE7
 	TODO,      //0xE8
 	TODO,      //0xE9
@@ -1591,3 +1591,109 @@ func sbcAN(cpu *cpu) cycleCount {
 	return sbcANCycles
 }
 */
+
+// 3.3.3.5. AND n
+// Description:
+//		Logically AND n with A, result in A.
+// Use with:
+//		n = A,B,C,D,E,H,L,(HL),#
+// Flags affected:
+//		Z - Set if result is zero.
+//		N - Reset.
+//		H - Set.
+//		C - Reset.
+// Opcodes:
+//		Instruction		Parameters		Opcode		Cycles
+//		AND 			A 				A7 			4
+//		AND 			B 				A0 			4
+//		AND 			C 				A1 			4
+//		AND 			D 				A2 			4
+//		AND 			E 				A3 			4
+//		AND 			H 				A4 			4
+//		AND 			L 				A5 			4
+//		AND 			(HL) 			A6 			8
+//		AND 			# 				E6 			8
+
+func andAA(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A & A) (bitwise AND)
+	cpu.r.af.a = cpu.r.af.a & cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	cpu.r.setFlagC(false)
+	return andAACycles
+}
+func andAB(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A & B) (bitwise AND)
+	cpu.r.af.a = cpu.r.af.a & cpu.r.bc.b
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	cpu.r.setFlagC(false)
+	return andABCycles
+}
+func andAC(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A & C) (bitwise AND)
+	cpu.r.af.a = cpu.r.af.a & cpu.r.bc.c
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	cpu.r.setFlagC(false)
+	return andACCycles
+}
+func andAD(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A & D) (bitwise AND)
+	cpu.r.af.a = cpu.r.af.a & cpu.r.de.d
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	cpu.r.setFlagC(false)
+	return andADCycles
+}
+func andAE(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A & E) (bitwise AND)
+	cpu.r.af.a = cpu.r.af.a & cpu.r.de.e
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	cpu.r.setFlagC(false)
+	return andAECycles
+}
+func andAH(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A & H) (bitwise AND)
+	cpu.r.af.a = cpu.r.af.a & cpu.r.hl.h
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	cpu.r.setFlagC(false)
+	return andAHCycles
+}
+func andAL(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A & L) (bitwise AND)
+	cpu.r.af.a = cpu.r.af.a & cpu.r.hl.l
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	cpu.r.setFlagC(false)
+	return andALCycles
+}
+func andAMemHl(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A & the value of memory pointed by HL) (bitwise AND)
+	// cpu.r.af.a = cpu.r.af.a & cpu.r.
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	cpu.r.setFlagC(false)
+	// TODO: to implement
+	return andAMemHlCycles
+}
+func andAN(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A & an immediate value) (bitwise AND)
+	// cpu.r.af.a = cpu.r.af.a & cpu.r.
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	cpu.r.setFlagC(false)
+	// TODO: to implement
+	return andANCycles
+}

@@ -229,14 +229,14 @@ const (
 	orALCycles        = 4  // 0xB5
 	orAMemHlCycles    = 8  // 0xB6
 	orAACycles        = 4  // 0xB7
-	xBEightCycles     = 0  // 0xB8
-	xBNineCycles      = 0  // 0xB9
-	xBACycles         = 0  // 0xBA
-	xBBCycles         = 0  // 0xBB
-	xBCCycles         = 0  // 0xBC
-	xBDCycles         = 0  // 0xBD
-	xBECycles         = 0  // 0xBE
-	xBFCycles         = 0  // 0xBF
+	cpABCycles     = 4  // 0xB8
+	cpACCycles      = 4  // 0xB9
+	cpADCycles         = 4  // 0xBA
+	cpAECycles         = 4  // 0xBB
+	cpAHCycles         = 4 // 0xBC
+	cpALCycles         = 4  // 0xBD
+	cpAMemHlCycles         = 8  // 0xBE
+	cpAACycles         = 4  // 0xBF
 	xCZeroCycles      = 0  // 0xC0
 	popBcCycles       = 12 // 0xC1
 	xCTwoCycles       = 0  // 0xC2
@@ -299,7 +299,7 @@ const (
 	xFBCycles         = 0  // 0xFB
 	xFCCycles         = 0  // 0xFC
 	xFDCycles         = 0  // 0xFD
-	xFECycles         = 0  // 0xFE
+	cpANCycles         = 8  // 0xFE
 	xFFCycles         = 0  // 0xFF
 )
 
@@ -488,14 +488,14 @@ var op = [0x100] instructions{
 	orAL,      //0xB5
 	orAMemHl,  //0xB6
 	orAN,      //0xB7
-	TODO,      //0xB8
-	TODO,      //0xB9
-	TODO,      //0xBA
-	TODO,      //0xBB
-	TODO,      //0xBC
-	TODO,      //0xBD
-	TODO,      //0xBE
-	TODO,      //0xBF
+	cpAB,      //0xB8
+	cpAC,      //0xB9
+	cpAD,      //0xBA
+	cpAE,      //0xBB
+	cpAH,      //0xBC
+	cpAL,      //0xBD
+	cpAMemHl,      //0xBE
+	cpAN,      //0xBF
 	TODO,      //0xC0
 	popBc,     //0xC1
 	TODO,      //0xC2
@@ -558,7 +558,7 @@ var op = [0x100] instructions{
 	TODO,      //0xFB
 	TODO,      //0xFC
 	TODO,      //0xFD
-	TODO,      //0xFE
+	cpAN,      //0xFE
 	TODO,      //0xFF
 }
 
@@ -1908,4 +1908,101 @@ func xorAN(cpu *cpu) cycleCount {
 	cpu.r.setFlagH(false)
 	cpu.r.setFlagC(false)
 	return xorANCycles
+}
+
+// 3.3.3.8. CP n
+// Description:
+//	Compare A with n. This is basically an A - n
+// 	subtraction instruction but the results are thrown
+// 	away.
+// Use with:
+//	n = A,B,C,D,E,H,L,(HL),#
+// Flags affected:
+//	Z - Set if result is zero. (Set if A = n.)
+//	N - Set.
+//	H - Set if no borrow from bit 4.
+//	C - Set for no borrow. (Set if A < n.)
+// Opcodes:
+//		Instruction 	Parameters 		Opcode 		Cycles
+//		CP 				A 				BF 			4
+//		CP 				B 				B8 			4
+//		CP 				C 				B9 			4
+//		CP 				D 				BA 			4
+//		CP 				E 				BB 			4
+//		CP 				H 				BC 			4
+//		CP 				L 				BD 			4
+//		CP 				(HL) 			BE 			8
+//		CP 				# 				FE 			8
+
+func cpAA(cpu *cpu) cycleCount {
+	// Compares A to A. The result is not stored; this function only affects flags.
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagN(true)
+	// TODO: cpu.r.setFlagH()
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	return cpAACycles
+}
+func cpAB(cpu *cpu) cycleCount {
+	// Compares A to B. The result is not stored; this function only affects flags.
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagN(true)
+	// TODO: cpu.r.setFlagH()
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.bc.b)
+	return cpABCycles
+}
+func cpAC(cpu *cpu) cycleCount {
+	// Compares A to C. The result is not stored; this function only affects flags.
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.bc.c)
+	cpu.r.setFlagN(true)
+	// TODO: cpu.r.setFlagH()
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	return cpACCycles
+}
+func cpAD(cpu *cpu) cycleCount {
+	// Compares A to D. The result is not stored; this function only affects flags.
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagN(true)
+	// TODO: cpu.r.setFlagH()
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	return cpADCycles
+}
+func cpAE(cpu *cpu) cycleCount {
+	// Compares A to E. The result is not stored; this function only affects flags.
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagN(true)
+	// TODO: cpu.r.setFlagH()
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	return cpAECycles
+}
+func cpAH(cpu *cpu) cycleCount {
+	// Compares A to H. The result is not stored; this function only affects flags.
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagN(true)
+	// TODO: cpu.r.setFlagH()
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	return cpAHCycles
+}
+func cpAL(cpu *cpu) cycleCount {
+	// Compares A to L. The result is not stored; this function only affects flags.
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagN(true)
+	// TODO: cpu.r.setFlagH()
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	return cpALCycles
+}
+func cpAMemHl(cpu *cpu) cycleCount {
+	// Compares A to (. The result is not stored; this function only affects flags.
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagN(true)
+	// TODO: cpu.r.setFlagH()
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	return cpAMemHlCycles
+}
+func cpAN(cpu *cpu) cycleCount {
+	// Compares A to #. The result is not stored; this function only affects flags.
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagN(true)
+	// TODO: cpu.r.setFlagH()
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	return cpANCycles
 }

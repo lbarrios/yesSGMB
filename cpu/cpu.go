@@ -213,14 +213,14 @@ const (
 	andALCycles       = 4  // 0xA5
 	andAMemHlCycles   = 8  // 0xA6
 	andAACycles       = 8  // 0xA7
-	xAEightCycles     = 0  // 0xA8
-	xANineCycles      = 0  // 0xA9
-	xAACycles         = 0  // 0xAA
-	xABCycles         = 0  // 0xAB
-	xACCycles         = 0  // 0xAC
-	xADCycles         = 0  // 0xAD
-	xAECycles         = 0  // 0xAE
-	xAFCycles         = 0  // 0xAF
+	xorABCycles       = 4  // 0xA8
+	xorACCycles       = 4  // 0xA9
+	xorADCycles       = 4  // 0xAA
+	xorAECycles       = 4  // 0xAB
+	xorAHCycles       = 4  // 0xAC
+	xorALCycles       = 4  // 0xAD
+	xorAMemHlCycles   = 8  // 0xAE
+	xorAACycles       = 4  // 0xAF
 	orABCycles        = 4  // 0xB0
 	orACCycles        = 4  // 0xB1
 	orADCycles        = 4  // 0xB2
@@ -283,7 +283,7 @@ const (
 	xEBCycles         = 0  // 0xEB
 	xECCycles         = 0  // 0xEC
 	xEDCycles         = 0  // 0xED
-	xEECycles         = 0  // 0xEE
+	xorANCycles       = 8  // 0xEE
 	xEFCycles         = 0  // 0xEF
 	ldAStackNCycles   = 12 // 0xF0
 	popAfCycles       = 12 // 0xF1
@@ -291,7 +291,7 @@ const (
 	xFThreeCycles     = 0  // 0xF3
 	xFFourCycles      = 0  // 0xF4
 	pushAfCycles      = 16 // 0xF5
-	orANCycles       = 8  // 0xF6
+	orANCycles        = 8  // 0xF6
 	xFSevenCycles     = 0  // 0xF7
 	ldHlSpNCycles     = 12 // 0xF8
 	ldSpHlCycles      = 0  // 0xF9
@@ -472,14 +472,14 @@ var op = [0x100] instructions{
 	andAL,     //0xA5
 	andAMemHl, //0xA6
 	andAA,     //0xA7
-	TODO,      //0xA8
-	TODO,      //0xA9
-	TODO,      //0xAA
-	TODO,      //0xAB
-	TODO,      //0xAC
-	TODO,      //0xAD
-	TODO,      //0xAE
-	TODO,      //0xAF
+	xorAB,     //0xA8
+	xorAC,     //0xA9
+	xorAD,     //0xAA
+	xorAE,     //0xAB
+	xorAH,     //0xAC
+	xorAL,     //0xAD
+	xorAMemHl, //0xAE
+	xorAA,     //0xAF
 	orAB,      //0xB0
 	orAC,      //0xB1
 	orAD,      //0xB2
@@ -542,7 +542,7 @@ var op = [0x100] instructions{
 	TODO,      //0xEB
 	TODO,      //0xEC
 	TODO,      //0xED
-	TODO,      //0xEE
+	xorAN,     //0xEE
 	TODO,      //0xEF
 	ldAStackN, //0xF0
 	popAf,     //0xF1
@@ -1802,4 +1802,110 @@ func orAN(cpu *cpu) cycleCount {
 	cpu.r.setFlagH(false)
 	cpu.r.setFlagC(false)
 	return orANCycles
+}
+
+// 3.3.3.7. XOR n
+// Description:
+//	Logical exclusive OR n with register A, result in A.
+// Use with:
+//	n = A,B,C,D,E,H,L,(HL),#
+// Flags affected:
+//	Z - Set if result is zero.
+//	N - Reset.
+//	H - Reset.
+//	C - Reset.
+// Opcodes:
+//		Instruction 	Parameters 		Opcode 		Cycles
+//		XOR 			A 				AF 			4
+//		XOR 			B 				A8 			4
+//		XOR 			C 				A9 			4
+//		XOR 			D 				AA 			4
+//		XOR 			E 				AB 			4
+//		XOR 			H 				AC 			4
+//		XOR 			L 				AD 			4
+//		XOR 			(HL) 			AE 			8
+//		XOR 			* 				EE 			8
+
+func xorAA(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A ^ A) (bitwise XOR)
+	cpu.r.af.a ^= cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return xorAACycles
+}
+func xorAB(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A ^ B) (bitwise XOR)
+	cpu.r.af.a ^= cpu.r.bc.b
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return xorABCycles
+}
+func xorAC(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A ^ C) (bitwise XOR)
+	cpu.r.af.a ^= cpu.r.bc.c
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return xorACCycles
+}
+func xorAD(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A ^ D) (bitwise XOR)
+	cpu.r.af.a ^= cpu.r.de.d
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return xorADCycles
+}
+func xorAE(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A ^ E) (bitwise XOR)
+	cpu.r.af.a ^= cpu.r.de.e
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return xorAECycles
+}
+func xorAH(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A ^ H) (bitwise XOR)
+	cpu.r.af.a ^= cpu.r.hl.h
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return xorAHCycles
+}
+func xorAL(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A ^ L) (bitwise XOR)
+	cpu.r.af.a ^= cpu.r.hl.l
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return xorALCycles
+}
+func xorAMemHl(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A ^ the memory position pointed by HL) (bitwise XOR)
+	//cpu.r.af.a ^= cpu.r.
+	//TODO: to implement
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return xorAMemHlCycles
+}
+func xorAN(cpu *cpu) cycleCount {
+	// Stores into register A the result of (A ^ an immediate value) (bitwise XOR)
+	// cpu.r.af.a ^= cpu.r.
+	//TODO: to implement
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return xorANCycles
 }

@@ -248,7 +248,7 @@ const (
 	xCEightCycles     = 0  // 0xC8
 	xCNineCycles      = 0  // 0xC9
 	xCACycles         = 0  // 0xCA
-	xCBCycles         = 0  // 0xCB
+	rxNCycles         = 8  // 0xCB
 	xCCCycles         = 0  // 0xCC
 	xCDCycles         = 0  // 0xCD
 	xCECycles         = 0  // 0xCE
@@ -507,7 +507,7 @@ var op = [0x100] instructions{
 	TODO,      //0xC8
 	TODO,      //0xC9
 	TODO,      //0xCA
-	TODO,      //0xCB
+	rxN,       //0xCB
 	TODO,      //0xCC
 	TODO,      //0xCD
 	TODO,      //0xCE
@@ -2746,6 +2746,171 @@ func rrA(cpu *cpu) cycleCount {
 // 		RLC 			L 				CB 05 		8
 // 		RLC 			(HL) 			CB 06 		16
 
+var rxNInstructions = map[byte]instructions{
+	// RLC
+	0x07: rlcA,
+	0x00: rlcB,
+	0x01: rlcC,
+	0x02: rlcD,
+	0x03: rlcE,
+	0x04: rlcH,
+	0x05: rlcL,
+	0x06: rlcMemHl,
+	// RL
+	0x17: rlA,
+	0x10: rlB,
+	0x11: rlC,
+	0x12: rlD,
+	0x13: rlE,
+	0x14: rlH,
+	0x15: rlL,
+	0x16: rlMemHl,
+	// RRC
+	0x0F: rrcA,
+	0x08: rrcB,
+	0x09: rrcC,
+	0x0A: rrcD,
+	0x0B: rrcE,
+	0x0C: rrcH,
+	0x0D: rrcL,
+	0x0E: rrcMemHl,
+	// RR
+	0x1F: rrA,
+	0x18: rrB,
+	0x19: rrC,
+	0x1A: rrD,
+	0x1B: rrE,
+	0x1C: rrH,
+	0x1D: rrL,
+	0x1E: rrMemHl,
+}
+
+const (
+	rlcBCycles     = 8
+	rlcCCycles     = 8
+	rlcDCycles     = 8
+	rlcECycles     = 8
+	rlcHCycles     = 8
+	rlcLCycles     = 8
+	rlcMemHlCycles = 16
+)
+
+func rxN(cpu *cpu) cycleCount {
+	// Reads one opcode from memory,
+	// and decides which RL/RLC/RR/RRC function to call
+	var nextOpcode = byte(0)
+	// TODO: Read the next opcode from memory
+	var cycles = rxNInstructions[nextOpcode](cpu)
+	if cycles < rxNCycles {
+		return rxNCycles
+	}
+	return cycles
+}
+
+// func rlcA(cpu *cpu) cycleCount
+// already implemented
+
+func rlcB(cpu *cpu) cycleCount {
+	// Rotate B left 1 bit; B[0] = pre(B)[7]
+	var bit7 = bool(cpu.r.bc.b&0x80 == 0x80)
+
+	cpu.r.bc.b = cpu.r.bc.b << 1
+	if bit7 {
+		cpu.r.bc.b |= 0x01 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.bc.b == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlcBCycles
+}
+
+func rlcC(cpu *cpu) cycleCount {
+	// Rotate C left 1 bit; C[0] = pre(C)[7]
+	var bit7 = bool(cpu.r.bc.c&0x80 == 0x80)
+
+	cpu.r.bc.c = cpu.r.bc.c << 1
+	if bit7 {
+		cpu.r.bc.c |= 0x01 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.bc.c == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlcCCycles
+}
+
+func rlcD(cpu *cpu) cycleCount {
+	// Rotate D left 1 bit; D[0] = pre(D)[7]
+	var bit7 = bool(cpu.r.de.d&0x80 == 0x80)
+
+	cpu.r.de.d = cpu.r.de.d << 1
+	if bit7 {
+		cpu.r.de.d |= 0x01 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.de.d == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlcDCycles
+}
+
+func rlcE(cpu *cpu) cycleCount {
+	// Rotate E left 1 bit; E[0] = pre(E)[7]
+	var bit7 = bool(cpu.r.de.e&0x80 == 0x80)
+
+	cpu.r.de.e = cpu.r.de.e << 1
+	if bit7 {
+		cpu.r.de.e |= 0x01 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.de.e == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlcECycles
+}
+
+func rlcH(cpu *cpu) cycleCount {
+	// Rotate H left 1 bit; H[0] = pre(H)[7]
+	var bit7 = bool(cpu.r.hl.h&0x80 == 0x80)
+
+	cpu.r.hl.h = cpu.r.hl.h << 1
+	if bit7 {
+		cpu.r.hl.h |= 0x01 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.hl.h == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlcHCycles
+}
+
+func rlcL(cpu *cpu) cycleCount {
+	// Rotate L left 1 bit; L[0] = pre(L)[7]
+	var bit7 = bool(cpu.r.hl.l&0x80 == 0x80)
+
+	cpu.r.hl.l = cpu.r.hl.l << 1
+	if bit7 {
+		cpu.r.hl.l |= 0x01 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.hl.l == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlcLCycles
+}
+
+func rlcMemHl(cpu *cpu) cycleCount {
+	// TODO: To implement
+	return rlcMemHlCycles
+}
+
 // 3.3.6.6. RL n
 // Description:
 // 	Rotate n left through Carry flag.
@@ -2766,6 +2931,126 @@ func rrA(cpu *cpu) cycleCount {
 // 		RL 				H 				CB 14 		8
 // 		RL 				L 				CB 15 		8
 // 		RL 				(HL) 			CB 16 		16
+
+const (
+	rlBCycles     = 8
+	rlCCycles     = 8
+	rlDCycles     = 8
+	rlECycles     = 8
+	rlHCycles     = 8
+	rlLCycles     = 8
+	rlMemHlCycles = 16
+)
+
+// func rlA(cpu *cpu) cycleCount
+// already implemented
+
+func rlB(cpu *cpu) cycleCount {
+	// Rotate B left 1 bit, but through Carry Flag
+	// Note that Carry = B[7] and B[0] = Carry
+	var bit7 = bool(cpu.r.bc.b&0x80 == 0x80)
+
+	cpu.r.bc.b = cpu.r.bc.b << 1
+	if cpu.r.af.f.c {
+		cpu.r.bc.b |= 0x1 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.bc.b == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlBCycles
+}
+
+func rlC(cpu *cpu) cycleCount {
+	// Rotate C left 1 bit, but through Carry Flag
+	// Note that Carry = C[7] and C[0] = Carry
+	var bit7 = bool(cpu.r.bc.c&0x80 == 0x80)
+
+	cpu.r.bc.c = cpu.r.bc.c << 1
+	if cpu.r.af.f.c {
+		cpu.r.bc.c |= 0x1 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.bc.c == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlCCycles
+}
+
+func rlD(cpu *cpu) cycleCount {
+	// Rotate D left 1 bit, but through Carry Flag
+	// Note that Carry = D[7] and D[0] = Carry
+	var bit7 = bool(cpu.r.de.d&0x80 == 0x80)
+
+	cpu.r.de.d = cpu.r.de.d << 1
+	if cpu.r.af.f.c {
+		cpu.r.de.d |= 0x1 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.de.d == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlDCycles
+}
+
+func rlE(cpu *cpu) cycleCount {
+	// Rotate E left 1 bit, but through Carry Flag
+	// Note that Carry = E[7] and E[0] = Carry
+	var bit7 = bool(cpu.r.de.e&0x80 == 0x80)
+
+	cpu.r.de.e = cpu.r.de.e << 1
+	if cpu.r.af.f.c {
+		cpu.r.de.e |= 0x1 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.de.e == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlECycles
+}
+
+func rlH(cpu *cpu) cycleCount {
+	// Rotate H left 1 bit, but through Carry Flag
+	// Note that Carry = H[7] and H[0] = Carry
+	var bit7 = bool(cpu.r.hl.h&0x80 == 0x80)
+
+	cpu.r.hl.h = cpu.r.hl.h << 1
+	if cpu.r.af.f.c {
+		cpu.r.hl.h |= 0x1 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.hl.h == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlHCycles
+}
+
+func rlL(cpu *cpu) cycleCount {
+	// Rotate L left 1 bit, but through Carry Flag
+	// Note that Carry = L[7] and L[0] = Carry
+	var bit7 = bool(cpu.r.hl.l&0x80 == 0x80)
+
+	cpu.r.hl.l = cpu.r.hl.l << 1
+	if cpu.r.af.f.c {
+		cpu.r.hl.l |= 0x1 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.hl.l == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlLCycles
+}
+
+func rlMemHl(cpu *cpu) cycleCount {
+	// TODO: To implement
+	return rlMemHlCycles
+}
 
 // 3.3.6.7. RRC n
 // Description:
@@ -2788,6 +3073,126 @@ func rrA(cpu *cpu) cycleCount {
 // 		RRC 			L 				CB 0D 		8
 // 		RRC 			(HL) 			CB 0E 		16
 
+// func rrcA(cpu *cpu) cycleCount
+// already implemented
+
+const (
+	rrcBCycles     = 8
+	rrcCCycles     = 8
+	rrcDCycles     = 8
+	rrcECycles     = 8
+	rrcHCycles     = 8
+	rrcLCycles     = 8
+	rrcMemHlCycles = 16
+)
+
+func rrcB(cpu *cpu) cycleCount {
+	// Rotate B right 1 bit
+	// Old bit 0 goes to Carry Flag
+	var bit0 = bool(cpu.r.bc.b&0x01 == 0x01)
+
+	cpu.r.bc.b = cpu.r.bc.b >> 1
+	if bit0 {
+		cpu.r.bc.b |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.bc.b == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrcBCycles
+}
+
+func rrcC(cpu *cpu) cycleCount {
+	// Rotate C right 1 bit
+	// Old bit 0 goes to Carry Flag
+	var bit0 = bool(cpu.r.bc.c&0x01 == 0x01)
+
+	cpu.r.bc.c = cpu.r.bc.c >> 1
+	if bit0 {
+		cpu.r.bc.c |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.bc.c == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrcCCycles
+}
+
+func rrcD(cpu *cpu) cycleCount {
+	// Rotate D right 1 bit
+	// Old bit 0 goes to Carry Flag
+	var bit0 = bool(cpu.r.de.d&0x01 == 0x01)
+
+	cpu.r.de.d = cpu.r.de.d >> 1
+	if bit0 {
+		cpu.r.de.d |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.de.d == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrcDCycles
+}
+
+func rrcE(cpu *cpu) cycleCount {
+	// Rotate E right 1 bit
+	// Old bit 0 goes to Carry Flag
+	var bit0 = bool(cpu.r.de.e&0x01 == 0x01)
+
+	cpu.r.de.e = cpu.r.de.e >> 1
+	if bit0 {
+		cpu.r.de.e |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.de.e == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrcECycles
+}
+
+func rrcH(cpu *cpu) cycleCount {
+	// Rotate H right 1 bit
+	// Old bit 0 goes to Carry Flag
+	var bit0 = bool(cpu.r.hl.h&0x01 == 0x01)
+
+	cpu.r.hl.h = cpu.r.hl.h >> 1
+	if bit0 {
+		cpu.r.hl.h |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.hl.h == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrcHCycles
+}
+
+func rrcL(cpu *cpu) cycleCount {
+	// Rotate L right 1 bit
+	// Old bit 0 goes to Carry Flag
+	var bit0 = bool(cpu.r.hl.l&0x01 == 0x01)
+
+	cpu.r.hl.l = cpu.r.hl.l >> 1
+	if bit0 {
+		cpu.r.hl.l |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.hl.l == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrcLCycles
+}
+
+func rrcMemHl(cpu *cpu) cycleCount {
+	// TODO: To implement
+	return rrcMemHlCycles
+}
+
 // 3.3.6.8. RR n
 // Description:
 // 	Rotate n right through Carry flag.
@@ -2808,6 +3213,125 @@ func rrA(cpu *cpu) cycleCount {
 // 		RR 				H 				CB 1C 		8
 // 		RR 				L 				CB 1D 		8
 // 		RR 				(HL) 			CB 1E 		16
+
+// func rrA(cpu *cpu) cycleCount
+// already implemented
+
+const (
+	rrBCycles     = 8
+	rrCCycles     = 8
+	rrDCycles     = 8
+	rrECycles     = 8
+	rrHCycles     = 8
+	rrLCycles     = 8
+	rrMemHlCycles = 16
+)
+
+func rrB(cpu *cpu) cycleCount {
+	// Rotate B right 1 bit, but through Carry Flag
+	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
+	var bit0 = bool(cpu.r.bc.b&0x01 == 0x01)
+
+	cpu.r.bc.b = cpu.r.bc.b >> 1
+	if cpu.r.af.f.c {
+		cpu.r.bc.b |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.bc.b == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrBCycles
+}
+
+func rrC(cpu *cpu) cycleCount {
+	// Rotate C right 1 bit, but through Carry Flag
+	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
+	var bit0 = bool(cpu.r.bc.c&0x01 == 0x01)
+
+	cpu.r.bc.c = cpu.r.bc.c >> 1
+	if cpu.r.af.f.c {
+		cpu.r.bc.c |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.bc.c == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrCCycles
+}
+
+func rrD(cpu *cpu) cycleCount {
+	// Rotate D right 1 bit, but through Carry Flag
+	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
+	var bit0 = bool(cpu.r.de.d&0x01 == 0x01)
+
+	cpu.r.de.d = cpu.r.de.d >> 1
+	if cpu.r.af.f.c {
+		cpu.r.de.d |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.de.d == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrDCycles
+}
+
+func rrE(cpu *cpu) cycleCount {
+	// Rotate E right 1 bit, but through Carry Flag
+	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
+	var bit0 = bool(cpu.r.de.e&0x01 == 0x01)
+
+	cpu.r.de.e = cpu.r.de.e >> 1
+	if cpu.r.af.f.c {
+		cpu.r.de.e |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.de.e == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrECycles
+}
+
+func rrH(cpu *cpu) cycleCount {
+	// Rotate H right 1 bit, but through Carry Flag
+	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
+	var bit0 = bool(cpu.r.hl.h&0x01 == 0x01)
+
+	cpu.r.hl.h = cpu.r.hl.h >> 1
+	if cpu.r.af.f.c {
+		cpu.r.hl.h |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.hl.h == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrHCycles
+}
+
+func rrL(cpu *cpu) cycleCount {
+	// Rotate L right 1 bit, but through Carry Flag
+	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
+	var bit0 = bool(cpu.r.hl.l&0x01 == 0x01)
+
+	cpu.r.hl.l = cpu.r.hl.l >> 1
+	if cpu.r.af.f.c {
+		cpu.r.hl.l |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.hl.l == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrLCycles
+}
+
+func rrMemHl(cpu *cpu) cycleCount {
+	return rrMemHlCycles
+}
 
 // 3.3.6.9. SLA n
 // Description:

@@ -56,7 +56,7 @@ const (
 	ldMemNnSpCycles   = 20 // 0x08
 	addHlBcCycles     = 8  // 0x09
 	ldAMemBcCycles    = 8  // 0x0A
-	xZeroBCycles      = 0  // 0x0B
+	decBcCycles       = 8  // 0x0B
 	incCCycles        = 4  // 0x0C
 	decCCycles        = 4  // 0x0D
 	ldCNCycles        = 8  // 0x0E
@@ -72,7 +72,7 @@ const (
 	xOneEightCycles   = 0  // 0x18
 	addHlDeCycles     = 8  // 0x19
 	ldAMemDeCycles    = 8  // 0x1A
-	xOneBCycles       = 0  // 0x1B
+	decDeCycles       = 8  // 0x1B
 	incECycles        = 4  // 0x1C
 	decECycles        = 4  // 0x1D
 	ldENCycles        = 8  // 0x1E
@@ -84,15 +84,15 @@ const (
 	incHCycles        = 4  // 0x24
 	decHCycles        = 4  // 0x25
 	ldHNCycles        = 8  // 0x26
-	xTwoSevenCycles   = 0  // 0x27
+	daACycles         = 4  // 0x27
 	xTwoEightCycles   = 0  // 0x28
 	addHlHlCycles     = 8  // 0x29
 	ldiAMemHlCycles   = 8  // 0x2A
-	xTwoBCycles       = 0  // 0x2B
+	decHlCycles       = 8  // 0x2B
 	incLCycles        = 4  // 0x2C
 	decLCycles        = 4  // 0x2D
 	ldLNCycles        = 8  // 0x2E
-	xTwoFCycles       = 0  // 0x2F
+	cplACycles        = 4  // 0x2F
 	xThreeZeroCycles  = 0  // 0x30
 	ldSpNnCycles      = 12 // 0x31
 	lddMemHlACycles   = 8  // 0x32
@@ -104,7 +104,7 @@ const (
 	xThreeEightCycles = 0  // 0x38
 	addHlSpCycles     = 8  // 0x39
 	lddAMemHlCycles   = 8  // 0x3A
-	xThreeBCycles     = 0  // 0x3B
+	decSpCycles       = 8  // 0x3B
 	incACycles        = 4  // 0x3C
 	decACycles        = 4  // 0x3D
 	ldANCycles        = 0  // 0x3E
@@ -315,7 +315,7 @@ var op = [0x100] instructions{
 	ldMemNnSp, //0x08
 	addHlBc,   //0x09
 	ldAMemBc,  //0x0A
-	TODO,      //0x0B
+	decBc,     //0x0B
 	incC,      //0x0C
 	decC,      //0x0D
 	ldCN,      //0x0E
@@ -331,7 +331,7 @@ var op = [0x100] instructions{
 	TODO,      //0x18
 	addHlDe,   //0x19
 	ldAMemDe,  //0x1A
-	TODO,      //0x1B
+	decDe,     //0x1B
 	incE,      //0x1C
 	decE,      //0x1D
 	ldEN,      //0x1E
@@ -343,15 +343,15 @@ var op = [0x100] instructions{
 	incH,      //0x24
 	decH,      //0x25
 	ldHN,      //0x26
-	TODO,      //0x27
+	daA,       //0x27
 	TODO,      //0x28
 	addHlHl,   //0x29
 	ldiAMemHl, //0x2A
-	TODO,      //0x2B
+	decHl,     //0x2B
 	incL,      //0x2C
 	decL,      //0x2D
 	ldLN,      //0x2E
-	TODO,      //0x2F
+	cplA,      //0x2F
 	TODO,      //0x30
 	ldSpNn,    //0x31
 	lddMemHlA, //0x32
@@ -363,7 +363,7 @@ var op = [0x100] instructions{
 	TODO,      //0x38
 	addHlSp,   //0x39
 	lddAMemHl, //0x3A
-	TODO,      //0x3B
+	decSp,     //0x3B
 	incA,      //0x3C
 	decA,      //0x3D
 	ldAN,      //0x3E
@@ -2323,4 +2323,188 @@ func incSp(cpu *cpu) cycleCount {
 	// Increment register SP
 	cpu.r.sp++
 	return incSpCycles
+}
+
+// 3.3.4.4. DEC nn
+// Description:
+//	Decrement register nn.
+// Use with:
+//	nn = BC,DE,HL,SP
+// Flags affected:
+//	None.
+// Opcodes:
+//		Instruction 	Parameters 		Opcode 		Cycles
+//		DEC 			BC 				0B 			8
+//		DEC 			DE 				1B 			8
+//		DEC 			HL 				2B 			8
+//		DEC 			SP 				3B 			8
+
+func decBc(cpu *cpu) cycleCount {
+	// Decrement register BC
+	var bc = cpu.r.bcAsInt()
+	bc--
+	cpu.r.bc.c = byte(bc & 0xff)
+	cpu.r.bc.b = byte(bc >> 8)
+	return decBcCycles
+}
+func decDe(cpu *cpu) cycleCount {
+	// Decrement register DE
+	var de = cpu.r.deAsInt()
+	de--
+	cpu.r.de.e = byte(de & 0xff)
+	cpu.r.de.d = byte(de >> 8)
+	return decDeCycles
+}
+func decHl(cpu *cpu) cycleCount {
+	// Decrement register HL
+	var hl = cpu.r.hlAsInt()
+	hl--
+	cpu.r.hl.l = byte(hl & 0xff)
+	cpu.r.hl.h = byte(hl >> 8)
+	return decHlCycles
+}
+func decSp(cpu *cpu) cycleCount {
+	// Decrement register SP
+	cpu.r.sp++
+	return decSpCycles
+}
+
+// 3.3.5. Miscellaneous
+
+// 3.3.5.1. SWAP n
+// Description:
+// 	Swap upper & lower nibles of n.
+// Use with:
+// 	n = A,B,C,D,E,H,L,(HL)
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Reset.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		SWAP 			A 				CB 37 			8
+// 		SWAP 			B 				CB 30 			8
+// 		SWAP 			C 				CB 31 			8
+// 		SWAP 			D 				CB 32 			8
+// 		SWAP 			E 				CB 33 			8
+// 		SWAP 			H 				CB 34 			8
+// 		SWAP 			L 				CB 35 			8
+// 		SWAP 			(HL) 			CB 6 			16
+
+var swapInstructions = map[byte]instructions{
+	0x37: swapA,
+	0x30: swapB,
+	0x31: swapC,
+	0x32: swapD,
+	0x33: swapE,
+	0x34: swapH,
+	0x35: swapL,
+	0x06: swapMemHl,
+}
+
+func swap(cpu *cpu) cycleCount {
+	// Swap upper & lower nibles
+	// This function gets the next opcode from memory,
+	// and calls to the corresponding function
+	var nextOpcode = byte(0)
+	// TODO: Read the next opcode from memory
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(false)
+	return swapInstructions[nextOpcode](cpu)
+}
+
+func swapA(cpu *cpu) cycleCount {
+	// Swap upper & lower nibles of register A
+	var oldA = cpu.r.af.a
+	cpu.r.af.a = byte(oldA<<4) + byte(oldA<<4)
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	return 8
+}
+func swapB(cpu *cpu) cycleCount {
+	// Swap upper & lower nibles of register B
+	var oldB = cpu.r.bc.b
+	cpu.r.bc.b = byte(oldB<<4) + byte(oldB<<4)
+	cpu.r.setFlagZ(cpu.r.bc.b == 0)
+	return 8
+}
+func swapC(cpu *cpu) cycleCount {
+	// Swap upper & lower nibles of register C
+	var oldC = cpu.r.bc.c
+	cpu.r.bc.c = byte(oldC<<4) + byte(oldC<<4)
+	cpu.r.setFlagZ(cpu.r.bc.c == 0)
+	return 8
+}
+func swapD(cpu *cpu) cycleCount {
+	// Swap upper & lower nibles of register D
+	var oldD = cpu.r.de.d
+	cpu.r.de.d = byte(oldD<<4) + byte(oldD<<4)
+	cpu.r.setFlagZ(cpu.r.de.d == 0)
+	return 8
+}
+func swapE(cpu *cpu) cycleCount {
+	// Swap upper & lower nibles of register E
+	var oldE = cpu.r.de.e
+	cpu.r.de.e = byte(oldE<<4) + byte(oldE<<4)
+	cpu.r.setFlagZ(cpu.r.de.e == 0)
+	return 8
+}
+func swapH(cpu *cpu) cycleCount {
+	// Swap upper & lower nibles of register H
+	var oldH = cpu.r.hl.h
+	cpu.r.hl.h = byte(oldH<<4) + byte(oldH<<4)
+	cpu.r.setFlagZ(cpu.r.hl.h == 0)
+	return 8
+}
+func swapL(cpu *cpu) cycleCount {
+	// Swap upper & lower nibles of register L
+	var oldL = cpu.r.hl.l
+	cpu.r.hl.l = byte(oldL<<4) + byte(oldL<<4)
+	cpu.r.setFlagZ(cpu.r.hl.l == 0)
+	return 8
+}
+func swapMemHl(cpu *cpu) cycleCount {
+	// Swap upper & lower nibles of the position of memory pointed by register HL
+	// TODO: To implement
+	return 16
+}
+
+// 3.3.5.2. DAA
+// Description:
+// 	Decimal adjust register A.
+// 	This instruction adjusts register A so that the
+// 	correct representation of Binary Coded Decimal (BCD)
+// 	is obtained.
+// Flags affected:
+// 	Z - Set if register A is zero.
+// 	N - Not affected.
+// 	H - Reset.
+// 	C - Set or reset according to operation.
+//
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		DAA 			-/- 			27 			4
+
+func daA(cpu *cpu) cycleCount {
+	// TODO: To implement
+	return daACycles
+}
+
+// 3.3.5.3. CPL
+// Description:
+// 	Complement A register. (Flip all bits.)
+// Flags affected:
+// 	Z - Not affected.
+// 	N - Set.
+// 	H - Set.
+// 	C - Not affected.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		CPL 			-/- 			2F 			4
+
+func cplA(cpu *cpu) cycleCount {
+	// Revert all bits of register A (ie. bitwise XOR with 0xFF)
+	cpu.r.af.a ^= 0xFF
+	return cplACycles
 }

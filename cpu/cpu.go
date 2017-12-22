@@ -2810,6 +2810,222 @@ var rxNInstructions = map[byte]instructions{
 	0x3C: srlH,
 	0x3D: srlL,
 	0x3E: srlMemHl,
+	// BIT0
+	0x47: bit0A,
+	0x40: bit0B,
+	0x41: bit0C,
+	0x42: bit0D,
+	0x43: bit0E,
+	0x44: bit0H,
+	0x45: bit0L,
+	0x46: bit0MemHl,
+	// BIT1
+	0x4F: bit1A,
+	0x48: bit1B,
+	0x49: bit1C,
+	0x4A: bit1D,
+	0x4B: bit1E,
+	0x4C: bit1H,
+	0x4D: bit1L,
+	0x4E: bit1MemHl,
+	// BIT2
+	0x57: bit2A,
+	0x50: bit2B,
+	0x51: bit2C,
+	0x52: bit2D,
+	0x53: bit2E,
+	0x54: bit2H,
+	0x55: bit2L,
+	0x56: bit2MemHl,
+	// BIT3
+	0x5F: bit3A,
+	0x58: bit3B,
+	0x59: bit3C,
+	0x5A: bit3D,
+	0x5B: bit3E,
+	0x5C: bit3H,
+	0x5D: bit3L,
+	0x5E: bit3MemHl,
+	// BIT4
+	0x67: bit4A,
+	0x60: bit4B,
+	0x61: bit4C,
+	0x62: bit4D,
+	0x63: bit4E,
+	0x64: bit4H,
+	0x65: bit4L,
+	0x66: bit4MemHl,
+	// BIT5
+	0x6F: bit5A,
+	0x68: bit5B,
+	0x69: bit5C,
+	0x6A: bit5D,
+	0x6B: bit5E,
+	0x6C: bit5H,
+	0x6D: bit5L,
+	0x6E: bit5MemHl,
+	// BIT6
+	0x77: bit6A,
+	0x70: bit6B,
+	0x71: bit6C,
+	0x72: bit6D,
+	0x73: bit6E,
+	0x74: bit6H,
+	0x75: bit6L,
+	0x76: bit6MemHl,
+	// BIT7
+	0x7F: bit7A,
+	0x78: bit7B,
+	0x79: bit7C,
+	0x7A: bit7D,
+	0x7B: bit7E,
+	0x7C: bit7H,
+	0x7D: bit7L,
+	0x7E: bit7MemHl,
+	// RES0
+	0x87: res0A,
+	0x80: res0B,
+	0x81: res0C,
+	0x82: res0D,
+	0x83: res0E,
+	0x84: res0H,
+	0x85: res0L,
+	0x86: res0MemHl,
+	// RES1
+	0x8F: res1A,
+	0x88: res1B,
+	0x89: res1C,
+	0x8A: res1D,
+	0x8B: res1E,
+	0x8C: res1H,
+	0x8D: res1L,
+	0x8E: res1MemHl,
+	// RES2
+	0x97: res2A,
+	0x90: res2B,
+	0x91: res2C,
+	0x92: res2D,
+	0x93: res2E,
+	0x94: res2H,
+	0x95: res2L,
+	0x96: res2MemHl,
+	// RES3
+	0x9F: res3A,
+	0x98: res3B,
+	0x99: res3C,
+	0x9A: res3D,
+	0x9B: res3E,
+	0x9C: res3H,
+	0x9D: res3L,
+	0x9E: res3MemHl,
+	// RES4
+	0xA7: res4A,
+	0xA0: res4B,
+	0xA1: res4C,
+	0xA2: res4D,
+	0xA3: res4E,
+	0xA4: res4H,
+	0xA5: res4L,
+	0xA6: res4MemHl,
+	// RES5
+	0xAF: res5A,
+	0xA8: res5B,
+	0xA9: res5C,
+	0xAA: res5D,
+	0xAB: res5E,
+	0xAC: res5H,
+	0xAD: res5L,
+	0xAE: res5MemHl,
+	// RES6
+	0xB7: res6A,
+	0xB0: res6B,
+	0xB1: res6C,
+	0xB2: res6D,
+	0xB3: res6E,
+	0xB4: res6H,
+	0xB5: res6L,
+	0xB6: res6MemHl,
+	// RES7
+	0xBF: res7A,
+	0xB8: res7B,
+	0xB9: res7C,
+	0xBA: res7D,
+	0xBB: res7E,
+	0xBC: res7H,
+	0xBD: res7L,
+	0xBE: res7MemHl,
+	// SET0
+	0xC7: set0A,
+	0xC0: set0B,
+	0xC1: set0C,
+	0xC2: set0D,
+	0xC3: set0E,
+	0xC4: set0H,
+	0xC5: set0L,
+	0xC6: set0MemHl,
+	// SET1
+	0xCF: set1A,
+	0xC8: set1B,
+	0xC9: set1C,
+	0xCA: set1D,
+	0xCB: set1E,
+	0xCC: set1H,
+	0xCD: set1L,
+	0xCE: set1MemHl,
+	// SET2
+	0xD7: set2A,
+	0xD0: set2B,
+	0xD1: set2C,
+	0xD2: set2D,
+	0xD3: set2E,
+	0xD4: set2H,
+	0xD5: set2L,
+	0xD6: set2MemHl,
+	// SET3
+	0xDF: set3A,
+	0xD8: set3B,
+	0xD9: set3C,
+	0xDA: set3D,
+	0xDB: set3E,
+	0xDC: set3H,
+	0xDD: set3L,
+	0xDE: set3MemHl,
+	// SET4
+	0xE7: set4A,
+	0xE0: set4B,
+	0xE1: set4C,
+	0xE2: set4D,
+	0xE3: set4E,
+	0xE4: set4H,
+	0xE5: set4L,
+	0xE6: set4MemHl,
+	// SET5
+	0xEF: set5A,
+	0xE8: set5B,
+	0xE9: set5C,
+	0xEA: set5D,
+	0xEB: set5E,
+	0xEC: set5H,
+	0xED: set5L,
+	0xEE: set5MemHl,
+	// SET6
+	0xF7: set6A,
+	0xF0: set6B,
+	0xF1: set6C,
+	0xF2: set6D,
+	0xF3: set6E,
+	0xF4: set6H,
+	0xF5: set6L,
+	0xF6: set6MemHl,
+	// SET7
+	0xFF: set7A,
+	0xF8: set7B,
+	0xF9: set7C,
+	0xFA: set7D,
+	0xFB: set7E,
+	0xFC: set7H,
+	0xFD: set7L,
+	0xFE: set7MemHl,
 }
 
 const (
@@ -3711,4 +3927,1139 @@ func srlMemHl(cpu *cpu) cycleCount {
 	// Shift MemHl right into Carry.
 	// MemHl[7] = 0
 	return srlMemHlCycles
+}
+
+// 3.3.7. Bit Opcodes
+
+// 3.3.7.1. BIT b,r
+// Description:
+// 	Test bit b in register r.
+// Use with:
+// 	b = 0 - 7, r = A,B,C,D,E,H,L,(HL)
+// Flags affected:
+// 	Z - Set if bit b of register r is 0.
+// 	N - Reset.
+// 	H - Set.
+// 	C - Not affected.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		BIT 			b,A 			CB 47 		8
+// 		BIT 			b,B 			CB 40 		8
+// 		BIT 			b,C 			CB 41 		8
+// 		BIT 			b,D 			CB 42 		8
+// 		BIT 			b,E 			CB 43 		8
+// 		BIT 			b,H 			CB 44 		8
+// 		BIT 			b,L 			CB 45 		8
+// 		BIT 			b,(HL) 			CB 46 		16
+
+const (
+	bitACycles     = 8
+	bitBCycles     = 8
+	bitCCycles     = 8
+	bitDCycles     = 8
+	bitECycles     = 8
+	bitHCycles     = 8
+	bitLCycles     = 8
+	bitMemHlCycles = 16
+)
+
+func bit0A(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.af.a & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitACycles
+}
+func bit1A(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.af.a & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitACycles
+}
+func bit2A(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.af.a & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitACycles
+}
+func bit3A(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.af.a & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitACycles
+}
+func bit4A(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.af.a & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitACycles
+}
+func bit5A(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.af.a & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitACycles
+}
+func bit6A(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.af.a & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitACycles
+}
+func bit7A(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.af.a & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitACycles
+}
+
+func bit0B(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.b & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitBCycles
+}
+func bit1B(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.b & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitBCycles
+}
+func bit2B(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.b & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitBCycles
+}
+func bit3B(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.b & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitBCycles
+}
+func bit4B(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.b & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitBCycles
+}
+func bit5B(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.b & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitBCycles
+}
+func bit6B(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.b & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitBCycles
+}
+func bit7B(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.b & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitBCycles
+}
+
+func bit0C(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.c & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitCCycles
+}
+func bit1C(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.c & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitCCycles
+}
+func bit2C(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.c & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitCCycles
+}
+func bit3C(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.c & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitCCycles
+}
+func bit4C(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.c & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitCCycles
+}
+func bit5C(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.c & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitCCycles
+}
+func bit6C(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.c & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitCCycles
+}
+func bit7C(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.bc.c & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitCCycles
+}
+
+func bit0D(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.d & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitDCycles
+}
+func bit1D(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.d & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitDCycles
+}
+func bit2D(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.d & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitDCycles
+}
+func bit3D(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.d & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitDCycles
+}
+func bit4D(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.d & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitDCycles
+}
+func bit5D(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.d & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitDCycles
+}
+func bit6D(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.d & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitDCycles
+}
+func bit7D(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.d & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitDCycles
+}
+
+func bit0E(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.e & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitECycles
+}
+func bit1E(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.e & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitECycles
+}
+func bit2E(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.e & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitECycles
+}
+func bit3E(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.e & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitECycles
+}
+func bit4E(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.e & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitECycles
+}
+func bit5E(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.e & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitECycles
+}
+func bit6E(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.e & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitECycles
+}
+func bit7E(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.de.e & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitECycles
+}
+
+func bit0H(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.h & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitHCycles
+}
+func bit1H(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.h & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitHCycles
+}
+func bit2H(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.h & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitHCycles
+}
+func bit3H(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.h & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitHCycles
+}
+func bit4H(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.h & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitHCycles
+}
+func bit5H(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.h & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitHCycles
+}
+func bit6H(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.h & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitHCycles
+}
+func bit7H(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.h & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitHCycles
+}
+
+func bit0L(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.l & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitLCycles
+}
+func bit1L(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.l & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitLCycles
+}
+func bit2L(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.l & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitLCycles
+}
+func bit3L(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.l & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitLCycles
+}
+func bit4L(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.l & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitLCycles
+}
+func bit5L(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.l & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitLCycles
+}
+func bit6L(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.l & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitLCycles
+}
+func bit7L(cpu *cpu) cycleCount {
+	cpu.r.setFlagZ((cpu.r.hl.l & 0x01) == 0x00)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
+	return bitLCycles
+}
+
+func bit0MemHl(cpu *cpu) cycleCount {
+	// TODO: To implement
+	return bitMemHlCycles
+}
+func bit1MemHl(cpu *cpu) cycleCount {
+	// TODO: To implement
+	return bitMemHlCycles
+}
+func bit2MemHl(cpu *cpu) cycleCount {
+	// TODO: To implement
+	return bitMemHlCycles
+}
+func bit3MemHl(cpu *cpu) cycleCount {
+	// TODO: To implement
+	return bitMemHlCycles
+}
+func bit4MemHl(cpu *cpu) cycleCount {
+	// TODO: To implement
+	return bitMemHlCycles
+}
+func bit5MemHl(cpu *cpu) cycleCount {
+	// TODO: To implement
+	return bitMemHlCycles
+}
+func bit6MemHl(cpu *cpu) cycleCount {
+	// TODO: To implement
+	return bitMemHlCycles
+}
+func bit7MemHl(cpu *cpu) cycleCount {
+	// TODO: To implement
+	return bitMemHlCycles
+}
+
+// 3.3.7.2. SET b,r
+// Description:
+// 	Set bit b in register r.
+// Use with:
+// 	b = 0 - 7, r = A,B,C,D,E,H,L,(HL)
+// Flags affected:
+// 	None.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		SET 			b,A 			CB C7 		8
+// 		SET 			b,B 			CB C0 		8
+// 		SET 			b,C 			CB C1 		8
+// 		SET 			b,D 			CB C2 		8
+// 		SET 			b,E 			CB C3 		8
+// 		SET 			b,H 			CB C4 		8
+// 		SET 			b,L 			CB C5 		8
+// 		SET 			b,(HL) 			CB C6 		16
+
+// 		SET 			b,A 			CB C7 		8
+// 		SET 			b,B 			CB C0 		8
+// 		SET 			b,C 			CB C1 		8
+// 		SET 			b,D 			CB C2 		8
+// 		SET 			b,E 			CB C3 		8
+// 		SET 			b,H 			CB C4 		8
+// 		SET 			b,L 			CB C5 		8
+// 		SET 			b,MemHl 			CB C6 		16
+
+const (
+	setACycles     = 8
+	setBCycles     = 8
+	setCCycles     = 8
+	setDCycles     = 8
+	setECycles     = 8
+	setHCycles     = 8
+	setLCycles     = 8
+	setMemHlCycles = 16
+)
+
+func set0A(cpu *cpu) cycleCount {
+	// Sets the 0 bit of the register A
+	cpu.r.af.a = cpu.r.af.a | (0x01 << 0)
+	return setACycles
+}
+func set0B(cpu *cpu) cycleCount {
+	// Sets the 0 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 0)
+	return setBCycles
+}
+func set0C(cpu *cpu) cycleCount {
+	// Sets the 0 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 0)
+	return setCCycles
+}
+func set0D(cpu *cpu) cycleCount {
+	// Sets the 0 bit of the register D
+	cpu.r.de.d = cpu.r.de.d | (0x01 << 0)
+	return setDCycles
+}
+func set0E(cpu *cpu) cycleCount {
+	// Sets the 0 bit of the register E
+	cpu.r.de.e = cpu.r.de.e | (0x01 << 0)
+	return setECycles
+}
+func set0H(cpu *cpu) cycleCount {
+	// Sets the 0 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 0)
+	return setHCycles
+}
+func set0L(cpu *cpu) cycleCount {
+	// Sets the 0 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 0)
+	return setLCycles
+}
+
+func set1A(cpu *cpu) cycleCount {
+	// Sets the 1 bit of the register A
+	cpu.r.af.a = cpu.r.af.a | (0x01 << 1)
+	return setACycles
+}
+func set1B(cpu *cpu) cycleCount {
+	// Sets the 1 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 1)
+	return setBCycles
+}
+func set1C(cpu *cpu) cycleCount {
+	// Sets the 1 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 1)
+	return setCCycles
+}
+func set1D(cpu *cpu) cycleCount {
+	// Sets the 1 bit of the register D
+	cpu.r.de.d = cpu.r.de.d | (0x01 << 1)
+	return setDCycles
+}
+func set1E(cpu *cpu) cycleCount {
+	// Sets the 1 bit of the register E
+	cpu.r.de.e = cpu.r.de.e | (0x01 << 1)
+	return setECycles
+}
+func set1H(cpu *cpu) cycleCount {
+	// Sets the 1 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 1)
+	return setHCycles
+}
+func set1L(cpu *cpu) cycleCount {
+	// Sets the 1 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 1)
+	return setLCycles
+}
+
+func set2A(cpu *cpu) cycleCount {
+	// Sets the 2 bit of the register A
+	cpu.r.af.a = cpu.r.af.a | (0x01 << 2)
+	return setACycles
+}
+func set2B(cpu *cpu) cycleCount {
+	// Sets the 2 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 2)
+	return setBCycles
+}
+func set2C(cpu *cpu) cycleCount {
+	// Sets the 2 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 2)
+	return setCCycles
+}
+func set2D(cpu *cpu) cycleCount {
+	// Sets the 2 bit of the register D
+	cpu.r.de.d = cpu.r.de.d | (0x01 << 2)
+	return setDCycles
+}
+func set2E(cpu *cpu) cycleCount {
+	// Sets the 2 bit of the register E
+	cpu.r.de.e = cpu.r.de.e | (0x01 << 2)
+	return setECycles
+}
+func set2H(cpu *cpu) cycleCount {
+	// Sets the 2 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 2)
+	return setHCycles
+}
+func set2L(cpu *cpu) cycleCount {
+	// Sets the 2 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 2)
+	return setLCycles
+}
+
+func set3A(cpu *cpu) cycleCount {
+	// Sets the 3 bit of the register A
+	cpu.r.af.a = cpu.r.af.a | (0x01 << 3)
+	return setACycles
+}
+func set3B(cpu *cpu) cycleCount {
+	// Sets the 3 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 3)
+	return setBCycles
+}
+func set3C(cpu *cpu) cycleCount {
+	// Sets the 3 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 3)
+	return setCCycles
+}
+func set3D(cpu *cpu) cycleCount {
+	// Sets the 3 bit of the register D
+	cpu.r.de.d = cpu.r.de.d | (0x01 << 3)
+	return setDCycles
+}
+func set3E(cpu *cpu) cycleCount {
+	// Sets the 3 bit of the register E
+	cpu.r.de.e = cpu.r.de.e | (0x01 << 3)
+	return setECycles
+}
+func set3H(cpu *cpu) cycleCount {
+	// Sets the 3 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 3)
+	return setHCycles
+}
+func set3L(cpu *cpu) cycleCount {
+	// Sets the 3 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 3)
+	return setLCycles
+}
+
+func set4A(cpu *cpu) cycleCount {
+	// Sets the 4 bit of the register A
+	cpu.r.af.a = cpu.r.af.a | (0x01 << 4)
+	return setACycles
+}
+func set4B(cpu *cpu) cycleCount {
+	// Sets the 4 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 4)
+	return setBCycles
+}
+func set4C(cpu *cpu) cycleCount {
+	// Sets the 4 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 4)
+	return setCCycles
+}
+func set4D(cpu *cpu) cycleCount {
+	// Sets the 4 bit of the register D
+	cpu.r.de.d = cpu.r.de.d | (0x01 << 4)
+	return setDCycles
+}
+func set4E(cpu *cpu) cycleCount {
+	// Sets the 4 bit of the register E
+	cpu.r.de.e = cpu.r.de.e | (0x01 << 4)
+	return setECycles
+}
+func set4H(cpu *cpu) cycleCount {
+	// Sets the 4 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 4)
+	return setHCycles
+}
+func set4L(cpu *cpu) cycleCount {
+	// Sets the 4 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 4)
+	return setLCycles
+}
+
+func set5A(cpu *cpu) cycleCount {
+	// Sets the 5 bit of the register A
+	cpu.r.af.a = cpu.r.af.a | (0x01 << 5)
+	return setACycles
+}
+func set5B(cpu *cpu) cycleCount {
+	// Sets the 5 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 5)
+	return setBCycles
+}
+func set5C(cpu *cpu) cycleCount {
+	// Sets the 5 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 5)
+	return setCCycles
+}
+func set5D(cpu *cpu) cycleCount {
+	// Sets the 5 bit of the register D
+	cpu.r.de.d = cpu.r.de.d | (0x01 << 5)
+	return setDCycles
+}
+func set5E(cpu *cpu) cycleCount {
+	// Sets the 5 bit of the register E
+	cpu.r.de.e = cpu.r.de.e | (0x01 << 5)
+	return setECycles
+}
+func set5H(cpu *cpu) cycleCount {
+	// Sets the 5 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 5)
+	return setHCycles
+}
+func set5L(cpu *cpu) cycleCount {
+	// Sets the 5 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 5)
+	return setLCycles
+}
+
+func set6A(cpu *cpu) cycleCount {
+	// Sets the 6 bit of the register A
+	cpu.r.af.a = cpu.r.af.a | (0x01 << 6)
+	return setACycles
+}
+func set6B(cpu *cpu) cycleCount {
+	// Sets the 6 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 6)
+	return setBCycles
+}
+func set6C(cpu *cpu) cycleCount {
+	// Sets the 6 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 6)
+	return setCCycles
+}
+func set6D(cpu *cpu) cycleCount {
+	// Sets the 6 bit of the register D
+	cpu.r.de.d = cpu.r.de.d | (0x01 << 6)
+	return setDCycles
+}
+func set6E(cpu *cpu) cycleCount {
+	// Sets the 6 bit of the register E
+	cpu.r.de.e = cpu.r.de.e | (0x01 << 6)
+	return setECycles
+}
+func set6H(cpu *cpu) cycleCount {
+	// Sets the 6 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 6)
+	return setHCycles
+}
+func set6L(cpu *cpu) cycleCount {
+	// Sets the 6 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 6)
+	return setLCycles
+}
+
+func set7A(cpu *cpu) cycleCount {
+	// Sets the 7 bit of the register A
+	cpu.r.af.a = cpu.r.af.a | (0x01 << 7)
+	return setACycles
+}
+func set7B(cpu *cpu) cycleCount {
+	// Sets the 7 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 7)
+	return setBCycles
+}
+func set7C(cpu *cpu) cycleCount {
+	// Sets the 7 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 7)
+	return setCCycles
+}
+func set7D(cpu *cpu) cycleCount {
+	// Sets the 7 bit of the register D
+	cpu.r.de.d = cpu.r.de.d | (0x01 << 7)
+	return setDCycles
+}
+func set7E(cpu *cpu) cycleCount {
+	// Sets the 7 bit of the register E
+	cpu.r.de.e = cpu.r.de.e | (0x01 << 7)
+	return setECycles
+}
+func set7H(cpu *cpu) cycleCount {
+	// Sets the 7 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 7)
+	return setHCycles
+}
+func set7L(cpu *cpu) cycleCount {
+	// Sets the 7 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 7)
+	return setLCycles
+}
+
+func set0MemHl(cpu *cpu) cycleCount {
+	// set the 0 bit of the position of memory pointed by register HL
+	// TODO: To implement
+	return setMemHlCycles
+}
+func set1MemHl(cpu *cpu) cycleCount {
+	// set the 1 bit of the position of memory pointed by register HL
+	// TODO: To implement
+	return setMemHlCycles
+}
+func set2MemHl(cpu *cpu) cycleCount {
+	// set the 2 bit of the position of memory pointed by register HL
+	// TODO: To implement
+	return setMemHlCycles
+}
+func set3MemHl(cpu *cpu) cycleCount {
+	// set the 3 bit of the position of memory pointed by register HL
+	// TODO: To implement
+	return setMemHlCycles
+}
+func set4MemHl(cpu *cpu) cycleCount {
+	// set the 4 bit of the position of memory pointed by register HL
+	// TODO: To implement
+	return setMemHlCycles
+}
+func set5MemHl(cpu *cpu) cycleCount {
+	// set the 5 bit of the position of memory pointed by register HL
+	// TODO: To implement
+	return setMemHlCycles
+}
+func set6MemHl(cpu *cpu) cycleCount {
+	// set the 6 bit of the position of memory pointed by register HL
+	// TODO: To implement
+	return setMemHlCycles
+}
+func set7MemHl(cpu *cpu) cycleCount {
+	// set the 7 bit of the position of memory pointed by register HL
+	// TODO: To implement
+	return setMemHlCycles
+}
+
+// 3.3.7.3. RES b,r
+// Description:
+// 	Reset bit b in register r.
+// Use with:
+// 	b = 0 - 7, r = A,B,C,D,E,H,L,(HL)
+// Flags affected:
+// 	None.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RES 			b,A 			CB 87 		8
+// 		RES 			b,B 			CB 80 		8
+// 		RES 			b,C 			CB 81 		8
+// 		RES 			b,D 			CB 82 		8
+// 		RES 			b,E 			CB 83 		8
+// 		RES 			b,H 			CB 84 		8
+// 		RES 			b,L 			CB 85 		8
+// 		RES 			b,(HL) 			CB 86 		16
+
+const (
+	resACycles     = 8
+	resBCycles     = 8
+	resCCycles     = 8
+	resDCycles     = 8
+	resECycles     = 8
+	resHCycles     = 8
+	resLCycles     = 8
+	resMemHlCycles = 16
+)
+
+func res0A(cpu *cpu) cycleCount {
+	// Reset the 0 bit of the register A
+	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 0))
+	return setACycles
+}
+func res0B(cpu *cpu) cycleCount {
+	// Reset the 0 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 0))
+	return setBCycles
+}
+func res0C(cpu *cpu) cycleCount {
+	// Reset the 0 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 0))
+	return setCCycles
+}
+func res0D(cpu *cpu) cycleCount {
+	// Reset the 0 bit of the register D
+	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 0))
+	return setDCycles
+}
+func res0E(cpu *cpu) cycleCount {
+	// Reset the 0 bit of the register E
+	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 0))
+	return setECycles
+}
+func res0H(cpu *cpu) cycleCount {
+	// Reset the 0 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 0))
+	return setHCycles
+}
+func res0L(cpu *cpu) cycleCount {
+	// Reset the 0 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 0))
+	return setLCycles
+}
+
+func res1A(cpu *cpu) cycleCount {
+	// Reset the 1 bit of the register A
+	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 1))
+	return setACycles
+}
+func res1B(cpu *cpu) cycleCount {
+	// Reset the 1 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 1))
+	return setBCycles
+}
+func res1C(cpu *cpu) cycleCount {
+	// Reset the 1 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 1))
+	return setCCycles
+}
+func res1D(cpu *cpu) cycleCount {
+	// Reset the 1 bit of the register D
+	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 1))
+	return setDCycles
+}
+func res1E(cpu *cpu) cycleCount {
+	// Reset the 1 bit of the register E
+	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 1))
+	return setECycles
+}
+func res1H(cpu *cpu) cycleCount {
+	// Reset the 1 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 1))
+	return setHCycles
+}
+func res1L(cpu *cpu) cycleCount {
+	// Reset the 1 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 1))
+	return setLCycles
+}
+
+func res2A(cpu *cpu) cycleCount {
+	// Reset the 2 bit of the register A
+	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 2))
+	return setACycles
+}
+func res2B(cpu *cpu) cycleCount {
+	// Reset the 2 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 2))
+	return setBCycles
+}
+func res2C(cpu *cpu) cycleCount {
+	// Reset the 2 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 2))
+	return setCCycles
+}
+func res2D(cpu *cpu) cycleCount {
+	// Reset the 2 bit of the register D
+	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 2))
+	return setDCycles
+}
+func res2E(cpu *cpu) cycleCount {
+	// Reset the 2 bit of the register E
+	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 2))
+	return setECycles
+}
+func res2H(cpu *cpu) cycleCount {
+	// Reset the 2 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 2))
+	return setHCycles
+}
+func res2L(cpu *cpu) cycleCount {
+	// Reset the 2 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 2))
+	return setLCycles
+}
+
+func res3A(cpu *cpu) cycleCount {
+	// Reset the 3 bit of the register A
+	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 3))
+	return setACycles
+}
+func res3B(cpu *cpu) cycleCount {
+	// Reset the 3 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 3))
+	return setBCycles
+}
+func res3C(cpu *cpu) cycleCount {
+	// Reset the 3 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 3))
+	return setCCycles
+}
+func res3D(cpu *cpu) cycleCount {
+	// Reset the 3 bit of the register D
+	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 3))
+	return setDCycles
+}
+func res3E(cpu *cpu) cycleCount {
+	// Reset the 3 bit of the register E
+	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 3))
+	return setECycles
+}
+func res3H(cpu *cpu) cycleCount {
+	// Reset the 3 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 3))
+	return setHCycles
+}
+func res3L(cpu *cpu) cycleCount {
+	// Reset the 3 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 3))
+	return setLCycles
+}
+
+func res4A(cpu *cpu) cycleCount {
+	// Reset the 4 bit of the register A
+	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 4))
+	return setACycles
+}
+func res4B(cpu *cpu) cycleCount {
+	// Reset the 4 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 4))
+	return setBCycles
+}
+func res4C(cpu *cpu) cycleCount {
+	// Reset the 4 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 4))
+	return setCCycles
+}
+func res4D(cpu *cpu) cycleCount {
+	// Reset the 4 bit of the register D
+	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 4))
+	return setDCycles
+}
+func res4E(cpu *cpu) cycleCount {
+	// Reset the 4 bit of the register E
+	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 4))
+	return setECycles
+}
+func res4H(cpu *cpu) cycleCount {
+	// Reset the 4 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 4))
+	return setHCycles
+}
+func res4L(cpu *cpu) cycleCount {
+	// Reset the 4 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 4))
+	return setLCycles
+}
+
+func res5A(cpu *cpu) cycleCount {
+	// Reset the 5 bit of the register A
+	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 5))
+	return setACycles
+}
+func res5B(cpu *cpu) cycleCount {
+	// Reset the 5 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 5))
+	return setBCycles
+}
+func res5C(cpu *cpu) cycleCount {
+	// Reset the 5 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 5))
+	return setCCycles
+}
+func res5D(cpu *cpu) cycleCount {
+	// Reset the 5 bit of the register D
+	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 5))
+	return setDCycles
+}
+func res5E(cpu *cpu) cycleCount {
+	// Reset the 5 bit of the register E
+	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 5))
+	return setECycles
+}
+func res5H(cpu *cpu) cycleCount {
+	// Reset the 5 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 5))
+	return setHCycles
+}
+func res5L(cpu *cpu) cycleCount {
+	// Reset the 5 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 5))
+	return setLCycles
+}
+
+func res6A(cpu *cpu) cycleCount {
+	// Reset the 6 bit of the register A
+	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 6))
+	return setACycles
+}
+func res6B(cpu *cpu) cycleCount {
+	// Reset the 6 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 6))
+	return setBCycles
+}
+func res6C(cpu *cpu) cycleCount {
+	// Reset the 6 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 6))
+	return setCCycles
+}
+func res6D(cpu *cpu) cycleCount {
+	// Reset the 6 bit of the register D
+	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 6))
+	return setDCycles
+}
+func res6E(cpu *cpu) cycleCount {
+	// Reset the 6 bit of the register E
+	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 6))
+	return setECycles
+}
+func res6H(cpu *cpu) cycleCount {
+	// Reset the 6 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 6))
+	return setHCycles
+}
+func res6L(cpu *cpu) cycleCount {
+	// Reset the 6 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 6))
+	return setLCycles
+}
+
+func res7A(cpu *cpu) cycleCount {
+	// Reset the 7 bit of the register A
+	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 7))
+	return setACycles
+}
+func res7B(cpu *cpu) cycleCount {
+	// Reset the 7 bit of the register B
+	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 7))
+	return setBCycles
+}
+func res7C(cpu *cpu) cycleCount {
+	// Reset the 7 bit of the register C
+	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 7))
+	return setCCycles
+}
+func res7D(cpu *cpu) cycleCount {
+	// Reset the 7 bit of the register D
+	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 7))
+	return setDCycles
+}
+func res7E(cpu *cpu) cycleCount {
+	// Reset the 7 bit of the register E
+	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 7))
+	return setECycles
+}
+func res7H(cpu *cpu) cycleCount {
+	// Reset the 7 bit of the register H
+	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 7))
+	return setHCycles
+}
+func res7L(cpu *cpu) cycleCount {
+	// Reset the 7 bit of the register L
+	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 7))
+	return setLCycles
+}
+
+func res0MemHl(cpu *cpu) cycleCount {
+	// Reset the 0 bit of the position of memory pointed by the register HL
+	// TODO: To implement
+	return resMemHlCycles
+}
+func res1MemHl(cpu *cpu) cycleCount {
+	// Reset the 1 bit of the position of memory pointed by the register HL
+	// TODO: To implement
+	return resMemHlCycles
+}
+func res2MemHl(cpu *cpu) cycleCount {
+	// Reset the 2 bit of the position of memory pointed by the register HL
+	// TODO: To implement
+	return resMemHlCycles
+}
+func res3MemHl(cpu *cpu) cycleCount {
+	// Reset the 3 bit of the position of memory pointed by the register HL
+	// TODO: To implement
+	return resMemHlCycles
+}
+func res4MemHl(cpu *cpu) cycleCount {
+	// Reset the 4 bit of the position of memory pointed by the register HL
+	// TODO: To implement
+	return resMemHlCycles
+}
+func res5MemHl(cpu *cpu) cycleCount {
+	// Reset the 5 bit of the position of memory pointed by the register HL
+	// TODO: To implement
+	return resMemHlCycles
+}
+func res6MemHl(cpu *cpu) cycleCount {
+	// Reset the 6 bit of the position of memory pointed by the register HL
+	// TODO: To implement
+	return resMemHlCycles
+}
+func res7MemHl(cpu *cpu) cycleCount {
+	// Reset the 7 bit of the position of memory pointed by the register HL
+	// TODO: To implement
+	return resMemHlCycles
 }

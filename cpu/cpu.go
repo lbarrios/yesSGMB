@@ -52,7 +52,7 @@ const (
 	incBCycles        = 4  // 0x04
 	decBCycles        = 4  // 0x05
 	ldBNCycles        = 8  // 0x06
-	xZeroSevenCycles  = 0  // 0x07
+	rlcACycles        = 4  // 0x07
 	ldMemNnSpCycles   = 20 // 0x08
 	addHlBcCycles     = 8  // 0x09
 	ldAMemBcCycles    = 8  // 0x0A
@@ -60,7 +60,7 @@ const (
 	incCCycles        = 4  // 0x0C
 	decCCycles        = 4  // 0x0D
 	ldCNCycles        = 8  // 0x0E
-	xZeroFCycles      = 0  // 0x0F
+	rrcACycles        = 4  // 0x0F
 	stopCycles        = 4  // 0x10
 	ldDeNnCycles      = 12 // 0x11
 	xOneTwoCycles     = 0  // 0x12
@@ -68,7 +68,7 @@ const (
 	incDCycles        = 4  // 0x14
 	decDCycles        = 4  // 0x15
 	ldDNCycles        = 8  // 0x16
-	xOneSevenCycles   = 0  // 0x17
+	rlACycles         = 4  // 0x17
 	xOneEightCycles   = 0  // 0x18
 	addHlDeCycles     = 8  // 0x19
 	ldAMemDeCycles    = 8  // 0x1A
@@ -76,7 +76,7 @@ const (
 	incECycles        = 4  // 0x1C
 	decECycles        = 4  // 0x1D
 	ldENCycles        = 8  // 0x1E
-	xOneFCycles       = 0  // 0x1F
+	rrACycles         = 4  // 0x1F
 	xTwoZeroCycles    = 0  // 0x20
 	ldHlNnCycles      = 12 // 0x21
 	ldiMemHlACycles   = 8  // 0x22
@@ -311,7 +311,7 @@ var op = [0x100] instructions{
 	incB,      //0x04
 	decB,      //0x05
 	ldBN,      //0x06
-	TODO,      //0x07
+	rlcA,      //0x07
 	ldMemNnSp, //0x08
 	addHlBc,   //0x09
 	ldAMemBc,  //0x0A
@@ -319,7 +319,7 @@ var op = [0x100] instructions{
 	incC,      //0x0C
 	decC,      //0x0D
 	ldCN,      //0x0E
-	TODO,      //0x0F
+	rrcA,      //0x0F
 	stop,      //0x10
 	ldDeNn,    //0x11
 	TODO,      //0x12
@@ -327,7 +327,7 @@ var op = [0x100] instructions{
 	incD,      //0x14
 	decD,      //0x15
 	ldDN,      //0x16
-	TODO,      //0x17
+	rlA,       //0x17
 	TODO,      //0x18
 	addHlDe,   //0x19
 	ldAMemDe,  //0x1A
@@ -335,7 +335,7 @@ var op = [0x100] instructions{
 	incE,      //0x1C
 	decE,      //0x1D
 	ldEN,      //0x1E
-	TODO,      //0x1F
+	rrA,       //0x1F
 	TODO,      //0x20
 	ldHlNn,    //0x21
 	ldiMemHlA, //0x22
@@ -2611,3 +2611,263 @@ func ei(cpu *cpu) cycleCount {
 	// TODO: To implement
 	return eiCycles
 }
+
+// 3.3.6. Rotates & Shifts
+
+// 3.3.6.1. RLCA
+// Description:
+// 	Rotate A left. Old bit 7 to Carry flag.
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Contains old bit 7 data.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RLCA 			-/- 			07 			4
+func rlcA(cpu *cpu) cycleCount {
+	// Rotate A left 1 bit; A[0] = pre(A)[7]
+	var bit7 = bool(cpu.r.af.a&0x80 == 0x80)
+
+	cpu.r.af.a = cpu.r.af.a << 1
+	if bit7 {
+		cpu.r.af.a |= 0x01 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlcACycles
+}
+
+// 3.3.6.2. RLA
+// Description:
+// 	Rotate A left through Carry flag.
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Contains old bit 7 data.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RLA 			-/- 			17 			4
+func rlA(cpu *cpu) cycleCount {
+	// Rotate A left 1 bit, but through Carry Flag
+	// Note that Carry = A[7] and A[0] = Carry
+	var bit7 = bool(cpu.r.af.a&0x80 == 0x80)
+
+	cpu.r.af.a = cpu.r.af.a << 1
+	if cpu.r.af.f.c {
+		cpu.r.af.a |= 0x1 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	return rlACycles
+}
+
+// 3.3.6.3. RRCA
+// Description:
+// 	Rotate A right. Old bit 0 to Carry flag.
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Contains old bit 0 data.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RRCA 			-/- 			0F 			4
+func rrcA(cpu *cpu) cycleCount {
+	// Rotate A right 1 bit
+	// Old bit 0 goes to Carry Flag
+	var bit0 = bool(cpu.r.af.a&0x01 == 0x01)
+
+	cpu.r.af.a = cpu.r.af.a >> 1
+	if bit0 {
+		cpu.r.af.a |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrcACycles
+}
+
+// 3.3.6.4. RRA
+// Description:
+// 	Rotate A right through Carry flag.
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Contains old bit 0 data.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RRA 			-/- 			1F 			4
+func rrA(cpu *cpu) cycleCount {
+	// Rotate A right 1 bit, but through Carry Flag
+	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
+	var bit0 = bool(cpu.r.af.a&0x01 == 0x01)
+
+	cpu.r.af.a = cpu.r.af.a >> 1
+	if cpu.r.af.f.c {
+		cpu.r.af.a |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	return rrACycles
+}
+
+// 3.3.6.5. RLC n
+// Description:
+// 	Rotate n left. Old bit 7 to Carry flag.
+// Use with:
+// 	n = A,B,C,D,E,H,L,(HL)
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Contains old bit 7 data.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RLC 			A 				CB 07 		8
+// 		RLC 			B 				CB 00 		8
+// 		RLC 			C 				CB 01 		8
+// 		RLC 			D 				CB 02 		8
+// 		RLC 			E 				CB 03 		8
+// 		RLC 			H 				CB 04 		8
+// 		RLC 			L 				CB 05 		8
+// 		RLC 			(HL) 			CB 06 		16
+
+// 3.3.6.6. RL n
+// Description:
+// 	Rotate n left through Carry flag.
+// Use with:
+// 	n = A,B,C,D,E,H,L,(HL)
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Contains old bit 7 data.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RL 				A 				CB 17 		8
+// 		RL 				B 				CB 10 		8
+// 		RL 				C 				CB 11 		8
+// 		RL 				D 				CB 12 		8
+// 		RL 				E 				CB 13 		8
+// 		RL 				H 				CB 14 		8
+// 		RL 				L 				CB 15 		8
+// 		RL 				(HL) 			CB 16 		16
+
+// 3.3.6.7. RRC n
+// Description:
+// 	Rotate n right. Old bit 0 to Carry flag.
+// Use with:
+// 	n = A,B,C,D,E,H,L,(HL)
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Contains old bit 0 data.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RRC 			A 				CB 0F 		8
+// 		RRC 			B 				CB 08 		8
+// 		RRC 			C 				CB 09 		8
+// 		RRC 			D 				CB 0A 		8
+// 		RRC 			E 				CB 0B 		8
+// 		RRC 			H 				CB 0C 		8
+// 		RRC 			L 				CB 0D 		8
+// 		RRC 			(HL) 			CB 0E 		16
+
+// 3.3.6.8. RR n
+// Description:
+// 	Rotate n right through Carry flag.
+// Use with:
+// 	n = A,B,C,D,E,H,L,(HL)
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Contains old bit 0 data.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RR 				A 				CB 1F 		8
+// 		RR 				B 				CB 18 		8
+// 		RR 				C 				CB 19 		8
+// 		RR 				D 				CB 1A 		8
+// 		RR 				E 				CB 1B 		8
+// 		RR 				H 				CB 1C 		8
+// 		RR 				L 				CB 1D 		8
+// 		RR 				(HL) 			CB 1E 		16
+
+// 3.3.6.9. SLA n
+// Description:
+// 	Shift n left into Carry. LSB of n set to 0.
+// Use with:
+// 	n = A,B,C,D,E,H,L,(HL)
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Contains old bit 7 data.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		SLA 			A 				CB 27 		8
+// 		SLA 			B 				CB 20 		8
+// 		SLA 			C 				CB 21 		8
+// 		SLA 			D 				CB 22 		8
+// 		SLA 			E 				CB 23 		8
+// 		SLA 			H 				CB 24 		8
+// 		SLA 			L 				CB 25 		8
+// 		SLA 			(HL) 			CB 26 		16
+
+// 3.3.6.10. SRA n
+// Description:
+// 	Shift n right into Carry. MSB doesn't change.
+// Use with:
+// 	n = A,B,C,D,E,H,L,(HL)
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Contains old bit 0 data.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		SRA 			A 				CB 2F 		8
+// 		SRA 			B 				CB 28 		8
+// 		SRA 			C 				CB 29 		8
+// 		SRA 			D 				CB 2A 		8
+// 		SRA 			E 				CB 2B 		8
+// 		SRA 			H 				CB 2C 		8
+// 		SRA 			L 				CB 2D 		8
+// 		SRA 			(HL) 			CB 2E 1		6
+
+// 3.3.6.11. SRL n
+// Description:
+// 	Shift n right into Carry. MSB set to 0.
+// Use with:
+// 	n = A,B,C,D,E,H,L,(HL)
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Contains old bit 0 data.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		SRL 			A 				CB 3F 		8
+// 		SRL 			B 				CB 38 		8
+// 		SRL 			C 				CB 39 		8
+// 		SRL 			D 				CB 3A 		8
+// 		SRL 			E 				CB 3B 		8
+// 		SRL 			H 				CB 3C 		8
+// 		SRL 			L 				CB 3D 		8
+// 		SRL 			(HL) 			CB 3E 		16

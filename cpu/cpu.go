@@ -48,65 +48,65 @@ const (
 	nopCycles         = 4  // 0x00
 	ldBcNnCycles      = 12 // 0x01
 	xZeroTwoCycles    = 0  // 0x02
-	xZeroThreeCycles  = 0  // 0x03
+	incBcCycles       = 8  // 0x03
 	incBCycles        = 4  // 0x04
-	decBCycles   = 4  // 0x05
+	decBCycles        = 4  // 0x05
 	ldBNCycles        = 8  // 0x06
 	xZeroSevenCycles  = 0  // 0x07
 	ldMemNnSpCycles   = 20 // 0x08
-	xZeroNineCycles   = 0  // 0x09
+	addHlBcCycles     = 8  // 0x09
 	ldAMemBcCycles    = 8  // 0x0A
 	xZeroBCycles      = 0  // 0x0B
 	incCCycles        = 4  // 0x0C
-	decCCycles      = 4  // 0x0D
+	decCCycles        = 4  // 0x0D
 	ldCNCycles        = 8  // 0x0E
 	xZeroFCycles      = 0  // 0x0F
 	xOneZeroCycles    = 0  // 0x10
 	ldDeNnCycles      = 12 // 0x11
 	xOneTwoCycles     = 0  // 0x12
-	xOneThreeCycles   = 0  // 0x13
+	incDeCycles       = 8  // 0x13
 	incDCycles        = 4  // 0x14
-	decDCycles    = 4  // 0x15
+	decDCycles        = 4  // 0x15
 	ldDNCycles        = 8  // 0x16
 	xOneSevenCycles   = 0  // 0x17
 	xOneEightCycles   = 0  // 0x18
-	xOneNineCycles    = 0  // 0x19
+	addHlDeCycles     = 8  // 0x19
 	ldAMemDeCycles    = 8  // 0x1A
 	xOneBCycles       = 0  // 0x1B
 	incECycles        = 4  // 0x1C
-	decECycles       = 4  // 0x1D
+	decECycles        = 4  // 0x1D
 	ldENCycles        = 8  // 0x1E
 	xOneFCycles       = 0  // 0x1F
 	xTwoZeroCycles    = 0  // 0x20
 	ldHlNnCycles      = 12 // 0x21
 	ldiMemHlACycles   = 8  // 0x22
-	xTwoThreeCycles   = 0  // 0x23
+	incHlCycles       = 8  // 0x23
 	incHCycles        = 4  // 0x24
-	decHCycles    = 4  // 0x25
+	decHCycles        = 4  // 0x25
 	ldHNCycles        = 8  // 0x26
 	xTwoSevenCycles   = 0  // 0x27
 	xTwoEightCycles   = 0  // 0x28
-	xTwoNineCycles    = 0  // 0x29
+	addHlHlCycles     = 8  // 0x29
 	ldiAMemHlCycles   = 8  // 0x2A
 	xTwoBCycles       = 0  // 0x2B
 	incLCycles        = 4  // 0x2C
-	decLCycles       = 4  // 0x2D
+	decLCycles        = 4  // 0x2D
 	ldLNCycles        = 8  // 0x2E
 	xTwoFCycles       = 0  // 0x2F
 	xThreeZeroCycles  = 0  // 0x30
 	ldSpNnCycles      = 12 // 0x31
 	lddMemHlACycles   = 8  // 0x32
-	xThreeThreeCycles = 0  // 0x33
-	incMemHlCycles  = 12  // 0x34
-	decMemHlCycles  = 12  // 0x35
+	incSpCycles       = 8  // 0x33
+	incMemHlCycles    = 12 // 0x34
+	decMemHlCycles    = 12 // 0x35
 	ldMemHlNCycles    = 12 // 0x36
 	xThreeSevenCycles = 0  // 0x37
 	xThreeEightCycles = 0  // 0x38
-	xThreeNineCycles  = 0  // 0x39
+	addHlSpCycles     = 8  // 0x39
 	lddAMemHlCycles   = 8  // 0x3A
 	xThreeBCycles     = 0  // 0x3B
 	incACycles        = 4  // 0x3C
-	decACycles     = 4  // 0x3D
+	decACycles        = 4  // 0x3D
 	ldANCycles        = 0  // 0x3E
 	xThreeFCycles     = 0  // 0x3F
 	ldBBCycles        = 4  // 0x40
@@ -277,7 +277,7 @@ const (
 	pushHlCycles      = 16 // 0xE5
 	andANCycles       = 8  // 0xE6
 	xESevenCycles     = 0  // 0xE7
-	xEEightCycles     = 0  // 0xE8
+	addSpNCycles      = 16 // 0xE8
 	xENineCycles      = 0  // 0xE9
 	xEACycles         = 0  // 0xEA
 	xEBCycles         = 0  // 0xEB
@@ -307,13 +307,13 @@ var op = [0x100] instructions{
 	nop,       //0x00
 	ldBcNn,    //0x01
 	TODO,      //0x02
-	TODO,      //0x03
+	incBc,     //0x03
 	incB,      //0x04
 	decB,      //0x05
 	ldBN,      //0x06
 	TODO,      //0x07
 	ldMemNnSp, //0x08
-	TODO,      //0x09
+	addHlBc,   //0x09
 	ldAMemBc,  //0x0A
 	TODO,      //0x0B
 	incC,      //0x0C
@@ -323,13 +323,13 @@ var op = [0x100] instructions{
 	TODO,      //0x10
 	ldDeNn,    //0x11
 	TODO,      //0x12
-	TODO,      //0x13
+	incDe,     //0x13
 	incD,      //0x14
 	decD,      //0x15
 	ldDN,      //0x16
 	TODO,      //0x17
 	TODO,      //0x18
-	TODO,      //0x19
+	addHlDe,   //0x19
 	ldAMemDe,  //0x1A
 	TODO,      //0x1B
 	incE,      //0x1C
@@ -339,13 +339,13 @@ var op = [0x100] instructions{
 	TODO,      //0x20
 	ldHlNn,    //0x21
 	ldiMemHlA, //0x22
-	TODO,      //0x23
+	incHl,     //0x23
 	incH,      //0x24
 	decH,      //0x25
 	ldHN,      //0x26
 	TODO,      //0x27
 	TODO,      //0x28
-	TODO,      //0x29
+	addHlHl,   //0x29
 	ldiAMemHl, //0x2A
 	TODO,      //0x2B
 	incL,      //0x2C
@@ -355,13 +355,13 @@ var op = [0x100] instructions{
 	TODO,      //0x30
 	ldSpNn,    //0x31
 	lddMemHlA, //0x32
-	TODO,      //0x33
+	incSp,     //0x33
 	incMemHl,  //0x34
 	decMemHl,  //0x35
 	ldMemHlN,  //0x36
 	TODO,      //0x37
 	TODO,      //0x38
-	TODO,      //0x39
+	addHlSp,   //0x39
 	lddAMemHl, //0x3A
 	TODO,      //0x3B
 	incA,      //0x3C
@@ -536,7 +536,7 @@ var op = [0x100] instructions{
 	pushHl,    //0xE5
 	andAN,     //0xE6
 	TODO,      //0xE7
-	TODO,      //0xE8
+	addSpN,    //0xE8
 	TODO,      //0xE9
 	TODO,      //0xEA
 	TODO,      //0xEB
@@ -2007,7 +2007,7 @@ func cpAN(cpu *cpu) cycleCount {
 	return cpANCycles
 }
 
-// 9. INC n
+// 3.3.3.9. INC n
 // Description:
 //	Increment register n.
 // Use with:
@@ -2098,7 +2098,7 @@ func incMemHl(cpu *cpu) cycleCount {
 	return incMemHlCycles
 }
 
-// 10. DEC n
+// 3.3.3.10. DEC n
 // Description:
 //	Decrement register n.
 // Use with:
@@ -2125,7 +2125,7 @@ func decA(cpu *cpu) cycleCount {
 	cpu.r.af.a--
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(true)
-	cpu.r.setFlagH((oldA & 0xf) == 0)
+	cpu.r.setFlagH((cpu.r.af.a & 0xf) > (oldA & 0xf))
 	return decACycles
 }
 func decB(cpu *cpu) cycleCount {
@@ -2134,7 +2134,7 @@ func decB(cpu *cpu) cycleCount {
 	cpu.r.bc.b--
 	cpu.r.setFlagZ(cpu.r.bc.b == 0)
 	cpu.r.setFlagN(true)
-	cpu.r.setFlagH((oldB & 0xf) == 0)
+	cpu.r.setFlagH((cpu.r.bc.b & 0xf) > (oldB & 0xf))
 	return decBCycles
 }
 func decC(cpu *cpu) cycleCount {
@@ -2143,7 +2143,7 @@ func decC(cpu *cpu) cycleCount {
 	cpu.r.bc.c--
 	cpu.r.setFlagZ(cpu.r.bc.c == 0)
 	cpu.r.setFlagN(true)
-	cpu.r.setFlagH((oldC & 0xf) == 0)
+	cpu.r.setFlagH((cpu.r.bc.c & 0xf) > (oldC & 0xf))
 	return decCCycles
 }
 func decD(cpu *cpu) cycleCount {
@@ -2152,7 +2152,7 @@ func decD(cpu *cpu) cycleCount {
 	cpu.r.de.d--
 	cpu.r.setFlagZ(cpu.r.de.d == 0)
 	cpu.r.setFlagN(true)
-	cpu.r.setFlagH((oldD & 0xf) == 0)
+	cpu.r.setFlagH((cpu.r.de.d & 0xf) > (oldD & 0xf))
 	return decDCycles
 }
 func decE(cpu *cpu) cycleCount {
@@ -2161,7 +2161,7 @@ func decE(cpu *cpu) cycleCount {
 	cpu.r.de.e--
 	cpu.r.setFlagZ(cpu.r.de.e == 0)
 	cpu.r.setFlagN(true)
-	cpu.r.setFlagH((oldE & 0xf) == 0)
+	cpu.r.setFlagH((cpu.r.de.e & 0xf) > (oldE & 0xf))
 	return decECycles
 }
 func decH(cpu *cpu) cycleCount {
@@ -2170,7 +2170,7 @@ func decH(cpu *cpu) cycleCount {
 	cpu.r.hl.h--
 	cpu.r.setFlagZ(cpu.r.hl.h == 0)
 	cpu.r.setFlagN(true)
-	cpu.r.setFlagH((oldH & 0xf) == 0)
+	cpu.r.setFlagH((cpu.r.hl.h & 0xf) > (oldH & 0xf))
 	return decHCycles
 }
 func decL(cpu *cpu) cycleCount {
@@ -2179,11 +2179,148 @@ func decL(cpu *cpu) cycleCount {
 	cpu.r.hl.l--
 	cpu.r.setFlagZ(cpu.r.hl.l == 0)
 	cpu.r.setFlagN(true)
-	cpu.r.setFlagH((oldL & 0xf) == 0)
+	cpu.r.setFlagH((cpu.r.hl.l & 0xf) > (oldL & 0xf))
 	return decLCycles
 }
 func decMemHl(cpu *cpu) cycleCount {
 	// Decrement memory position pointed by register HL
 	//TODO: To implement
 	return decMemHlCycles
+}
+
+// 3.3.4. 16-Bit Arithmetic
+
+// 3.3.4.1. ADD HL,n
+// Description:
+//	Add n to HL.
+// Use with:
+//	n = BC,DE,HL,SP
+// Flags affected:
+//	Z - Not affected.
+//	N - Reset.
+//	H - Set if carry from bit 11.
+//	C - Set if carry from bit 15.
+// Opcodes:
+//		Instruction 	Parameters 		Opcode 		Cycles
+//		ADD 			HL,BC 			09 			8
+//		ADD 			HL,DE 			19 			8
+//		ADD 			HL,HL 			29 			8
+//		ADD 			HL,SP 			39 			8
+
+func addHlBc(cpu *cpu) cycleCount {
+	// Add the value of register BC into register HL
+	var carry = byte((uint16(cpu.r.hl.l) + uint16(cpu.r.bc.c)) >> 8)
+	var oldH = cpu.r.hl.h
+	cpu.r.hl.l += cpu.r.bc.c
+	cpu.r.hl.h += carry + cpu.r.bc.b
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.hl.h & 0xf) < (oldH & 0xf))
+	cpu.r.setFlagC(cpu.r.hl.h < oldH)
+	return addHlBcCycles
+}
+
+func addHlDe(cpu *cpu) cycleCount {
+	// Add the value of register DE into register HL
+	var carry = byte((uint16(cpu.r.hl.l) + uint16(cpu.r.de.e)) >> 8)
+	var oldH = cpu.r.hl.h
+	cpu.r.hl.l += cpu.r.de.e
+	cpu.r.hl.h += carry + cpu.r.de.d
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.hl.h & 0xf) < (oldH & 0xf))
+	cpu.r.setFlagC(cpu.r.hl.h < oldH)
+	return addHlDeCycles
+}
+
+func addHlHl(cpu *cpu) cycleCount {
+	// Add the value of register HL into register HL
+	var carry = byte((uint16(cpu.r.hl.l) + uint16(cpu.r.hl.l)) >> 8)
+	var oldH = cpu.r.hl.h
+	cpu.r.hl.l += cpu.r.hl.l
+	cpu.r.hl.h += carry + cpu.r.hl.h
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.hl.h & 0xf) < (oldH & 0xf))
+	cpu.r.setFlagC(cpu.r.hl.h < oldH)
+	return addHlHlCycles
+}
+
+func addHlSp(cpu *cpu) cycleCount {
+	// Add the value of register SP into register HL
+	var carry = byte((uint16(cpu.r.hl.l) + uint16(byte(cpu.r.spLow()))) >> 8)
+	var oldH = cpu.r.hl.h
+	cpu.r.hl.l += cpu.r.spLow()
+	cpu.r.hl.h += carry + cpu.r.spHigh()
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.hl.h & 0xf) < (oldH & 0xf))
+	cpu.r.setFlagC(cpu.r.hl.h < oldH)
+	return addHlSpCycles
+}
+
+// 3.3.4.2. ADD SP,n
+// Description:
+//	Add n to Stack Pointer (SP).
+// Use with:
+//	n = one byte signed immediate value (#).
+// Flags affected:
+//	Z - Reset.
+//	N - Reset.
+//	H - Set or reset according to operation.
+//	C - Set or reset according to operation.
+// Opcodes:
+//		Instruction 	Parameters 		Opcode 		Cycles
+//		ADD 			SP,# 			E8 			16
+
+func addSpN(cpu *cpu) cycleCount {
+	// Add the immediate value N to Stack Pointer (SP)
+	var oldSpHigh = cpu.r.spHigh()
+	//cpu.r.sp += N
+	// TODO: To implement
+	cpu.r.setFlagZ(false)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.spHigh() & 0xf) < (oldSpHigh & 0xf))
+	cpu.r.setFlagC(cpu.r.spHigh() < oldSpHigh)
+	return addSpNCycles
+}
+
+// 3.3.4.3. INC nn
+// Description:
+//	Increment register nn.
+// Use with:
+//	nn = BC,DE,HL,SP
+// Flags affected:
+//	None.
+// Opcodes:
+//		Instruction 	Parameters 		Opcode 		Cycles
+//		INC 			BC 				03 			8
+//		INC 			DE 				13 			8
+//		INC 			HL 				23 			8
+//		INC 			SP 				33 			8
+
+func incBc(cpu *cpu) cycleCount {
+	// Increment register BC
+	var bc = cpu.r.bcAsInt()
+	bc++
+	cpu.r.bc.c = byte(bc & 0xff)
+	cpu.r.bc.b = byte(bc >> 8)
+	return incBcCycles
+}
+func incDe(cpu *cpu) cycleCount {
+	// Increment register DE
+	var de = cpu.r.deAsInt()
+	de++
+	cpu.r.de.e = byte(de & 0xff)
+	cpu.r.de.d = byte(de >> 8)
+	return incDeCycles
+}
+func incHl(cpu *cpu) cycleCount {
+	// Increment register HL
+	var hl = cpu.r.hlAsInt()
+	hl++
+	cpu.r.hl.l = byte(hl & 0xff)
+	cpu.r.hl.h = byte(hl >> 8)
+	return incHlCycles
+}
+func incSp(cpu *cpu) cycleCount {
+	// Increment register SP
+	cpu.r.sp++
+	return incSpCycles
 }

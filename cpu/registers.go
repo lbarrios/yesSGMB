@@ -30,13 +30,21 @@ func (r Registers) bcAsInt() uint16 {
 func (r Registers) deAsInt() uint16 {
 	res := uint16(r.de.d) << 8
 	res += uint16(r.de.e)
-	return res << 8
+	return res
 }
 
 func (r Registers) hlAsInt() uint16 {
 	res := uint16(r.hl.h) << 8
 	res += uint16(r.hl.l)
-	return res << 8
+	return res
+}
+
+func (r Registers) spLow() byte {
+	return byte(r.sp & 0x0f)
+}
+
+func (r Registers) spHigh() byte {
+	return byte(r.sp >> 8)
 }
 
 func (r *Registers) setFlagZ(condition bool) {

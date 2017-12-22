@@ -61,7 +61,7 @@ const (
 	decCCycles        = 4  // 0x0D
 	ldCNCycles        = 8  // 0x0E
 	xZeroFCycles      = 0  // 0x0F
-	xOneZeroCycles    = 0  // 0x10
+	stopCycles        = 4  // 0x10
 	ldDeNnCycles      = 12 // 0x11
 	xOneTwoCycles     = 0  // 0x12
 	incDeCycles       = 8  // 0x13
@@ -100,7 +100,7 @@ const (
 	incMemHlCycles    = 12 // 0x34
 	decMemHlCycles    = 12 // 0x35
 	ldMemHlNCycles    = 12 // 0x36
-	xThreeSevenCycles = 0  // 0x37
+	scfCycles         = 4  // 0x37
 	xThreeEightCycles = 0  // 0x38
 	addHlSpCycles     = 8  // 0x39
 	lddAMemHlCycles   = 8  // 0x3A
@@ -108,7 +108,7 @@ const (
 	incACycles        = 4  // 0x3C
 	decACycles        = 4  // 0x3D
 	ldANCycles        = 0  // 0x3E
-	xThreeFCycles     = 0  // 0x3F
+	ccfCycles         = 4  // 0x3F
 	ldBBCycles        = 4  // 0x40
 	ldBCCycles        = 4  // 0x41
 	ldBDCycles        = 4  // 0x42
@@ -163,7 +163,7 @@ const (
 	ldMemHlECycles    = 8  // 0x73
 	ldMemHlHCycles    = 8  // 0x74
 	ldMemHlLCycles    = 8  // 0x75
-	xSevenSixCycles   = 0  // 0x76
+	haltCycles        = 4  // 0x76
 	xSevenSevenCycles = 0  // 0x77
 	ldABCycles        = 4  // 0x78
 	ldACCycles        = 4  // 0x79
@@ -288,7 +288,7 @@ const (
 	ldAStackNCycles   = 12 // 0xF0
 	popAfCycles       = 12 // 0xF1
 	ldAStackCCycles   = 8  // 0xF2
-	xFThreeCycles     = 0  // 0xF3
+	diCycles          = 4  // 0xF3
 	xFFourCycles      = 0  // 0xF4
 	pushAfCycles      = 16 // 0xF5
 	orANCycles        = 8  // 0xF6
@@ -296,7 +296,7 @@ const (
 	ldHlSpNCycles     = 12 // 0xF8
 	ldSpHlCycles      = 0  // 0xF9
 	ldAMemNnCycles    = 16 // 0xFA
-	xFBCycles         = 0  // 0xFB
+	eiCycles          = 4  // 0xFB
 	xFCCycles         = 0  // 0xFC
 	xFDCycles         = 0  // 0xFD
 	cpANCycles        = 8  // 0xFE
@@ -320,7 +320,7 @@ var op = [0x100] instructions{
 	decC,      //0x0D
 	ldCN,      //0x0E
 	TODO,      //0x0F
-	TODO,      //0x10
+	stop,      //0x10
 	ldDeNn,    //0x11
 	TODO,      //0x12
 	incDe,     //0x13
@@ -359,7 +359,7 @@ var op = [0x100] instructions{
 	incMemHl,  //0x34
 	decMemHl,  //0x35
 	ldMemHlN,  //0x36
-	TODO,      //0x37
+	scf,       //0x37
 	TODO,      //0x38
 	addHlSp,   //0x39
 	lddAMemHl, //0x3A
@@ -367,7 +367,7 @@ var op = [0x100] instructions{
 	incA,      //0x3C
 	decA,      //0x3D
 	ldAN,      //0x3E
-	TODO,      //0x3F
+	ccf,       //0x3F
 	ldBB,      //0x40
 	ldBC,      //0x41
 	ldBD,      //0x42
@@ -422,7 +422,7 @@ var op = [0x100] instructions{
 	ldMemHlE,  //0x73
 	ldMemHlL,  //0x74
 	ldMemHlH,  //0x75
-	TODO,      //0x76
+	halt,      //0x76
 	TODO,      //0x77
 	ldAB,      //0x78
 	ldAC,      //0x79
@@ -547,7 +547,7 @@ var op = [0x100] instructions{
 	ldAStackN, //0xF0
 	popAf,     //0xF1
 	ldAStackC, //0xF2
-	TODO,      //0xF3
+	di,        //0xF3
 	TODO,      //0xF4
 	pushAf,    //0xF5
 	orAN,      //0xF6
@@ -555,7 +555,7 @@ var op = [0x100] instructions{
 	ldHlSpN,   //0xF8
 	ldSpHl,    //0xF9
 	ldAMemNn,  //0xFA
-	TODO,      //0xFB
+	ei,        //0xFB
 	TODO,      //0xFC
 	TODO,      //0xFD
 	cpAN,      //0xFE
@@ -565,11 +565,6 @@ var op = [0x100] instructions{
 func TODO(cpu *cpu) cycleCount {
 	// This function is not defined!
 	return 0
-}
-
-func nop(cpu *cpu) cycleCount {
-	// Does nothing
-	return nopCycles
 }
 
 // 3.3. Instructions
@@ -2507,4 +2502,112 @@ func cplA(cpu *cpu) cycleCount {
 	// Revert all bits of register A (ie. bitwise XOR with 0xFF)
 	cpu.r.af.a ^= 0xFF
 	return cplACycles
+}
+
+// 3.3.5.4. CCF
+// Description:
+// 	Complement carry flag.
+// 	If C flag is set, then reset it.
+// 	If C flag is reset, then set it.
+// Flags affected:
+// 	Z - Not affected.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Complemented.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		CCF 			-/- 			3F 			4
+func ccf(cpu *cpu) cycleCount {
+	// Toggle flag C
+	cpu.r.setFlagC(!cpu.r.af.f.c)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return ccfCycles
+}
+
+// 3.3.5.5. SCF
+// Description:
+// 	Set Carry flag.
+// Flags affected:
+// 	Z - Not affected.
+// 	N - Reset.
+// 	H - Reset.
+// 	C - Set.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		SCF 			-/- 			37 			4
+func scf(cpu *cpu) cycleCount {
+	// Sets the Carry Flag
+	cpu.r.setFlagC(true)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return scfCycles
+}
+
+// 3.3.5.6. NOP
+// Description:
+// 	No operation.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		NOP 			-/- 			00 			4
+func nop(cpu *cpu) cycleCount {
+	// Does nothing
+	return nopCycles
+}
+
+// 3.3.5.7. HALT
+// Description:
+// 	Power down CPU until an interrupt occurs. Use this
+// 	when ever possible to reduce energy consumption.
+// Opcodes:
+// 	Instruction 	Parameters 		Opcode 		Cycles
+// 	HALT 			-/- 			76 			4
+func halt(cpu *cpu) cycleCount {
+	// Power down CPU until an interrupt occurs
+	// TODO: To implement
+	return haltCycles
+}
+
+// 3.3.5.8. STOP
+// Description:
+// 	Halt CPU & LCD display until button pressed.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		STOP 			-/- 			10 00 		4
+func stop(cpu *cpu) cycleCount {
+	// Stops the CPU until an interrupt occurs
+	// TODO: To implement
+	return stopCycles
+}
+
+// 3.3.5.9. DI
+// Description:
+// 	This instruction disables interrupts but not
+// 	immediately. Interrupts are disabled after
+// 	instruction after DI is executed.
+// Flags affected:
+// 	None.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		DI 				-/- 			F3 			4
+func di(cpu *cpu) cycleCount {
+	// Disables Interruptions
+	// TODO: To implement
+	return diCycles
+}
+
+// 3.3.5.10. EI
+// Description:
+// 	Enable interrupts. This intruction enables interrupts
+// 	but not immediately. Interrupts are enabled after
+// 	instruction after EI is executed.
+// Flags affected:
+// 	None.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		EI 				-/- 			FB 			4
+func ei(cpu *cpu) cycleCount {
+	// Enables Interruptions
+	// TODO: To implement
+	return eiCycles
 }

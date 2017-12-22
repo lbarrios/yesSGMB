@@ -2783,6 +2783,33 @@ var rxNInstructions = map[byte]instructions{
 	0x1C: rrH,
 	0x1D: rrL,
 	0x1E: rrMemHl,
+	// SLA
+	0x27: slaA,
+	0x20: slaB,
+	0x21: slaC,
+	0x22: slaD,
+	0x23: slaE,
+	0x24: slaH,
+	0x25: slaL,
+	0x26: slaMemHl,
+	// SRA
+	0x2F: sraA,
+	0x28: sraB,
+	0x29: sraC,
+	0x2A: sraD,
+	0x2B: sraE,
+	0x2C: sraH,
+	0x2D: sraL,
+	0x2E: sraMemHl,
+	// SRL
+	0x3F: srlA,
+	0x38: srlB,
+	0x39: srlC,
+	0x3A: srlD,
+	0x3B: srlE,
+	0x3C: srlH,
+	0x3D: srlL,
+	0x3E: srlMemHl,
 }
 
 const (
@@ -3354,6 +3381,101 @@ func rrMemHl(cpu *cpu) cycleCount {
 // 		SLA 			L 				CB 25 		8
 // 		SLA 			(HL) 			CB 26 		16
 
+const (
+	slaACycles     = 8
+	slaBCycles     = 8
+	slaCCycles     = 8
+	slaDCycles     = 8
+	slaECycles     = 8
+	slaHCycles     = 8
+	slaLCycles     = 8
+	slaMemHlCycles = 16
+)
+
+func slaA(cpu *cpu) cycleCount {
+	// Shift A left into Carry
+	// A[0] set to 0
+	cpu.r.setFlagC((cpu.r.af.a & 0x80) == 0x80)
+	cpu.r.af.a = cpu.r.af.a << 1
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return slaACycles
+}
+
+func slaB(cpu *cpu) cycleCount {
+	// Shift B left into Carry
+	// B[0] set to 0
+	cpu.r.setFlagC((cpu.r.bc.b & 0x80) == 0x80)
+	cpu.r.bc.b = cpu.r.bc.b << 1
+	cpu.r.setFlagZ(cpu.r.bc.b == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return slaBCycles
+}
+
+func slaC(cpu *cpu) cycleCount {
+	// Shift C left into Carry
+	// C[0] set to 0
+	cpu.r.setFlagC((cpu.r.bc.c & 0x80) == 0x80)
+	cpu.r.bc.c = cpu.r.bc.c << 1
+	cpu.r.setFlagZ(cpu.r.bc.c == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return slaCCycles
+}
+
+func slaD(cpu *cpu) cycleCount {
+	// Shift D left into Carry
+	// D[0] set to 0
+	cpu.r.setFlagC((cpu.r.de.d & 0x80) == 0x80)
+	cpu.r.de.d = cpu.r.de.d << 1
+	cpu.r.setFlagZ(cpu.r.de.d == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return slaDCycles
+}
+
+func slaE(cpu *cpu) cycleCount {
+	// Shift E left into Carry
+	// E[0] set to 0
+	cpu.r.setFlagC((cpu.r.de.e & 0x80) == 0x80)
+	cpu.r.de.e = cpu.r.de.e << 1
+	cpu.r.setFlagZ(cpu.r.de.e == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return slaECycles
+}
+
+func slaH(cpu *cpu) cycleCount {
+	// Shift H left into Carry
+	// H[0] set to 0
+	cpu.r.setFlagC((cpu.r.hl.h & 0x80) == 0x80)
+	cpu.r.hl.h = cpu.r.hl.h << 1
+	cpu.r.setFlagZ(cpu.r.hl.h == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return slaHCycles
+}
+
+func slaL(cpu *cpu) cycleCount {
+	// Shift L left into Carry
+	// L[0] set to 0
+	cpu.r.setFlagC((cpu.r.hl.l & 0x80) == 0x80)
+	cpu.r.hl.l = cpu.r.hl.l << 1
+	cpu.r.setFlagZ(cpu.r.hl.l == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return slaLCycles
+}
+
+func slaMemHl(cpu *cpu) cycleCount {
+	// Shift MemHl left into Carry
+	// MemHl[0] set to 0
+	// TODO: To implement
+	return slaMemHlCycles
+}
+
 // 3.3.6.10. SRA n
 // Description:
 // 	Shift n right into Carry. MSB doesn't change.
@@ -3373,7 +3495,108 @@ func rrMemHl(cpu *cpu) cycleCount {
 // 		SRA 			E 				CB 2B 		8
 // 		SRA 			H 				CB 2C 		8
 // 		SRA 			L 				CB 2D 		8
-// 		SRA 			(HL) 			CB 2E 1		6
+// 		SRA 			(HL) 			CB 2E		16
+
+const (
+	sraACycles     = 8
+	sraBCycles     = 8
+	sraCCycles     = 8
+	sraDCycles     = 8
+	sraECycles     = 8
+	sraHCycles     = 8
+	sraLCycles     = 8
+	sraMemHlCycles = 16
+)
+
+func sraA(cpu *cpu) cycleCount {
+	// Shift A right into carry
+	// A[7] doesn't change
+	var msb = cpu.r.af.a & 0x80
+	cpu.r.setFlagC((cpu.r.af.a & 0x01) == 0x01)
+	cpu.r.af.a = (cpu.r.af.a >> 1) | msb // restores MSB
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return sraACycles
+}
+
+func sraB(cpu *cpu) cycleCount {
+	// Shift B right into carry
+	// B[7] doesn't change
+	var msb = cpu.r.bc.b & 0x80
+	cpu.r.setFlagC((cpu.r.bc.b & 0x01) == 0x01)
+	cpu.r.bc.b = (cpu.r.bc.b >> 1) | msb // restores MSB
+	cpu.r.setFlagZ(cpu.r.bc.b == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return sraBCycles
+}
+
+func sraC(cpu *cpu) cycleCount {
+	// Shift C right into carry
+	// C[7] doesn't change
+	var msb = cpu.r.bc.c & 0x80
+	cpu.r.setFlagC((cpu.r.bc.c & 0x01) == 0x01)
+	cpu.r.bc.c = (cpu.r.bc.c >> 1) | msb // restores MSB
+	cpu.r.setFlagZ(cpu.r.bc.c == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return sraCCycles
+}
+
+func sraD(cpu *cpu) cycleCount {
+	// Shift D right into carry
+	// D[7] doesn't change
+	var msb = cpu.r.de.d & 0x80
+	cpu.r.setFlagC((cpu.r.de.d & 0x01) == 0x01)
+	cpu.r.de.d = (cpu.r.de.d >> 1) | msb // restores MSB
+	cpu.r.setFlagZ(cpu.r.de.d == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return sraDCycles
+}
+
+func sraE(cpu *cpu) cycleCount {
+	// Shift E right into carry
+	// E[7] doesn't change
+	var msb = cpu.r.de.e & 0x80
+	cpu.r.setFlagC((cpu.r.de.e & 0x01) == 0x01)
+	cpu.r.de.e = (cpu.r.de.e >> 1) | msb // restores MSB
+	cpu.r.setFlagZ(cpu.r.de.e == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return sraECycles
+}
+
+func sraH(cpu *cpu) cycleCount {
+	// Shift H right into carry
+	// H[7] doesn't change
+	var msb = cpu.r.hl.h & 0x80
+	cpu.r.setFlagC((cpu.r.hl.h & 0x01) == 0x01)
+	cpu.r.hl.h = (cpu.r.hl.h >> 1) | msb // restores MSB
+	cpu.r.setFlagZ(cpu.r.hl.h == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return sraHCycles
+}
+
+func sraL(cpu *cpu) cycleCount {
+	// Shift L right into carry
+	// L[7] doesn't change
+	var msb = cpu.r.hl.l & 0x80
+	cpu.r.setFlagC((cpu.r.hl.l & 0x01) == 0x01)
+	cpu.r.hl.l = (cpu.r.hl.l >> 1) | msb // restores MSB
+	cpu.r.setFlagZ(cpu.r.hl.l == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return sraLCycles
+}
+
+func sraMemHl(cpu *cpu) cycleCount {
+	// Shift MemHl right into carry
+	// MemHl[7] doesn't change
+	return sraMemHlCycles
+}
 
 // 3.3.6.11. SRL n
 // Description:
@@ -3395,3 +3618,97 @@ func rrMemHl(cpu *cpu) cycleCount {
 // 		SRL 			H 				CB 3C 		8
 // 		SRL 			L 				CB 3D 		8
 // 		SRL 			(HL) 			CB 3E 		16
+
+const (
+	srlACycles     = 8
+	srlBCycles     = 8
+	srlCCycles     = 8
+	srlDCycles     = 8
+	srlECycles     = 8
+	srlHCycles     = 8
+	srlLCycles     = 8
+	srlMemHlCycles = 16
+)
+
+func srlA(cpu *cpu) cycleCount {
+	// Shift A right into Carry.
+	// A[7] = 0
+	cpu.r.setFlagC((cpu.r.af.a & 0x01) == 0x01)
+	cpu.r.af.a = cpu.r.af.a >> 1
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return srlACycles
+}
+
+func srlB(cpu *cpu) cycleCount {
+	// Shift B right into Carry.
+	// B[7] = 0
+	cpu.r.setFlagC((cpu.r.bc.b & 0x01) == 0x01)
+	cpu.r.bc.b = cpu.r.bc.b >> 1
+	cpu.r.setFlagZ(cpu.r.bc.b == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return srlBCycles
+}
+
+func srlC(cpu *cpu) cycleCount {
+	// Shift C right into Carry.
+	// C[7] = 0
+	cpu.r.setFlagC((cpu.r.bc.c & 0x01) == 0x01)
+	cpu.r.bc.c = cpu.r.bc.c >> 1
+	cpu.r.setFlagZ(cpu.r.bc.c == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return srlCCycles
+}
+
+func srlD(cpu *cpu) cycleCount {
+	// Shift D right into Carry.
+	// D[7] = 0
+	cpu.r.setFlagC((cpu.r.de.d & 0x01) == 0x01)
+	cpu.r.de.d = cpu.r.de.d >> 1
+	cpu.r.setFlagZ(cpu.r.de.d == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return srlDCycles
+}
+
+func srlE(cpu *cpu) cycleCount {
+	// Shift E right into Carry.
+	// E[7] = 0
+	cpu.r.setFlagC((cpu.r.de.e & 0x01) == 0x01)
+	cpu.r.de.e = cpu.r.de.e >> 1
+	cpu.r.setFlagZ(cpu.r.de.e == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return srlECycles
+}
+
+func srlH(cpu *cpu) cycleCount {
+	// Shift H right into Carry.
+	// H[7] = 0
+	cpu.r.setFlagC((cpu.r.hl.h & 0x01) == 0x01)
+	cpu.r.hl.h = cpu.r.hl.h >> 1
+	cpu.r.setFlagZ(cpu.r.hl.h == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return srlHCycles
+}
+
+func srlL(cpu *cpu) cycleCount {
+	// Shift L right into Carry.
+	// L[7] = 0
+	cpu.r.setFlagC((cpu.r.hl.l & 0x01) == 0x01)
+	cpu.r.hl.l = cpu.r.hl.l >> 1
+	cpu.r.setFlagZ(cpu.r.hl.l == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	return srlLCycles
+}
+
+func srlMemHl(cpu *cpu) cycleCount {
+	// Shift MemHl right into Carry.
+	// MemHl[7] = 0
+	return srlMemHlCycles
+}

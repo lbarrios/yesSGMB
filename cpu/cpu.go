@@ -45,525 +45,533 @@ func (cpu *cpu) Reset() {
 }
 
 const (
-	nopCycles         = 4  // 0x00
-	ldBcNnCycles      = 12 // 0x01
-	xZeroTwoCycles    = 0  // 0x02
-	incBcCycles       = 8  // 0x03
-	incBCycles        = 4  // 0x04
-	decBCycles        = 4  // 0x05
-	ldBNCycles        = 8  // 0x06
-	rlcACycles        = 4  // 0x07
-	ldMemNnSpCycles   = 20 // 0x08
-	addHlBcCycles     = 8  // 0x09
-	ldAMemBcCycles    = 8  // 0x0A
-	decBcCycles       = 8  // 0x0B
-	incCCycles        = 4  // 0x0C
-	decCCycles        = 4  // 0x0D
-	ldCNCycles        = 8  // 0x0E
-	rrcACycles        = 4  // 0x0F
-	stopCycles        = 4  // 0x10
-	ldDeNnCycles      = 12 // 0x11
-	xOneTwoCycles     = 0  // 0x12
-	incDeCycles       = 8  // 0x13
-	incDCycles        = 4  // 0x14
-	decDCycles        = 4  // 0x15
-	ldDNCycles        = 8  // 0x16
-	rlACycles         = 4  // 0x17
-	jrCycles          = 8  // 0x18
-	addHlDeCycles     = 8  // 0x19
-	ldAMemDeCycles    = 8  // 0x1A
-	decDeCycles       = 8  // 0x1B
-	incECycles        = 4  // 0x1C
-	decECycles        = 4  // 0x1D
-	ldENCycles        = 8  // 0x1E
-	rrACycles         = 4  // 0x1F
-	jrNZCycles        = 8  // 0x20
-	ldHlNnCycles      = 12 // 0x21
-	ldiMemHlACycles   = 8  // 0x22
-	incHlCycles       = 8  // 0x23
-	incHCycles        = 4  // 0x24
-	decHCycles        = 4  // 0x25
-	ldHNCycles        = 8  // 0x26
-	daACycles         = 4  // 0x27
-	jrZCycles         = 8  // 0x28
-	addHlHlCycles     = 8  // 0x29
-	ldiAMemHlCycles   = 8  // 0x2A
-	decHlCycles       = 8  // 0x2B
-	incLCycles        = 4  // 0x2C
-	decLCycles        = 4  // 0x2D
-	ldLNCycles        = 8  // 0x2E
-	cplACycles        = 4  // 0x2F
-	jrNCCycles        = 8  // 0x30
-	ldSpNnCycles      = 12 // 0x31
-	lddMemHlACycles   = 8  // 0x32
-	incSpCycles       = 8  // 0x33
-	incMemHlCycles    = 12 // 0x34
-	decMemHlCycles    = 12 // 0x35
-	ldMemHlNCycles    = 12 // 0x36
-	scfCycles         = 4  // 0x37
-	jrCCycles         = 8  // 0x38
-	addHlSpCycles     = 8  // 0x39
-	lddAMemHlCycles   = 8  // 0x3A
-	decSpCycles       = 8  // 0x3B
-	incACycles        = 4  // 0x3C
-	decACycles        = 4  // 0x3D
-	ldANCycles        = 0  // 0x3E
-	ccfCycles         = 4  // 0x3F
-	ldBBCycles        = 4  // 0x40
-	ldBCCycles        = 4  // 0x41
-	ldBDCycles        = 4  // 0x42
-	ldBECycles        = 4  // 0x43
-	ldBHCycles        = 4  // 0x44
-	ldBLCycles        = 4  // 0x45
-	ldBHlCycles       = 8  // 0x46
-	ldBACycles        = 4  // 0x47
-	ldCBCycles        = 4  // 0x48
-	ldCCCycles        = 4  // 0x49
-	ldCDCycles        = 4  // 0x4A
-	ldCECycles        = 4  // 0x4B
-	ldCHCycles        = 4  // 0x4C
-	ldCLCycles        = 4  // 0x4D
-	ldCHlCycles       = 8  // 0x4E
-	ldCACycles        = 4  // 0x4F
-	ldDBCycles        = 4  // 0x50
-	ldDCCycles        = 4  // 0x51
-	ldDDCycles        = 4  // 0x52
-	ldDECycles        = 4  // 0x53
-	ldDHCycles        = 4  // 0x54
-	ldDLCycles        = 4  // 0x55
-	ldDHlCycles       = 8  // 0x56
-	ldDACycles        = 4  // 0x57
-	ldEBCycles        = 4  // 0x58
-	ldECCycles        = 4  // 0x59
-	ldEDCycles        = 4  // 0x5A
-	ldEECycles        = 4  // 0x5B
-	ldEHCycles        = 4  // 0x5C
-	ldELCycles        = 4  // 0x5D
-	ldEHlCycles       = 8  // 0x5E
-	ldEACycles        = 4  // 0x5F
-	ldHBCycles        = 4  // 0x60
-	ldHCCycles        = 4  // 0x61
-	ldHDCycles        = 4  // 0x62
-	ldHECycles        = 4  // 0x63
-	ldHHCycles        = 4  // 0x64
-	ldHLCycles        = 4  // 0x65
-	ldHHlCycles       = 8  // 0x66
-	xSixSevenCycles   = 0  // 0x67
-	ldLBCycles        = 4  // 0x68
-	ldLCCycles        = 4  // 0x69
-	ldLDCycles        = 4  // 0x6A
-	ldLECycles        = 4  // 0x6B
-	ldLHCycles        = 4  // 0x6C
-	ldLLCycles        = 4  // 0x6D
-	ldLHlCycles       = 8  // 0x6E
-	xSixFCycles       = 0  // 0x6F
-	ldMemHlBCycles    = 8  // 0x70
-	ldMemHlCCycles    = 8  // 0x71
-	ldMemHlDCycles    = 8  // 0x72
-	ldMemHlECycles    = 8  // 0x73
-	ldMemHlHCycles    = 8  // 0x74
-	ldMemHlLCycles    = 8  // 0x75
-	haltCycles        = 4  // 0x76
-	xSevenSevenCycles = 0  // 0x77
-	ldABCycles        = 4  // 0x78
-	ldACCycles        = 4  // 0x79
-	ldADCycles        = 4  // 0x7A
-	ldAECycles        = 4  // 0x7B
-	ldAHCycles        = 4  // 0x7C
-	ldALCycles        = 4  // 0x7D
-	ldAMemHlCycles    = 8  // 0x7E
-	ldAACycles        = 4  // 0x7F
-	addABCycles       = 4  // 0x80
-	addACCycles       = 4  // 0x81
-	addADCycles       = 4  // 0x82
-	addAECycles       = 4  // 0x83
-	addAHCycles       = 4  // 0x84
-	addALCycles       = 4  // 0x85
-	addAMemHlCycles   = 8  // 0x86
-	addAACycles       = 4  // 0x87
-	xEightEightCycles = 0  // 0x88
-	xEightNineCycles  = 0  // 0x89
-	xEightACycles     = 0  // 0x8A
-	xEightBCycles     = 0  // 0x8B
-	xEightCCycles     = 0  // 0x8C
-	xEightDCycles     = 0  // 0x8D
-	xEightECycles     = 0  // 0x8E
-	xEightFCycles     = 0  // 0x8F
-	subABCycles       = 4  // 0x90
-	subACCycles       = 4  // 0x91
-	subADCycles       = 4  // 0x92
-	subAECycles       = 4  // 0x93
-	subAHCycles       = 4  // 0x94
-	subALCycles       = 4  // 0x95
-	subAMemHlCycles   = 8  // 0x96
-	subAACycles       = 4  // 0x97
-	sbcABCycles       = 4  // 0x98
-	sbcACCycles       = 4  // 0x99
-	sbcADCycles       = 4  // 0x9A
-	sbcAECycles       = 4  // 0x9B
-	sbcAHCycles       = 4  // 0x9C
-	sbcALCycles       = 4  // 0x9D
-	sbcAMemHlCycles   = 8  // 0x9E
-	sbcAACycles       = 4  // 0x9F
-	andABCycles       = 4  // 0xA0
-	andACCycles       = 4  // 0xA1
-	andADCycles       = 4  // 0xA2
-	andAECycles       = 4  // 0xA3
-	andAHCycles       = 4  // 0xA4
-	andALCycles       = 4  // 0xA5
-	andAMemHlCycles   = 8  // 0xA6
-	andAACycles       = 8  // 0xA7
-	xorABCycles       = 4  // 0xA8
-	xorACCycles       = 4  // 0xA9
-	xorADCycles       = 4  // 0xAA
-	xorAECycles       = 4  // 0xAB
-	xorAHCycles       = 4  // 0xAC
-	xorALCycles       = 4  // 0xAD
-	xorAMemHlCycles   = 8  // 0xAE
-	xorAACycles       = 4  // 0xAF
-	orABCycles        = 4  // 0xB0
-	orACCycles        = 4  // 0xB1
-	orADCycles        = 4  // 0xB2
-	orAECycles        = 4  // 0xB3
-	orAHCycles        = 4  // 0xB4
-	orALCycles        = 4  // 0xB5
-	orAMemHlCycles    = 8  // 0xB6
-	orAACycles        = 4  // 0xB7
-	cpABCycles        = 4  // 0xB8
-	cpACCycles        = 4  // 0xB9
-	cpADCycles        = 4  // 0xBA
-	cpAECycles        = 4  // 0xBB
-	cpAHCycles        = 4  // 0xBC
-	cpALCycles        = 4  // 0xBD
-	cpAMemHlCycles    = 8  // 0xBE
-	cpAACycles        = 4  // 0xBF
-	retNZCycles      = 8  // 0xC0
-	popBcCycles       = 12 // 0xC1
-	jpNZCycles        = 12 // 0xC2
-	jpCycles          = 8  // 0xC3
-	callNZCycles      = 12 // 0xC4
-	pushBcCycles      = 16 // 0xC5
-	addANnCycles      = 8  // 0xC6
-	rst00HCycles      = 32 // 0xC7
-	retZCycles     = 8 // 0xC8
-	retCycles      = 8  // 0xC9
-	jpZCycles         = 12 // 0xCA
-	rxNCycles         = 8  // 0xCB
-	callZCycles       = 12 // 0xCC
-	callCycles        = 12 // 0xCD
-	xCECycles         = 0  // 0xCE
-	rst08HCycles      = 32 // 0xCF
-	retNCCycles      = 8  // 0xD0
-	popDeCycles       = 12 // 0xD1
-	jpNCCycles        = 12 // 0xD2
-	xDThreeCycles     = 0  // 0xD3
-	callNCCycles      = 12 // 0xD4
-	pushDeCycles      = 16 // 0xD5
-	subANnCycles      = 8  // 0xD6
-	rst10HCycles      = 32 // 0xD7
-	retCCycles     = 8  // 0xD8
+	nopCycles       = 4  // 0x00
+	ldBcNnCycles    = 12 // 0x01
+	ldMemBcACycles  = 8  // 0x02
+	incBcCycles     = 8  // 0x03
+	incBCycles      = 4  // 0x04
+	decBCycles      = 4  // 0x05
+	ldBNCycles      = 8  // 0x06
+	rlcACycles      = 4  // 0x07
+	ldMemNnSpCycles = 20 // 0x08
+	addHlBcCycles   = 8  // 0x09
+	ldAMemBcCycles  = 8  // 0x0A
+	decBcCycles     = 8  // 0x0B
+	incCCycles      = 4  // 0x0C
+	decCCycles      = 4  // 0x0D
+	ldCNCycles      = 8  // 0x0E
+	rrcACycles      = 4  // 0x0F
+	stopCycles      = 4  // 0x10
+	ldDeNnCycles    = 12 // 0x11
+	ldMemDeACycles  = 8  // 0x12
+	incDeCycles     = 8  // 0x13
+	incDCycles      = 4  // 0x14
+	decDCycles      = 4  // 0x15
+	ldDNCycles      = 8  // 0x16
+	rlACycles       = 4  // 0x17
+	jrCycles        = 8  // 0x18
+	addHlDeCycles   = 8  // 0x19
+	ldAMemDeCycles  = 8  // 0x1A
+	decDeCycles     = 8  // 0x1B
+	incECycles      = 4  // 0x1C
+	decECycles      = 4  // 0x1D
+	ldENCycles      = 8  // 0x1E
+	rrACycles       = 4  // 0x1F
+	jrNZCycles      = 8  // 0x20
+	ldHlNnCycles    = 12 // 0x21
+	ldiMemHlACycles = 8  // 0x22
+	incHlCycles     = 8  // 0x23
+	incHCycles      = 4  // 0x24
+	decHCycles      = 4  // 0x25
+	ldHNCycles      = 8  // 0x26
+	daACycles       = 4  // 0x27
+	jrZCycles       = 8  // 0x28
+	addHlHlCycles   = 8  // 0x29
+	ldiAMemHlCycles = 8  // 0x2A
+	decHlCycles     = 8  // 0x2B
+	incLCycles      = 4  // 0x2C
+	decLCycles      = 4  // 0x2D
+	ldLNCycles      = 8  // 0x2E
+	cplACycles      = 4  // 0x2F
+	jrNCCycles      = 8  // 0x30
+	ldSpNnCycles    = 12 // 0x31
+	lddMemHlACycles = 8  // 0x32
+	incSpCycles     = 8  // 0x33
+	incMemHlCycles  = 12 // 0x34
+	decMemHlCycles  = 12 // 0x35
+	ldMemHlNCycles  = 12 // 0x36
+	scfCycles       = 4  // 0x37
+	jrCCycles       = 8  // 0x38
+	addHlSpCycles   = 8  // 0x39
+	lddAMemHlCycles = 8  // 0x3A
+	decSpCycles     = 8  // 0x3B
+	incACycles      = 4  // 0x3C
+	decACycles      = 4  // 0x3D
+	ldANCycles      = 0  // 0x3E
+	ccfCycles       = 4  // 0x3F
+	ldBBCycles      = 4  // 0x40
+	ldBCCycles      = 4  // 0x41
+	ldBDCycles      = 4  // 0x42
+	ldBECycles      = 4  // 0x43
+	ldBHCycles      = 4  // 0x44
+	ldBLCycles      = 4  // 0x45
+	ldBHlCycles     = 8  // 0x46
+	ldBACycles      = 4  // 0x47
+	ldCBCycles      = 4  // 0x48
+	ldCCCycles      = 4  // 0x49
+	ldCDCycles      = 4  // 0x4A
+	ldCECycles      = 4  // 0x4B
+	ldCHCycles      = 4  // 0x4C
+	ldCLCycles      = 4  // 0x4D
+	ldCHlCycles     = 8  // 0x4E
+	ldCACycles      = 4  // 0x4F
+	ldDBCycles      = 4  // 0x50
+	ldDCCycles      = 4  // 0x51
+	ldDDCycles      = 4  // 0x52
+	ldDECycles      = 4  // 0x53
+	ldDHCycles      = 4  // 0x54
+	ldDLCycles      = 4  // 0x55
+	ldDHlCycles     = 8  // 0x56
+	ldDACycles      = 4  // 0x57
+	ldEBCycles      = 4  // 0x58
+	ldECCycles      = 4  // 0x59
+	ldEDCycles      = 4  // 0x5A
+	ldEECycles      = 4  // 0x5B
+	ldEHCycles      = 4  // 0x5C
+	ldELCycles      = 4  // 0x5D
+	ldEHlCycles     = 8  // 0x5E
+	ldEACycles      = 4  // 0x5F
+	ldHBCycles      = 4  // 0x60
+	ldHCCycles      = 4  // 0x61
+	ldHDCycles      = 4  // 0x62
+	ldHECycles      = 4  // 0x63
+	ldHHCycles      = 4  // 0x64
+	ldHLCycles      = 4  // 0x65
+	ldHHlCycles     = 8  // 0x66
+	ldHACycles      = 4  // 0x67
+	ldLBCycles      = 4  // 0x68
+	ldLCCycles      = 4  // 0x69
+	ldLDCycles      = 4  // 0x6A
+	ldLECycles      = 4  // 0x6B
+	ldLHCycles      = 4  // 0x6C
+	ldLLCycles      = 4  // 0x6D
+	ldLHlCycles     = 8  // 0x6E
+	ldLACycles      = 4  // 0x6F
+	ldMemHlBCycles  = 8  // 0x70
+	ldMemHlCCycles  = 8  // 0x71
+	ldMemHlDCycles  = 8  // 0x72
+	ldMemHlECycles  = 8  // 0x73
+	ldMemHlHCycles  = 8  // 0x74
+	ldMemHlLCycles  = 8  // 0x75
+	haltCycles      = 4  // 0x76
+	ldMemHlACycles  = 8  // 0x77
+	ldABCycles      = 4  // 0x78
+	ldACCycles      = 4  // 0x79
+	ldADCycles      = 4  // 0x7A
+	ldAECycles      = 4  // 0x7B
+	ldAHCycles      = 4  // 0x7C
+	ldALCycles      = 4  // 0x7D
+	ldAMemHlCycles  = 8  // 0x7E
+	ldAACycles      = 4  // 0x7F
+	addABCycles     = 4  // 0x80
+	addACCycles     = 4  // 0x81
+	addADCycles     = 4  // 0x82
+	addAECycles     = 4  // 0x83
+	addAHCycles     = 4  // 0x84
+	addALCycles     = 4  // 0x85
+	addAMemHlCycles = 8  // 0x86
+	addAACycles     = 4  // 0x87
+	adcABCycles     = 4  // 0x88
+	adcACCycles     = 4  // 0x89
+	adcADCycles     = 4  // 0x8A
+	adcAECycles     = 4  // 0x8B
+	adcAHCycles     = 4  // 0x8C
+	adcALCycles     = 4  // 0x8D
+	adcAMemHlCycles = 8  // 0x8E
+	adcAACycles     = 4  // 0x8F
+	subABCycles     = 4  // 0x90
+	subACCycles     = 4  // 0x91
+	subADCycles     = 4  // 0x92
+	subAECycles     = 4  // 0x93
+	subAHCycles     = 4  // 0x94
+	subALCycles     = 4  // 0x95
+	subAMemHlCycles = 8  // 0x96
+	subAACycles     = 4  // 0x97
+	sbcABCycles     = 4  // 0x98
+	sbcACCycles     = 4  // 0x99
+	sbcADCycles     = 4  // 0x9A
+	sbcAECycles     = 4  // 0x9B
+	sbcAHCycles     = 4  // 0x9C
+	sbcALCycles     = 4  // 0x9D
+	sbcAMemHlCycles = 8  // 0x9E
+	sbcAACycles     = 4  // 0x9F
+	andABCycles     = 4  // 0xA0
+	andACCycles     = 4  // 0xA1
+	andADCycles     = 4  // 0xA2
+	andAECycles     = 4  // 0xA3
+	andAHCycles     = 4  // 0xA4
+	andALCycles     = 4  // 0xA5
+	andAMemHlCycles = 8  // 0xA6
+	andAACycles     = 8  // 0xA7
+	xorABCycles     = 4  // 0xA8
+	xorACCycles     = 4  // 0xA9
+	xorADCycles     = 4  // 0xAA
+	xorAECycles     = 4  // 0xAB
+	xorAHCycles     = 4  // 0xAC
+	xorALCycles     = 4  // 0xAD
+	xorAMemHlCycles = 8  // 0xAE
+	xorAACycles     = 4  // 0xAF
+	orABCycles      = 4  // 0xB0
+	orACCycles      = 4  // 0xB1
+	orADCycles      = 4  // 0xB2
+	orAECycles      = 4  // 0xB3
+	orAHCycles      = 4  // 0xB4
+	orALCycles      = 4  // 0xB5
+	orAMemHlCycles  = 8  // 0xB6
+	orAACycles      = 4  // 0xB7
+	cpABCycles      = 4  // 0xB8
+	cpACCycles      = 4  // 0xB9
+	cpADCycles      = 4  // 0xBA
+	cpAECycles      = 4  // 0xBB
+	cpAHCycles      = 4  // 0xBC
+	cpALCycles      = 4  // 0xBD
+	cpAMemHlCycles  = 8  // 0xBE
+	cpAACycles      = 4  // 0xBF
+	retNZCycles     = 8  // 0xC0
+	popBcCycles     = 12 // 0xC1
+	jpNZCycles      = 12 // 0xC2
+	jpCycles        = 8  // 0xC3
+	callNZCycles    = 12 // 0xC4
+	pushBcCycles    = 16 // 0xC5
+	addANnCycles    = 8  // 0xC6
+	rst00HCycles    = 32 // 0xC7
+	retZCycles      = 8  // 0xC8
+	retCycles       = 8  // 0xC9
+	jpZCycles       = 12 // 0xCA
+	rxNCycles       = 8  // 0xCB
+	callZCycles     = 12 // 0xCC
+	callCycles      = 12 // 0xCD
+	adcANnCycles    = 8  // 0xCE
+	rst08HCycles    = 32 // 0xCF
+	retNCCycles     = 8  // 0xD0
+	popDeCycles     = 12 // 0xD1
+	jpNCCycles      = 12 // 0xD2
+	xDThreeCycles   = 0  // 0xD3
+	callNCCycles    = 12 // 0xD4
+	pushDeCycles    = 16 // 0xD5
+	subANnCycles    = 8  // 0xD6
+	rst10HCycles    = 32 // 0xD7
+	retCCycles      = 8  // 0xD8
 	retiCycles      = 8  // 0xD9
-	jpCCycles         = 12 // 0xDA
-	xDBCycles         = 0  // 0xDB
-	callCCycles       = 12 // 0xDC
-	xDDCycles         = 0  // 0xDD
-	xDECycles         = 0  // 0xDE
-	rst18HCycles      = 32 // 0xDF
-	ldStackNACycles   = 12 // 0xE0
-	popHlCycles       = 12 // 0xE1
-	ldStackCACycles   = 8  // 0xE2
-	xEThreeCycles     = 0  // 0xE3
-	xEFourCycles      = 0  // 0xE4
-	pushHlCycles      = 16 // 0xE5
-	andANCycles       = 8  // 0xE6
-	rst20HCycles      = 32 // 0xE7
-	addSpNCycles      = 16 // 0xE8
-	jpMemHlCycles     = 4  // 0xE9
-	xEACycles         = 0  // 0xEA
-	xEBCycles         = 0  // 0xEB
-	xECCycles         = 0  // 0xEC
-	xEDCycles         = 0  // 0xED
-	xorANCycles       = 8  // 0xEE
-	rst28HCycles      = 32 // 0xEF
-	ldAStackNCycles   = 12 // 0xF0
-	popAfCycles       = 12 // 0xF1
-	ldAStackCCycles   = 8  // 0xF2
-	diCycles          = 4  // 0xF3
-	xFFourCycles      = 0  // 0xF4
-	pushAfCycles      = 16 // 0xF5
-	orANCycles        = 8  // 0xF6
-	rst30HCycles      = 32 // 0xF7
-	ldHlSpNCycles     = 12 // 0xF8
-	ldSpHlCycles      = 0  // 0xF9
-	ldAMemNnCycles    = 16 // 0xFA
-	eiCycles          = 4  // 0xFB
-	xFCCycles         = 0  // 0xFC
-	xFDCycles         = 0  // 0xFD
-	cpANCycles        = 8  // 0xFE
-	rst38HCycles      = 32 // 0xFF
+	jpCCycles       = 12 // 0xDA
+	xDBCycles       = 0  // 0xDB
+	callCCycles     = 12 // 0xDC
+	xDDCycles       = 0  // 0xDD
+	sbcANnCycles       = 8  // 0xDE
+	rst18HCycles    = 32 // 0xDF
+	ldStackNACycles = 12 // 0xE0
+	popHlCycles     = 12 // 0xE1
+	ldStackCACycles = 8  // 0xE2
+	xEThreeCycles   = 0  // 0xE3
+	xEFourCycles    = 0  // 0xE4
+	pushHlCycles    = 16 // 0xE5
+	andANCycles     = 8  // 0xE6
+	rst20HCycles    = 32 // 0xE7
+	addSpNCycles    = 16 // 0xE8
+	jpMemHlCycles   = 4  // 0xE9
+	ldMemNnACycles  = 16 // 0xEA
+	xEBCycles       = 0  // 0xEB
+	xECCycles       = 0  // 0xEC
+	xEDCycles       = 0  // 0xED
+	xorANCycles     = 8  // 0xEE
+	rst28HCycles    = 32 // 0xEF
+	ldAStackNCycles = 12 // 0xF0
+	popAfCycles     = 12 // 0xF1
+	ldAStackCCycles = 8  // 0xF2
+	diCycles        = 4  // 0xF3
+	xFFourCycles    = 0  // 0xF4
+	pushAfCycles    = 16 // 0xF5
+	orANCycles      = 8  // 0xF6
+	rst30HCycles    = 32 // 0xF7
+	ldHlSpNCycles   = 12 // 0xF8
+	ldSpHlCycles    = 0  // 0xF9
+	ldAMemNnCycles  = 16 // 0xFA
+	eiCycles        = 4  // 0xFB
+	xFCCycles       = 0  // 0xFC
+	xFDCycles       = 0  // 0xFD
+	cpANCycles      = 8  // 0xFE
+	rst38HCycles    = 32 // 0xFF
 )
 
 var op = [0x100] instructions{
-	nop,       //0x00
-	ldBcNn,    //0x01
-	TODO,      //0x02
-	incBc,     //0x03
-	incB,      //0x04
-	decB,      //0x05
-	ldBN,      //0x06
-	rlcA,      //0x07
-	ldMemNnSp, //0x08
-	addHlBc,   //0x09
-	ldAMemBc,  //0x0A
-	decBc,     //0x0B
-	incC,      //0x0C
-	decC,      //0x0D
-	ldCN,      //0x0E
-	rrcA,      //0x0F
-	stop,      //0x10
-	ldDeNn,    //0x11
-	TODO,      //0x12
-	incDe,     //0x13
-	incD,      //0x14
-	decD,      //0x15
-	ldDN,      //0x16
-	rlA,       //0x17
-	jr,        //0x18
-	addHlDe,   //0x19
-	ldAMemDe,  //0x1A
-	decDe,     //0x1B
-	incE,      //0x1C
-	decE,      //0x1D
-	ldEN,      //0x1E
-	rrA,       //0x1F
-	jrNZ,      //0x20
-	ldHlNn,    //0x21
-	ldiMemHlA, //0x22
-	incHl,     //0x23
-	incH,      //0x24
-	decH,      //0x25
-	ldHN,      //0x26
-	daA,       //0x27
-	jrZ,       //0x28
-	addHlHl,   //0x29
-	ldiAMemHl, //0x2A
-	decHl,     //0x2B
-	incL,      //0x2C
-	decL,      //0x2D
-	ldLN,      //0x2E
-	cplA,      //0x2F
-	jrNC,      //0x30
-	ldSpNn,    //0x31
-	lddMemHlA, //0x32
-	incSp,     //0x33
-	incMemHl,  //0x34
-	decMemHl,  //0x35
-	ldMemHlN,  //0x36
-	scf,       //0x37
-	jrC,       //0x38
-	addHlSp,   //0x39
-	lddAMemHl, //0x3A
-	decSp,     //0x3B
-	incA,      //0x3C
-	decA,      //0x3D
-	ldAN,      //0x3E
-	ccf,       //0x3F
-	ldBB,      //0x40
-	ldBC,      //0x41
-	ldBD,      //0x42
-	ldBE,      //0x43
-	ldBH,      //0x44
-	ldBL,      //0x45
-	ldBHl,     //0x46
-	ldBA,      //0x47
-	ldCB,      //0x48
-	ldCC,      //0x49
-	ldCD,      //0x4A
-	ldCE,      //0x4B
-	ldCH,      //0x4C
-	ldCL,      //0x4D
-	ldCHl,     //0x4E
-	ldCA,      //0x4F
-	ldDB,      //0x50
-	ldDC,      //0x51
-	ldDD,      //0x52
-	ldDE,      //0x53
-	ldDH,      //0x54
-	ldDL,      //0x55
-	ldDHl,     //0x56
-	ldDA,      //0x57
-	ldEB,      //0x58
-	ldEC,      //0x59
-	ldED,      //0x5A
-	ldEE,      //0x5B
-	ldEH,      //0x5C
-	ldEL,      //0x5D
-	ldEHl,     //0x5E
-	ldEA,      //0x5F
-	ldHB,      //0x60
-	ldHC,      //0x61
-	ldHD,      //0x62
-	ldHE,      //0x63
-	ldHH,      //0x64
-	ldHL,      //0x65
-	ldHHl,     //0x66
-	TODO,      //0x67
-	ldLB,      //0x68
-	ldLC,      //0x69
-	ldLD,      //0x6A
-	ldLE,      //0x6B
-	ldLH,      //0x6C
-	ldLL,      //0x6D
-	ldLHl,     //0x6E
-	TODO,      //0x6F
-	ldMemHlB,  //0x70
-	ldMemHlC,  //0x71
-	ldMemHlD,  //0x72
-	ldMemHlE,  //0x73
-	ldMemHlL,  //0x74
-	ldMemHlH,  //0x75
-	halt,      //0x76
-	TODO,      //0x77
-	ldAB,      //0x78
-	ldAC,      //0x79
-	ldAD,      //0x7A
-	ldAE,      //0x7B
-	ldAH,      //0x7C
-	ldAL,      //0x7D
-	ldAMemHl,  //0x7E
-	ldAA,      //0x7F
-	addAB,     //0x80
-	addAC,     //0x81
-	addAD,     //0x82
-	addAE,     //0x83
-	addAH,     //0x84
-	addAL,     //0x85
-	addAMemHl, //0x86
-	TODO,      //0x87
-	TODO,      //0x88
-	TODO,      //0x89
-	TODO,      //0x8A
-	TODO,      //0x8B
-	TODO,      //0x8C
-	TODO,      //0x8D
-	TODO,      //0x8E
-	TODO,      //0x8F
-	subAB,     //0x90
-	subAC,     //0x91
-	subAD,     //0x92
-	subAE,     //0x93
-	subAH,     //0x94
-	subAL,     //0x95
-	subAMemHl, //0x96
-	subAA,     //0x97
-	sbcAB,     //0x98
-	sbcAC,     //0x99
-	sbcAD,     //0x9A
-	sbcAE,     //0x9B
-	sbcAH,     //0x9C
-	sbcAL,     //0x9D
-	sbcAMemHl, //0x9E
-	TODO,      //0x9F
-	andAB,     //0xA0
-	andAC,     //0xA1
-	andAD,     //0xA2
-	andAE,     //0xA3
-	andAH,     //0xA4
-	andAL,     //0xA5
-	andAMemHl, //0xA6
-	andAA,     //0xA7
-	xorAB,     //0xA8
-	xorAC,     //0xA9
-	xorAD,     //0xAA
-	xorAE,     //0xAB
-	xorAH,     //0xAC
-	xorAL,     //0xAD
-	xorAMemHl, //0xAE
-	xorAA,     //0xAF
-	orAB,      //0xB0
-	orAC,      //0xB1
-	orAD,      //0xB2
-	orAE,      //0xB3
-	orAH,      //0xB4
-	orAL,      //0xB5
-	orAMemHl,  //0xB6
-	orAN,      //0xB7
-	cpAB,      //0xB8
-	cpAC,      //0xB9
-	cpAD,      //0xBA
-	cpAE,      //0xBB
-	cpAH,      //0xBC
-	cpAL,      //0xBD
-	cpAMemHl,  //0xBE
-	cpAN,      //0xBF
-	retNZ,      //0xC0
-	popBc,     //0xC1
-	jpNZ,      //0xC2
-	jp,        //0xC3
-	callNZ,    //0xC4
-	pushBc,    //0xC5
-	addANn,    //0xC6
-	rst00H,    //0xC7
-	retZ,      //0xC8
-	ret,      //0xC9
-	jpZ,       //0xCA
-	rxN,       //0xCB
-	callZ,     //0xCC
-	call,      //0xCD
-	TODO,      //0xCE
-	rst08H,    //0xCF
-	retNC,      //0xD0
-	popDe,     //0xD1
-	jpNC,      //0xD2
-	TODO,      //0xD3
-	callNC,    //0xD4
-	pushDe,    //0xD5
-	subANn,    //0xD6
-	rst10H,    //0xD7
-	retC,      //0xD8
-	reti,      //0xD9
-	jpC,       //0xDA
-	TODO,      //0xDB
-	callC,     //0xDC
-	TODO,      //0xDD
-	TODO,      //0xDE
-	rst18H,    //0xDF
-	ldStackNA, //0xE0
-	popHl,     //0xE1
-	ldStackCA, //0xE2
-	TODO,      //0xE3
-	TODO,      //0xE4
-	pushHl,    //0xE5
-	andAN,     //0xE6
-	rst20H,    //0xE7
-	addSpN,    //0xE8
-	jpMemHl,   //0xE9
-	TODO,      //0xEA
-	TODO,      //0xEB
-	TODO,      //0xEC
-	TODO,      //0xED
-	xorAN,     //0xEE
-	rst28H,    //0xEF
-	ldAStackN, //0xF0
-	popAf,     //0xF1
-	ldAStackC, //0xF2
-	di,        //0xF3
-	TODO,      //0xF4
-	pushAf,    //0xF5
-	orAN,      //0xF6
-	rst30H,    //0xF7
-	ldHlSpN,   //0xF8
-	ldSpHl,    //0xF9
-	ldAMemNn,  //0xFA
-	ei,        //0xFB
-	TODO,      //0xFC
-	TODO,      //0xFD
-	cpAN,      //0xFE
-	rst38H,    //0xFF
+	nop,            //0x00
+	ldBcNn,         //0x01
+	ldMemBcA,       //0x02
+	incBc,          //0x03
+	incB,           //0x04
+	decB,           //0x05
+	ldBN,           //0x06
+	rlcA,           //0x07
+	ldMemNnSp,      //0x08
+	addHlBc,        //0x09
+	ldAMemBc,       //0x0A
+	decBc,          //0x0B
+	incC,           //0x0C
+	decC,           //0x0D
+	ldCN,           //0x0E
+	rrcA,           //0x0F
+	stop,           //0x10
+	ldDeNn,         //0x11
+	ldMemDeA,       //0x12
+	incDe,          //0x13
+	incD,           //0x14
+	decD,           //0x15
+	ldDN,           //0x16
+	rlA,            //0x17
+	jr,             //0x18
+	addHlDe,        //0x19
+	ldAMemDe,       //0x1A
+	decDe,          //0x1B
+	incE,           //0x1C
+	decE,           //0x1D
+	ldEN,           //0x1E
+	rrA,            //0x1F
+	jrNZ,           //0x20
+	ldHlNn,         //0x21
+	ldiMemHlA,      //0x22
+	incHl,          //0x23
+	incH,           //0x24
+	decH,           //0x25
+	ldHN,           //0x26
+	daA,            //0x27
+	jrZ,            //0x28
+	addHlHl,        //0x29
+	ldiAMemHl,      //0x2A
+	decHl,          //0x2B
+	incL,           //0x2C
+	decL,           //0x2D
+	ldLN,           //0x2E
+	cplA,           //0x2F
+	jrNC,           //0x30
+	ldSpNn,         //0x31
+	lddMemHlA,      //0x32
+	incSp,          //0x33
+	incMemHl,       //0x34
+	decMemHl,       //0x35
+	ldMemHlN,       //0x36
+	scf,            //0x37
+	jrC,            //0x38
+	addHlSp,        //0x39
+	lddAMemHl,      //0x3A
+	decSp,          //0x3B
+	incA,           //0x3C
+	decA,           //0x3D
+	ldAN,           //0x3E
+	ccf,            //0x3F
+	ldBB,           //0x40
+	ldBC,           //0x41
+	ldBD,           //0x42
+	ldBE,           //0x43
+	ldBH,           //0x44
+	ldBL,           //0x45
+	ldBHl,          //0x46
+	ldBA,           //0x47
+	ldCB,           //0x48
+	ldCC,           //0x49
+	ldCD,           //0x4A
+	ldCE,           //0x4B
+	ldCH,           //0x4C
+	ldCL,           //0x4D
+	ldCHl,          //0x4E
+	ldCA,           //0x4F
+	ldDB,           //0x50
+	ldDC,           //0x51
+	ldDD,           //0x52
+	ldDE,           //0x53
+	ldDH,           //0x54
+	ldDL,           //0x55
+	ldDHl,          //0x56
+	ldDA,           //0x57
+	ldEB,           //0x58
+	ldEC,           //0x59
+	ldED,           //0x5A
+	ldEE,           //0x5B
+	ldEH,           //0x5C
+	ldEL,           //0x5D
+	ldEHl,          //0x5E
+	ldEA,           //0x5F
+	ldHB,           //0x60
+	ldHC,           //0x61
+	ldHD,           //0x62
+	ldHE,           //0x63
+	ldHH,           //0x64
+	ldHL,           //0x65
+	ldHHl,          //0x66
+	ldHA,           //0x67
+	ldLB,           //0x68
+	ldLC,           //0x69
+	ldLD,           //0x6A
+	ldLE,           //0x6B
+	ldLH,           //0x6C
+	ldLL,           //0x6D
+	ldLHl,          //0x6E
+	ldLA,           //0x6F
+	ldMemHlB,       //0x70
+	ldMemHlC,       //0x71
+	ldMemHlD,       //0x72
+	ldMemHlE,       //0x73
+	ldMemHlL,       //0x74
+	ldMemHlH,       //0x75
+	halt,           //0x76
+	ldMemHlA,       //0x77
+	ldAB,           //0x78
+	ldAC,           //0x79
+	ldAD,           //0x7A
+	ldAE,           //0x7B
+	ldAH,           //0x7C
+	ldAL,           //0x7D
+	ldAMemHl,       //0x7E
+	ldAA,           //0x7F
+	addAB,          //0x80
+	addAC,          //0x81
+	addAD,          //0x82
+	addAE,          //0x83
+	addAH,          //0x84
+	addAL,          //0x85
+	addAMemHl,      //0x86
+	addAA,           //0x87
+	adcAB,          //0x88
+	adcAC,          //0x89
+	adcAD,          //0x8A
+	adcAE,          //0x8B
+	adcAH,          //0x8C
+	adcAL,          //0x8D
+	adcAMemHl,      //0x8E
+	adcAA,          //0x8F
+	subAB,          //0x90
+	subAC,          //0x91
+	subAD,          //0x92
+	subAE,          //0x93
+	subAH,          //0x94
+	subAL,          //0x95
+	subAMemHl,      //0x96
+	subAA,          //0x97
+	sbcAB,          //0x98
+	sbcAC,          //0x99
+	sbcAD,          //0x9A
+	sbcAE,          //0x9B
+	sbcAH,          //0x9C
+	sbcAL,          //0x9D
+	sbcAMemHl,      //0x9E
+	sbcAA,           //0x9F
+	andAB,          //0xA0
+	andAC,          //0xA1
+	andAD,          //0xA2
+	andAE,          //0xA3
+	andAH,          //0xA4
+	andAL,          //0xA5
+	andAMemHl,      //0xA6
+	andAA,          //0xA7
+	xorAB,          //0xA8
+	xorAC,          //0xA9
+	xorAD,          //0xAA
+	xorAE,          //0xAB
+	xorAH,          //0xAC
+	xorAL,          //0xAD
+	xorAMemHl,      //0xAE
+	xorAA,          //0xAF
+	orAB,           //0xB0
+	orAC,           //0xB1
+	orAD,           //0xB2
+	orAE,           //0xB3
+	orAH,           //0xB4
+	orAL,           //0xB5
+	orAMemHl,       //0xB6
+	orAN,           //0xB7
+	cpAB,           //0xB8
+	cpAC,           //0xB9
+	cpAD,           //0xBA
+	cpAE,           //0xBB
+	cpAH,           //0xBC
+	cpAL,           //0xBD
+	cpAMemHl,       //0xBE
+	cpAN,           //0xBF
+	retNZ,          //0xC0
+	popBc,          //0xC1
+	jpNZ,           //0xC2
+	jp,             //0xC3
+	callNZ,         //0xC4
+	pushBc,         //0xC5
+	addANn,         //0xC6
+	rst00H,         //0xC7
+	retZ,           //0xC8
+	ret,            //0xC9
+	jpZ,            //0xCA
+	rxN,            //0xCB
+	callZ,          //0xCC
+	call,           //0xCD
+	adcANn,         //0xCE
+	rst08H,         //0xCF
+	retNC,          //0xD0
+	popDe,          //0xD1
+	jpNC,           //0xD2
+	nonImplemented, //0xD3
+	callNC,         //0xD4
+	pushDe,         //0xD5
+	subANn,         //0xD6
+	rst10H,         //0xD7
+	retC,           //0xD8
+	reti,           //0xD9
+	jpC,            //0xDA
+	nonImplemented, //0xDB
+	callC,          //0xDC
+	nonImplemented, //0xDD
+	sbcANn,           //0xDE
+	rst18H,         //0xDF
+	ldStackNA,      //0xE0
+	popHl,          //0xE1
+	ldStackCA,      //0xE2
+	nonImplemented, //0xE3
+	nonImplemented, //0xE4
+	pushHl,         //0xE5
+	andAN,          //0xE6
+	rst20H,         //0xE7
+	addSpN,         //0xE8
+	jpMemHl,        //0xE9
+	ldMemNnA,       //0xEA
+	nonImplemented, //0xEB
+	nonImplemented, //0xEC
+	nonImplemented, //0xED
+	xorAN,          //0xEE
+	rst28H,         //0xEF
+	ldAStackN,      //0xF0
+	popAf,          //0xF1
+	ldAStackC,      //0xF2
+	di,             //0xF3
+	nonImplemented, //0xF4
+	pushAf,         //0xF5
+	orAN,           //0xF6
+	rst30H,         //0xF7
+	ldHlSpN,        //0xF8
+	ldSpHl,         //0xF9
+	ldAMemNn,       //0xFA
+	ei,             //0xFB
+	nonImplemented, //0xFC
+	nonImplemented, //0xFD
+	cpAN,           //0xFE
+	rst38H,         //0xFF
 }
 
 func TODO(cpu *cpu) cycleCount {
 	// This function is not defined!
+	return 0
+}
+
+func nonImplemented(cpu *cpu) cycleCount {
+	// This function is not intended to be implemented
+	// if the execution of the rom reaches this point
+	// then whe have a problem..!!
+	// TODO: Throw exception?
 	return 0
 }
 
@@ -977,21 +985,50 @@ func ldBA(cpu *cpu) cycleCount {
 	cpu.r.bc.b = cpu.r.af.a
 	return ldBACycles
 }
-
 func ldCA(cpu *cpu) cycleCount {
-	// Put the value of register A into register B
+	// Put the value of register A into register C
 	cpu.r.bc.c = cpu.r.af.a
 	return ldCACycles
 }
 func ldDA(cpu *cpu) cycleCount {
-	// Put the value of register A into register B
+	// Put the value of register A into register D
 	cpu.r.de.d = cpu.r.af.a
 	return ldDACycles
 }
 func ldEA(cpu *cpu) cycleCount {
-	// Put the value of register A into register B
+	// Put the value of register A into register E
 	cpu.r.de.e = cpu.r.af.a
 	return ldEACycles
+}
+func ldHA(cpu *cpu) cycleCount {
+	// Put the value of register A into register H
+	cpu.r.hl.h = cpu.r.af.a
+	return ldHACycles
+}
+func ldLA(cpu *cpu) cycleCount {
+	// Put the value of register A into register L
+	cpu.r.hl.l = cpu.r.af.a
+	return ldLACycles
+}
+func ldMemBcA(cpu *cpu) cycleCount {
+	// Put the value of register A into the position of memory pointed by register BC
+	// TODO: To implement
+	return ldMemBcACycles
+}
+func ldMemDeA(cpu *cpu) cycleCount {
+	// Put the value of register A into the position of memory pointed by register DE
+	// TODO: To implement
+	return ldMemDeACycles
+}
+func ldMemHlA(cpu *cpu) cycleCount {
+	// Put the value of register A into the position of memory pointed by register HL
+	// TODO: To implement
+	return ldMemHlACycles
+}
+func ldMemNnA(cpu *cpu) cycleCount {
+	// Put the value of register A into the position of memory pointed by an immediate value
+	// TODO: To implement
+	return ldMemNnACycles
 }
 
 // 3.3.1.5. LD A,(C)
@@ -1381,6 +1418,110 @@ func addANn(cpu *cpu) cycleCount {
 	return addANnCycles
 }
 
+// 3.3.3.2. ADC A,n
+// Description:
+// 	Add n + Carry flag to A.
+// Use with:
+// 	n = A,B,C,D,E,H,L,(HL),#
+// Flags affected:
+// 	Z - Set if result is zero.
+// 	N - Reset.
+// 	H - Set if carry from bit 3.
+// 	C - Set if carry from bit 7.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		ADC 			A,A 			8F 			4
+// 		ADC 			A,B 			88 			4
+// 		ADC 			A,C 			89 			4
+// 		ADC 			A,D 			8A 			4
+// 		ADC 			A,E 			8B 			4
+// 		ADC 			A,H 			8C 			4
+// 		ADC 			A,L 			8D 			4
+// 		ADC 			A,(HL) 			8E 			8
+// 		ADC 			A,# 			CE 			8
+
+func adcAA(cpu *cpu) cycleCount {
+	// Add (A+Carry) into register A.
+	var oldA = cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
+	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	return adcAACycles
+}
+func adcAB(cpu *cpu) cycleCount {
+	// Add (B+Carry) into register A.
+	var oldA = cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
+	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	return adcABCycles
+}
+func adcAC(cpu *cpu) cycleCount {
+	// Add (C+Carry) into register A.
+	var oldA = cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
+	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	return adcACCycles
+}
+func adcAD(cpu *cpu) cycleCount {
+	// Add (D+Carry) into register A.
+	var oldA = cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
+	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	return adcADCycles
+}
+func adcAE(cpu *cpu) cycleCount {
+	// Add (E+Carry) into register A.
+	var oldA = cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
+	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	return adcAECycles
+}
+func adcAH(cpu *cpu) cycleCount {
+	// Add (H+Carry) into register A.
+	var oldA = cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
+	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	return adcAHCycles
+}
+func adcAL(cpu *cpu) cycleCount {
+	// Add (L+Carry) into register A.
+	var oldA = cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
+	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	return adcALCycles
+}
+func adcAMemHl(cpu *cpu) cycleCount {
+	// Add (MemHl+Carry) into register A.
+	var oldA = cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
+	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	return adcAMemHlCycles
+}
+func adcANn(cpu *cpu) cycleCount {
+	// Add (Nn+Carry) into register A.
+	var oldA = cpu.r.af.a
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
+	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	return adcANnCycles
+}
+
 // 3.3.3.3. SUB n
 // Description:
 // 		Subtract n from A.
@@ -1512,7 +1653,7 @@ func subANn(cpu *cpu) cycleCount {
 //		SBC 			A,H 			9C 		4
 //		SBC 			A,L 			9D 		4
 //		SBC 			A,(HL) 			9E 		8
-//		SBC 			A,# 			?? 		?
+//		SBC 			A,# 			DE 		8
 
 func sbcAA(cpu *cpu) cycleCount {
 	// Subtract from register A the value of register A plus carry flag
@@ -1577,15 +1718,12 @@ func sbcAMemHl(cpu *cpu) cycleCount {
 	return sbcAMemHlCycles
 }
 
-// There is missing documentation about this funcion
-/*
-func sbcAN(cpu *cpu) cycleCount {
+func sbcANn(cpu *cpu) cycleCount {
 	// Subtract from register A the value of register # plus carry flag
 	// cpu.r.af.a -= ...
 	//TODO: to implement
-	return sbcANCycles
+	return sbcANnCycles
 }
-*/
 
 // 3.3.3.5. AND n
 // Description:
@@ -5341,7 +5479,7 @@ func rst38H(cpu *cpu) cycleCount {
 // 		Instruction 	Parameters 		Opcode 		Cycles
 // 		RET 			-/- 			C9 			8
 
-func ret(cpu *cpu) cycleCount{
+func ret(cpu *cpu) cycleCount {
 	// Pop two bytes from stack,
 	// and jump to that address.
 	// TODO: To implement
@@ -5363,7 +5501,7 @@ func ret(cpu *cpu) cycleCount{
 // 		RET 			NC 				D0 			8
 // 		RET 			C 				D8 			8
 
-func retNZ(cpu *cpu) cycleCount{
+func retNZ(cpu *cpu) cycleCount {
 	// If Z flag is reset, then
 	// pop two bytes from stack,
 	// and jump to that address.
@@ -5371,7 +5509,7 @@ func retNZ(cpu *cpu) cycleCount{
 	return retNZCycles
 }
 
-func retZ(cpu *cpu) cycleCount{
+func retZ(cpu *cpu) cycleCount {
 	// If Z flag is set, then
 	// pop two bytes from stack,
 	// and jump to that address.
@@ -5379,7 +5517,7 @@ func retZ(cpu *cpu) cycleCount{
 	return retZCycles
 }
 
-func retNC(cpu *cpu) cycleCount{
+func retNC(cpu *cpu) cycleCount {
 	// If C flag is reset, then
 	// pop two bytes from stack,
 	// and jump to that address.
@@ -5387,7 +5525,7 @@ func retNC(cpu *cpu) cycleCount{
 	return retNCCycles
 }
 
-func retC(cpu *cpu) cycleCount{
+func retC(cpu *cpu) cycleCount {
 	// If C flag is set, then
 	// pop two bytes from stack,
 	// and jump to that address.

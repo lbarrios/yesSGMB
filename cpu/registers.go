@@ -1,5 +1,16 @@
 package cpu
 
+type Flags struct {
+	z bool // zero flag
+	n bool // subtract flag
+	h bool // half carry flag
+	c bool // carry flag
+	_ bool // to complete 1 byte
+	_ bool // to complete 1 byte
+	_ bool // to complete 1 byte
+	_ bool // to complete 1 byte
+}
+
 type Registers struct {
 	af struct {
 		a byte  // high

@@ -4738,289 +4738,289 @@ const (
 func res0A(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register A
 	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 0))
-	return setACycles
+	return resACycles
 }
 func res0B(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register B
 	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 0))
-	return setBCycles
+	return resBCycles
 }
 func res0C(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register C
 	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 0))
-	return setCCycles
+	return resCCycles
 }
 func res0D(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register D
 	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 0))
-	return setDCycles
+	return resDCycles
 }
 func res0E(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register E
 	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 0))
-	return setECycles
+	return resECycles
 }
 func res0H(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register H
 	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 0))
-	return setHCycles
+	return resHCycles
 }
 func res0L(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register L
 	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 0))
-	return setLCycles
+	return resLCycles
 }
 
 func res1A(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register A
 	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 1))
-	return setACycles
+	return resACycles
 }
 func res1B(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register B
 	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 1))
-	return setBCycles
+	return resBCycles
 }
 func res1C(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register C
 	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 1))
-	return setCCycles
+	return resCCycles
 }
 func res1D(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register D
 	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 1))
-	return setDCycles
+	return resDCycles
 }
 func res1E(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register E
 	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 1))
-	return setECycles
+	return resECycles
 }
 func res1H(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register H
 	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 1))
-	return setHCycles
+	return resHCycles
 }
 func res1L(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register L
 	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 1))
-	return setLCycles
+	return resLCycles
 }
 
 func res2A(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register A
 	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 2))
-	return setACycles
+	return resACycles
 }
 func res2B(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register B
 	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 2))
-	return setBCycles
+	return resBCycles
 }
 func res2C(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register C
 	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 2))
-	return setCCycles
+	return resCCycles
 }
 func res2D(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register D
 	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 2))
-	return setDCycles
+	return resDCycles
 }
 func res2E(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register E
 	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 2))
-	return setECycles
+	return resECycles
 }
 func res2H(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register H
 	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 2))
-	return setHCycles
+	return resHCycles
 }
 func res2L(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register L
 	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 2))
-	return setLCycles
+	return resLCycles
 }
 
 func res3A(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register A
 	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 3))
-	return setACycles
+	return resACycles
 }
 func res3B(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register B
 	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 3))
-	return setBCycles
+	return resBCycles
 }
 func res3C(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register C
 	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 3))
-	return setCCycles
+	return resCCycles
 }
 func res3D(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register D
 	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 3))
-	return setDCycles
+	return resDCycles
 }
 func res3E(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register E
 	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 3))
-	return setECycles
+	return resECycles
 }
 func res3H(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register H
 	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 3))
-	return setHCycles
+	return resHCycles
 }
 func res3L(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register L
 	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 3))
-	return setLCycles
+	return resLCycles
 }
 
 func res4A(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register A
 	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 4))
-	return setACycles
+	return resACycles
 }
 func res4B(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register B
 	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 4))
-	return setBCycles
+	return resBCycles
 }
 func res4C(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register C
 	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 4))
-	return setCCycles
+	return resCCycles
 }
 func res4D(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register D
 	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 4))
-	return setDCycles
+	return resDCycles
 }
 func res4E(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register E
 	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 4))
-	return setECycles
+	return resECycles
 }
 func res4H(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register H
 	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 4))
-	return setHCycles
+	return resHCycles
 }
 func res4L(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register L
 	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 4))
-	return setLCycles
+	return resLCycles
 }
 
 func res5A(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register A
 	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 5))
-	return setACycles
+	return resACycles
 }
 func res5B(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register B
 	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 5))
-	return setBCycles
+	return resBCycles
 }
 func res5C(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register C
 	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 5))
-	return setCCycles
+	return resCCycles
 }
 func res5D(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register D
 	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 5))
-	return setDCycles
+	return resDCycles
 }
 func res5E(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register E
 	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 5))
-	return setECycles
+	return resECycles
 }
 func res5H(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register H
 	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 5))
-	return setHCycles
+	return resHCycles
 }
 func res5L(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register L
 	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 5))
-	return setLCycles
+	return resLCycles
 }
 
 func res6A(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register A
 	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 6))
-	return setACycles
+	return resACycles
 }
 func res6B(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register B
 	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 6))
-	return setBCycles
+	return resBCycles
 }
 func res6C(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register C
 	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 6))
-	return setCCycles
+	return resCCycles
 }
 func res6D(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register D
 	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 6))
-	return setDCycles
+	return resDCycles
 }
 func res6E(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register E
 	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 6))
-	return setECycles
+	return resECycles
 }
 func res6H(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register H
 	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 6))
-	return setHCycles
+	return resHCycles
 }
 func res6L(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register L
 	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 6))
-	return setLCycles
+	return resLCycles
 }
 
 func res7A(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register A
 	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 7))
-	return setACycles
+	return resACycles
 }
 func res7B(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register B
 	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 7))
-	return setBCycles
+	return resBCycles
 }
 func res7C(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register C
 	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 7))
-	return setCCycles
+	return resCCycles
 }
 func res7D(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register D
 	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 7))
-	return setDCycles
+	return resDCycles
 }
 func res7E(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register E
 	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 7))
-	return setECycles
+	return resECycles
 }
 func res7H(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register H
 	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 7))
-	return setHCycles
+	return resHCycles
 }
 func res7L(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register L
 	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 7))
-	return setLCycles
+	return resLCycles
 }
 
 func res0MemHl(cpu *cpu) cycleCount {
@@ -5062,4 +5062,135 @@ func res7MemHl(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the position of memory pointed by the register HL
 	// TODO: To implement
 	return resMemHlCycles
+}
+
+// 3.3.8. Jumps
+
+// 3.3.8.1. JP nn
+// Description:
+// 	Jump to address nn.
+// Use with:
+// 	nn = two byte immediate value. (LS byte first.)
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		JP 				nn 				C3 			12
+func jp(cpu *cpu) cycleCount {
+	// Jump to address nn
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return jpCycles
+}
+
+// 3.3.8.2. JP cc,nn
+// Description:
+// 	Jump to address n if following condition is true:
+// 	cc = NZ, Jump if Z flag is reset.
+// 	cc = Z, Jump if Z flag is set.
+// 	cc = NC, Jump if C flag is reset.
+// 	cc = C, Jump if C flag is set.
+// Use with:
+// 	nn = two byte immediate value. (LS byte first.)
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		JP 				NZ,nn 			C2 			12
+// 		JP 				Z,nn 			CA 			12
+// 		JP 				NC,nn 			D2 			12
+// 		JP 				C,nn 			DA 			12
+
+func jpNZ(cpu *cpu) cycleCount {
+	// Jump to address nn if the flag Z is reset
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return jpNZCycles
+}
+func jpZ(cpu *cpu) cycleCount {
+	// Jump to address nn if the flag Z is set
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return jpZCycles
+}
+func jpNC(cpu *cpu) cycleCount {
+	// Jump to address nn if the flag C is reset
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return jpNCCycles
+}
+func jpC(cpu *cpu) cycleCount {
+	// Jump to address nn if the flag C is set
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return jpCCycles
+}
+
+// 3.3.8.3. JP (HL)
+// Description:
+// 	Jump to address contained in HL.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		JP 				(HL) 			E9 			4
+
+func jpMemHl(cpu *cpu) cycleCount {
+	// Jump to address contained in register HL
+	// TODO: To implement
+	return jpMemHlCycles
+}
+
+// 3.3.8.4. JR n
+// Description:
+// 	Add n to current address and jump to it.
+// Use with:
+// 	n = one byte signed immediate value
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		JR 				n 				18 			8
+func jr(cpu *cpu) cycleCount {
+	// Adds current address + nn, and jumps to it
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return jrCycles
+}
+
+// 3.3.8.5. JR cc,n
+// Description:
+// 	If following condition is true then add n to current
+// 	address and jump to it:
+// Use with:
+// 	n = one byte signed immediate value
+// 	cc = NZ, Jump if Z flag is reset.
+// 	cc = Z, Jump if Z flag is set.
+// 	cc = NC, Jump if C flag is reset.
+// 	cc = C, Jump if C flag is set.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		JR 				NZ,* 			20 			8
+// 		JR 				Z,* 			28 			8
+// 		JR 				NC,* 			30 			8
+// 		JR 				C,* 			38 			8
+func jrNZ(cpu *cpu) cycleCount{
+	// If the flag Z is reset, then
+	// adds current address + nn, and jumps to it
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return jrNZCycles
+}
+func jrZ(cpu *cpu) cycleCount{
+	// If the flag Z is set, then
+	// adds current address + nn, and jumps to it
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return jrZCycles
+}
+func jrNC(cpu *cpu) cycleCount{
+	// If the flag C is reset, then
+	// adds current address + nn, and jumps to it
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return jrNCCycles
+}
+func jrC(cpu *cpu) cycleCount{
+	// If the flag C is set, then
+	// adds current address + nn, and jumps to it
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return jrCCycles
 }

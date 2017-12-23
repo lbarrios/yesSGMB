@@ -69,7 +69,7 @@ const (
 	decDCycles        = 4  // 0x15
 	ldDNCycles        = 8  // 0x16
 	rlACycles         = 4  // 0x17
-	xOneEightCycles   = 0  // 0x18
+	jrCycles          = 8  // 0x18
 	addHlDeCycles     = 8  // 0x19
 	ldAMemDeCycles    = 8  // 0x1A
 	decDeCycles       = 8  // 0x1B
@@ -77,7 +77,7 @@ const (
 	decECycles        = 4  // 0x1D
 	ldENCycles        = 8  // 0x1E
 	rrACycles         = 4  // 0x1F
-	xTwoZeroCycles    = 0  // 0x20
+	jrNZCycles        = 8  // 0x20
 	ldHlNnCycles      = 12 // 0x21
 	ldiMemHlACycles   = 8  // 0x22
 	incHlCycles       = 8  // 0x23
@@ -85,7 +85,7 @@ const (
 	decHCycles        = 4  // 0x25
 	ldHNCycles        = 8  // 0x26
 	daACycles         = 4  // 0x27
-	xTwoEightCycles   = 0  // 0x28
+	jrZCycles         = 8  // 0x28
 	addHlHlCycles     = 8  // 0x29
 	ldiAMemHlCycles   = 8  // 0x2A
 	decHlCycles       = 8  // 0x2B
@@ -93,7 +93,7 @@ const (
 	decLCycles        = 4  // 0x2D
 	ldLNCycles        = 8  // 0x2E
 	cplACycles        = 4  // 0x2F
-	xThreeZeroCycles  = 0  // 0x30
+	jrNCCycles        = 8  // 0x30
 	ldSpNnCycles      = 12 // 0x31
 	lddMemHlACycles   = 8  // 0x32
 	incSpCycles       = 8  // 0x33
@@ -101,7 +101,7 @@ const (
 	decMemHlCycles    = 12 // 0x35
 	ldMemHlNCycles    = 12 // 0x36
 	scfCycles         = 4  // 0x37
-	xThreeEightCycles = 0  // 0x38
+	jrCCycles         = 8  // 0x38
 	addHlSpCycles     = 8  // 0x39
 	lddAMemHlCycles   = 8  // 0x3A
 	decSpCycles       = 8  // 0x3B
@@ -239,36 +239,36 @@ const (
 	cpAACycles        = 4  // 0xBF
 	xCZeroCycles      = 0  // 0xC0
 	popBcCycles       = 12 // 0xC1
-	xCTwoCycles       = 0  // 0xC2
-	xCThreeCycles     = 0  // 0xC3
-	xCFourCycles      = 0  // 0xC4
+	jpNZCycles        = 12 // 0xC2
+	jpCycles          = 8  // 0xC3
+	callNZCycles      = 12 // 0xC4
 	pushBcCycles      = 16 // 0xC5
 	addANnCycles      = 8  // 0xC6
-	xCSevenCycles     = 0  // 0xC7
+	rst00HCycles      = 32 // 0xC7
 	xCEightCycles     = 0  // 0xC8
 	xCNineCycles      = 0  // 0xC9
-	xCACycles         = 0  // 0xCA
+	jpZCycles         = 12 // 0xCA
 	rxNCycles         = 8  // 0xCB
-	xCCCycles         = 0  // 0xCC
-	xCDCycles         = 0  // 0xCD
+	callZCycles       = 12 // 0xCC
+	callCycles        = 12 // 0xCD
 	xCECycles         = 0  // 0xCE
-	xCFCycles         = 0  // 0xCF
+	rst08HCycles      = 32 // 0xCF
 	xDZeroCycles      = 0  // 0xD0
 	popDeCycles       = 12 // 0xD1
-	xDTwoCycles       = 0  // 0xD2
+	jpNCCycles        = 12 // 0xD2
 	xDThreeCycles     = 0  // 0xD3
-	xDFourCycles      = 0  // 0xD4
+	callNCCycles      = 12 // 0xD4
 	pushDeCycles      = 16 // 0xD5
 	subANnCycles      = 8  // 0xD6
-	xDSevenCycles     = 0  // 0xD7
+	rst10HCycles      = 32 // 0xD7
 	xDEightCycles     = 0  // 0xD8
 	xDNineCycles      = 0  // 0xD9
-	xDACycles         = 0  // 0xDA
+	jpCCycles         = 12 // 0xDA
 	xDBCycles         = 0  // 0xDB
-	xDCCycles         = 0  // 0xDC
+	callCCycles       = 12 // 0xDC
 	xDDCycles         = 0  // 0xDD
 	xDECycles         = 0  // 0xDE
-	xDFCycles         = 0  // 0xDF
+	rst18HCycles      = 32 // 0xDF
 	ldStackNACycles   = 12 // 0xE0
 	popHlCycles       = 12 // 0xE1
 	ldStackCACycles   = 8  // 0xE2
@@ -276,15 +276,15 @@ const (
 	xEFourCycles      = 0  // 0xE4
 	pushHlCycles      = 16 // 0xE5
 	andANCycles       = 8  // 0xE6
-	xESevenCycles     = 0  // 0xE7
+	rst20HCycles      = 32 // 0xE7
 	addSpNCycles      = 16 // 0xE8
-	xENineCycles      = 0  // 0xE9
+	jpMemHlCycles     = 4  // 0xE9
 	xEACycles         = 0  // 0xEA
 	xEBCycles         = 0  // 0xEB
 	xECCycles         = 0  // 0xEC
 	xEDCycles         = 0  // 0xED
 	xorANCycles       = 8  // 0xEE
-	xEFCycles         = 0  // 0xEF
+	rst28HCycles      = 32 // 0xEF
 	ldAStackNCycles   = 12 // 0xF0
 	popAfCycles       = 12 // 0xF1
 	ldAStackCCycles   = 8  // 0xF2
@@ -292,7 +292,7 @@ const (
 	xFFourCycles      = 0  // 0xF4
 	pushAfCycles      = 16 // 0xF5
 	orANCycles        = 8  // 0xF6
-	xFSevenCycles     = 0  // 0xF7
+	rst30HCycles      = 32 // 0xF7
 	ldHlSpNCycles     = 12 // 0xF8
 	ldSpHlCycles      = 0  // 0xF9
 	ldAMemNnCycles    = 16 // 0xFA
@@ -300,7 +300,7 @@ const (
 	xFCCycles         = 0  // 0xFC
 	xFDCycles         = 0  // 0xFD
 	cpANCycles        = 8  // 0xFE
-	xFFCycles         = 0  // 0xFF
+	rst38HCycles      = 32 // 0xFF
 )
 
 var op = [0x100] instructions{
@@ -328,7 +328,7 @@ var op = [0x100] instructions{
 	decD,      //0x15
 	ldDN,      //0x16
 	rlA,       //0x17
-	TODO,      //0x18
+	jr,        //0x18
 	addHlDe,   //0x19
 	ldAMemDe,  //0x1A
 	decDe,     //0x1B
@@ -336,7 +336,7 @@ var op = [0x100] instructions{
 	decE,      //0x1D
 	ldEN,      //0x1E
 	rrA,       //0x1F
-	TODO,      //0x20
+	jrNZ,      //0x20
 	ldHlNn,    //0x21
 	ldiMemHlA, //0x22
 	incHl,     //0x23
@@ -344,7 +344,7 @@ var op = [0x100] instructions{
 	decH,      //0x25
 	ldHN,      //0x26
 	daA,       //0x27
-	TODO,      //0x28
+	jrZ,       //0x28
 	addHlHl,   //0x29
 	ldiAMemHl, //0x2A
 	decHl,     //0x2B
@@ -352,7 +352,7 @@ var op = [0x100] instructions{
 	decL,      //0x2D
 	ldLN,      //0x2E
 	cplA,      //0x2F
-	TODO,      //0x30
+	jrNC,      //0x30
 	ldSpNn,    //0x31
 	lddMemHlA, //0x32
 	incSp,     //0x33
@@ -360,7 +360,7 @@ var op = [0x100] instructions{
 	decMemHl,  //0x35
 	ldMemHlN,  //0x36
 	scf,       //0x37
-	TODO,      //0x38
+	jrC,       //0x38
 	addHlSp,   //0x39
 	lddAMemHl, //0x3A
 	decSp,     //0x3B
@@ -498,36 +498,36 @@ var op = [0x100] instructions{
 	cpAN,      //0xBF
 	TODO,      //0xC0
 	popBc,     //0xC1
-	TODO,      //0xC2
-	TODO,      //0xC3
-	TODO,      //0xC4
+	jpNZ,      //0xC2
+	jp,        //0xC3
+	callNZ,    //0xC4
 	pushBc,    //0xC5
 	addANn,    //0xC6
-	TODO,      //0xC7
+	rst00H,    //0xC7
 	TODO,      //0xC8
 	TODO,      //0xC9
-	TODO,      //0xCA
+	jpZ,       //0xCA
 	rxN,       //0xCB
-	TODO,      //0xCC
-	TODO,      //0xCD
+	callZ,     //0xCC
+	call,      //0xCD
 	TODO,      //0xCE
-	TODO,      //0xCF
+	rst08H,    //0xCF
 	TODO,      //0xD0
 	popDe,     //0xD1
-	TODO,      //0xD2
+	jpNC,      //0xD2
 	TODO,      //0xD3
-	TODO,      //0xD4
+	callNC,    //0xD4
 	pushDe,    //0xD5
 	subANn,    //0xD6
-	TODO,      //0xD7
+	rst10H,    //0xD7
 	TODO,      //0xD8
 	TODO,      //0xD9
-	TODO,      //0xDA
+	jpC,       //0xDA
 	TODO,      //0xDB
-	TODO,      //0xDC
+	callC,     //0xDC
 	TODO,      //0xDD
 	TODO,      //0xDE
-	TODO,      //0xDF
+	rst18H,    //0xDF
 	ldStackNA, //0xE0
 	popHl,     //0xE1
 	ldStackCA, //0xE2
@@ -535,15 +535,15 @@ var op = [0x100] instructions{
 	TODO,      //0xE4
 	pushHl,    //0xE5
 	andAN,     //0xE6
-	TODO,      //0xE7
+	rst20H,    //0xE7
 	addSpN,    //0xE8
-	TODO,      //0xE9
+	jpMemHl,   //0xE9
 	TODO,      //0xEA
 	TODO,      //0xEB
 	TODO,      //0xEC
 	TODO,      //0xED
 	xorAN,     //0xEE
-	TODO,      //0xEF
+	rst28H,    //0xEF
 	ldAStackN, //0xF0
 	popAf,     //0xF1
 	ldAStackC, //0xF2
@@ -551,7 +551,7 @@ var op = [0x100] instructions{
 	TODO,      //0xF4
 	pushAf,    //0xF5
 	orAN,      //0xF6
-	TODO,      //0xF7
+	rst30H,    //0xF7
 	ldHlSpN,   //0xF8
 	ldSpHl,    //0xF9
 	ldAMemNn,  //0xFA
@@ -559,7 +559,7 @@ var op = [0x100] instructions{
 	TODO,      //0xFC
 	TODO,      //0xFD
 	cpAN,      //0xFE
-	TODO,      //0xFF
+	rst38H,    //0xFF
 }
 
 func TODO(cpu *cpu) cycleCount {
@@ -5166,31 +5166,168 @@ func jr(cpu *cpu) cycleCount {
 // 		JR 				Z,* 			28 			8
 // 		JR 				NC,* 			30 			8
 // 		JR 				C,* 			38 			8
-func jrNZ(cpu *cpu) cycleCount{
+func jrNZ(cpu *cpu) cycleCount {
 	// If the flag Z is reset, then
 	// adds current address + nn, and jumps to it
 	// (nn: parameter from immediate value)
 	// TODO: To implement
 	return jrNZCycles
 }
-func jrZ(cpu *cpu) cycleCount{
+func jrZ(cpu *cpu) cycleCount {
 	// If the flag Z is set, then
 	// adds current address + nn, and jumps to it
 	// (nn: parameter from immediate value)
 	// TODO: To implement
 	return jrZCycles
 }
-func jrNC(cpu *cpu) cycleCount{
+func jrNC(cpu *cpu) cycleCount {
 	// If the flag C is reset, then
 	// adds current address + nn, and jumps to it
 	// (nn: parameter from immediate value)
 	// TODO: To implement
 	return jrNCCycles
 }
-func jrC(cpu *cpu) cycleCount{
+func jrC(cpu *cpu) cycleCount {
 	// If the flag C is set, then
 	// adds current address + nn, and jumps to it
 	// (nn: parameter from immediate value)
 	// TODO: To implement
 	return jrCCycles
+}
+
+// 3.3.9. Calls
+
+// 3.3.9.1. CALL nn
+// Description:
+// 	Push address of next instruction onto stack and then
+// 	jump to address nn.
+// Use with:
+// 	nn = two byte immediate value. (LS byte first.)
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		CALL 			nn 				CD 			12
+
+func call(cpu *cpu) cycleCount {
+	// Push the address of the next instruction onto stack
+	// and jump to address nn
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return callCycles
+}
+
+// 3.3.9.2. CALL cc,nn
+// Description:
+// 	Call address n if following condition is true:
+// 	cc = NZ, Call if Z flag is reset.
+// 	cc = Z, Call if Z flag is set.
+// 	cc = NC, Call if C flag is reset.
+// 	cc = C, Call if C flag is set.
+// Use with:
+// 	nn = two byte immediate value. (LS byte first.)
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		CALL 			NZ,nn 			C4 			12
+// 		CALL 			Z,nn 			CC 			12
+// 		CALL 			NC,nn 			D4 			12
+// 		CALL 			C,nn 			DC 			12
+
+func callNZ(cpu *cpu) cycleCount {
+	// If Z flag is reset, then
+	// push the address of the next instruction onto stack
+	// and jump to address nn
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return callNZCycles
+}
+func callZ(cpu *cpu) cycleCount {
+	// If Z flag is set, then
+	// push the address of the next instruction onto stack
+	// and jump to address nn
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return callZCycles
+}
+func callNC(cpu *cpu) cycleCount {
+	// If C flag is reset, then
+	// push the address of the next instruction onto stack
+	// and jump to address nn
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return callNCCycles
+}
+func callC(cpu *cpu) cycleCount {
+	// If C flag is set, then
+	// push the address of the next instruction onto stack
+	// and jump to address nn
+	// (nn: parameter from immediate value)
+	// TODO: To implement
+	return callCCycles
+}
+
+//3.3.10. Restarts
+
+// 3.3.10.1. RST n
+// Description:
+// 	Push present address onto stack.
+// 	Jump to address $0000 + n.
+// Use with:
+// 	n = $00,$08,$10,$18,$20,$28,$30,$38
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RST 			00H 			C7 			32
+// 		RST 			08H 			CF 			32
+// 		RST 			10H 			D7 			32
+// 		RST 			18H 			DF 			32
+// 		RST 			20H 			E7 			32
+// 		RST 			28H 			EF 			32
+// 		RST 			30H 			F7 			32
+// 		RST 			38H 			FF 			32
+
+func rst00H(cpu *cpu) cycleCount {
+	// Push current address to stack
+	// and jumps to 0x00
+	// TODO: To implement
+	return rst00HCycles
+}
+func rst08H(cpu *cpu) cycleCount {
+	// Push current address to stack
+	// and jumps to 0x08
+	// TODO: To implement
+	return rst08HCycles
+}
+func rst10H(cpu *cpu) cycleCount {
+	// Push current address to stack
+	// and jumps to 0x10
+	// TODO: To implement
+	return rst10HCycles
+}
+func rst18H(cpu *cpu) cycleCount {
+	// Push current address to stack
+	// and jumps to 0x18
+	// TODO: To implement
+	return rst18HCycles
+}
+func rst20H(cpu *cpu) cycleCount {
+	// Push current address to stack
+	// and jumps to 0x20
+	// TODO: To implement
+	return rst20HCycles
+}
+func rst28H(cpu *cpu) cycleCount {
+	// Push current address to stack
+	// and jumps to 0x28
+	// TODO: To implement
+	return rst28HCycles
+}
+func rst30H(cpu *cpu) cycleCount {
+	// Push current address to stack
+	// and jumps to 0x30
+	// TODO: To implement
+	return rst30HCycles
+}
+func rst38H(cpu *cpu) cycleCount {
+	// Push current address to stack
+	// and jumps to 0x38
+	// TODO: To implement
+	return rst38HCycles
 }

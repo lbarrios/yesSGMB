@@ -237,7 +237,7 @@ const (
 	cpALCycles        = 4  // 0xBD
 	cpAMemHlCycles    = 8  // 0xBE
 	cpAACycles        = 4  // 0xBF
-	xCZeroCycles      = 0  // 0xC0
+	retNZCycles      = 8  // 0xC0
 	popBcCycles       = 12 // 0xC1
 	jpNZCycles        = 12 // 0xC2
 	jpCycles          = 8  // 0xC3
@@ -245,15 +245,15 @@ const (
 	pushBcCycles      = 16 // 0xC5
 	addANnCycles      = 8  // 0xC6
 	rst00HCycles      = 32 // 0xC7
-	xCEightCycles     = 0  // 0xC8
-	xCNineCycles      = 0  // 0xC9
+	retZCycles     = 8 // 0xC8
+	retCycles      = 8  // 0xC9
 	jpZCycles         = 12 // 0xCA
 	rxNCycles         = 8  // 0xCB
 	callZCycles       = 12 // 0xCC
 	callCycles        = 12 // 0xCD
 	xCECycles         = 0  // 0xCE
 	rst08HCycles      = 32 // 0xCF
-	xDZeroCycles      = 0  // 0xD0
+	retNCCycles      = 8  // 0xD0
 	popDeCycles       = 12 // 0xD1
 	jpNCCycles        = 12 // 0xD2
 	xDThreeCycles     = 0  // 0xD3
@@ -261,8 +261,8 @@ const (
 	pushDeCycles      = 16 // 0xD5
 	subANnCycles      = 8  // 0xD6
 	rst10HCycles      = 32 // 0xD7
-	xDEightCycles     = 0  // 0xD8
-	xDNineCycles      = 0  // 0xD9
+	retCCycles     = 8  // 0xD8
+	retiCycles      = 8  // 0xD9
 	jpCCycles         = 12 // 0xDA
 	xDBCycles         = 0  // 0xDB
 	callCCycles       = 12 // 0xDC
@@ -496,7 +496,7 @@ var op = [0x100] instructions{
 	cpAL,      //0xBD
 	cpAMemHl,  //0xBE
 	cpAN,      //0xBF
-	TODO,      //0xC0
+	retNZ,      //0xC0
 	popBc,     //0xC1
 	jpNZ,      //0xC2
 	jp,        //0xC3
@@ -504,15 +504,15 @@ var op = [0x100] instructions{
 	pushBc,    //0xC5
 	addANn,    //0xC6
 	rst00H,    //0xC7
-	TODO,      //0xC8
-	TODO,      //0xC9
+	retZ,      //0xC8
+	ret,      //0xC9
 	jpZ,       //0xCA
 	rxN,       //0xCB
 	callZ,     //0xCC
 	call,      //0xCD
 	TODO,      //0xCE
 	rst08H,    //0xCF
-	TODO,      //0xD0
+	retNC,      //0xD0
 	popDe,     //0xD1
 	jpNC,      //0xD2
 	TODO,      //0xD3
@@ -520,8 +520,8 @@ var op = [0x100] instructions{
 	pushDe,    //0xD5
 	subANn,    //0xD6
 	rst10H,    //0xD7
-	TODO,      //0xD8
-	TODO,      //0xD9
+	retC,      //0xD8
+	reti,      //0xD9
 	jpC,       //0xDA
 	TODO,      //0xDB
 	callC,     //0xDC
@@ -5330,4 +5330,83 @@ func rst38H(cpu *cpu) cycleCount {
 	// and jumps to 0x38
 	// TODO: To implement
 	return rst38HCycles
+}
+
+// 3.3.11. Returns
+
+// 3.3.11.1. RET
+// Description:
+// 	Pop two bytes from stack & jump to that address.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RET 			-/- 			C9 			8
+
+func ret(cpu *cpu) cycleCount{
+	// Pop two bytes from stack,
+	// and jump to that address.
+	// TODO: To implement
+	return retCycles
+}
+
+// 3.3.11.2. RET cc
+// Description:
+// 	Return if following condition is true:
+// Use with:
+// 	cc = NZ, Return if Z flag is reset.
+// 	cc = Z, Return if Z flag is set.
+// 	cc = NC, Return if C flag is reset.
+// 	cc = C, Return if C flag is set.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RET 			NZ 				C0 			8
+// 		RET 			Z 				C8 			8
+// 		RET 			NC 				D0 			8
+// 		RET 			C 				D8 			8
+
+func retNZ(cpu *cpu) cycleCount{
+	// If Z flag is reset, then
+	// pop two bytes from stack,
+	// and jump to that address.
+	// TODO: To implement
+	return retNZCycles
+}
+
+func retZ(cpu *cpu) cycleCount{
+	// If Z flag is set, then
+	// pop two bytes from stack,
+	// and jump to that address.
+	// TODO: To implement
+	return retZCycles
+}
+
+func retNC(cpu *cpu) cycleCount{
+	// If C flag is reset, then
+	// pop two bytes from stack,
+	// and jump to that address.
+	// TODO: To implement
+	return retNCCycles
+}
+
+func retC(cpu *cpu) cycleCount{
+	// If C flag is set, then
+	// pop two bytes from stack,
+	// and jump to that address.
+	// TODO: To implement
+	return retCCycles
+}
+
+// 3.3.11.3. RETI
+// Description:
+// 	Pop two bytes from stack & jump to that address then
+// 	enable interrupts.
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		RETI 			-/- 			D9 			8
+
+func reti(cpu *cpu) cycleCount {
+	// Pop two bytes from stack
+	// and jump to that address.
+	// Then, enable interrumpts
+	// TODO: To implement
+	return retiCycles
 }

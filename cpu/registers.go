@@ -1,6 +1,9 @@
 package cpu
 
-import "github.com/lbarrios/yesSGMB/mmu"
+import (
+	"github.com/lbarrios/yesSGMB/types"
+	"fmt"
+)
 
 type word uint16
 
@@ -32,6 +35,26 @@ func (f *Flags) asByte() byte {
 	return r
 }
 
+func (f Flags) String() string {
+	z := 0
+	n := 0
+	h := 0
+	c := 0
+	if f.z {
+		z = 1
+	}
+	if f.n {
+		n = 1
+	}
+	if f.h {
+		h = 1
+	}
+	if f.c {
+		c = 1
+	}
+	return fmt.Sprintf("{z:%d n:%d h:%d c:%d}", z, n, h, c)
+}
+
 type Registers struct {
 	af struct {
 		a byte  // high
@@ -51,6 +74,20 @@ type Registers struct {
 	}
 	sp word // stack pointer
 	pc word // program counter
+}
+
+// String prints registers as string
+func (r Registers) String() string {
+	formatByte := func(b byte) string {
+		if b < 0x10 {
+			return fmt.Sprintf("0x0%X", b)
+		}
+		return fmt.Sprintf("0x%X", b)
+	}
+	return fmt.Sprintf("A: %s  B: %s  C: %s  D: %s  E: %s  H: %s  L: %s SP: %x PC: %x f: %s",
+		formatByte(r.af.a), formatByte(r.bc.b), formatByte(r.bc.c),
+		formatByte(r.de.d), formatByte(r.de.e), formatByte(r.hl.h), formatByte(r.hl.l),
+		r.sp, r.pc, r.af.f)
 }
 
 /**
@@ -77,20 +114,20 @@ func (r Registers) hlAsWord() word {
 /**
 	Registers as Address
  */
-func (r Registers) bcAsAddress() mmu.Address {
-	addr := mmu.Address{High: r.bc.b, Low: r.bc.c}
+func (r Registers) bcAsAddress() types.Address {
+	addr := types.Address{High: r.bc.b, Low: r.bc.c}
 	return addr
 }
-func (r Registers) deAsAddress() mmu.Address {
-	addr := mmu.Address{High: r.de.d, Low: r.de.e}
+func (r Registers) deAsAddress() types.Address {
+	addr := types.Address{High: r.de.d, Low: r.de.e}
 	return addr
 }
-func (r Registers) hlAsAddress() mmu.Address {
-	addr := mmu.Address{High: r.hl.h, Low: r.hl.l}
+func (r Registers) hlAsAddress() types.Address {
+	addr := types.Address{High: r.hl.h, Low: r.hl.l}
 	return addr
 }
-func (r Registers) spAsAddress() mmu.Address {
-	addr := mmu.Address{High: r.sp.high(), Low: r.sp.low()}
+func (r Registers) spAsAddress() types.Address {
+	addr := types.Address{High: r.sp.high(), Low: r.sp.low()}
 	return addr
 }
 

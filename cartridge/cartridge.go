@@ -12,7 +12,7 @@ import (
 	"bytes"
 )
 
-type cartridge struct {
+type Cartridge struct {
 	Filename            string
 	data                []byte
 	nintendoLogo        []byte
@@ -32,6 +32,7 @@ type cartridge struct {
 	versionNumber       int
 	headerChecksum      byte
 	globalChecksum      []byte
+	MBC                 MemoryBankController
 }
 
 const (
@@ -60,8 +61,8 @@ const (
 	globalChecksumEnd          = 0x014F + 1
 )
 
-func NewCartridge(filename string) (*cartridge, error) {
-	c := new(cartridge)
+func NewCartridge(filename string) (*Cartridge, error) {
+	c := new(Cartridge)
 
 	if err := c.LoadROMFile(filename); err != nil {
 		return nil, err
@@ -74,7 +75,7 @@ func NewCartridge(filename string) (*cartridge, error) {
 	return c, nil
 }
 
-func (c *cartridge) ParseHeader() (error) {
+func (c *Cartridge) ParseHeader() (error) {
 	// As the documentation states, the minimum cartridge ROM size is when the cartridge has zero rom banks
 	minimumRomSize := romSizeForBanks(0)
 	if len(c.data) < minimumRomSize {
@@ -130,6 +131,13 @@ func (c *cartridge) ParseHeader() (error) {
 	} else {
 		c.TypeDescription = desc
 	}
+	switch c.Type {
+	case MBC_ROMONLY:
+		c.MBC = &MBCRomOnly{}
+	default:
+		return errors.New(fmt.Sprintf("Unknown cartridge type for MBC: %X", c.Type))
+	}
+	c.MBC.Init(c.data)
 	log.Printf("The cartridge type is: %s", c.TypeDescription)
 
 	// ROM Banks and Size
@@ -162,7 +170,7 @@ func (c *cartridge) ParseHeader() (error) {
 	return nil
 }
 
-func (c *cartridge) LoadROMFile(filename string) error {
+func (c *Cartridge) LoadROMFile(filename string) error {
 	log.Printf("Loading file %s...", filename)
 	c.Filename = filename
 

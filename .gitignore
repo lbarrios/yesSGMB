@@ -5,3 +5,8 @@ test.gb
 
 # IDE
 .idea
+
+# emulators
+bgb
+nosgmb
+nosgba

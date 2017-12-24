@@ -1,8 +1,8 @@
 package cpu
 
 import (
-	"github.com/lbarrios/yesSGMB/mmu"
 	"log"
+	"github.com/lbarrios/yesSGMB/types"
 )
 
 // the comments are based on http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
@@ -1002,7 +1002,7 @@ func ldAMemNn(cpu *cpu) cycleCount {
 	// (LS byte comes first!)
 	low := cpu.fetch()
 	high := cpu.fetch()
-	cpu.r.af.a = cpu.mmu.ReadByte(mmu.Address{High: high, Low: low})
+	cpu.r.af.a = cpu.mmu.ReadByte(types.Address{High: high, Low: low})
 	return ldAMemNnCycles
 }
 
@@ -1069,7 +1069,7 @@ func ldMemNnA(cpu *cpu) cycleCount {
 	// (LS byte comes first!)
 	low := cpu.fetch()
 	high := cpu.fetch()
-	cpu.mmu.WriteByte(mmu.Address{High: high, Low: low}, cpu.r.af.a)
+	cpu.mmu.WriteByte(types.Address{High: high, Low: low}, cpu.r.af.a)
 	return ldMemNnACycles
 }
 
@@ -1080,7 +1080,7 @@ func ldMemNnA(cpu *cpu) cycleCount {
 
 func ldAStackC(cpu *cpu) cycleCount {
 	// Put the value from the position of memory (0xFF00+C) into register A
-	cpu.r.af.a = cpu.mmu.ReadByte(mmu.Address{High: 0xFF, Low: cpu.r.bc.c})
+	cpu.r.af.a = cpu.mmu.ReadByte(types.Address{High: 0xFF, Low: cpu.r.bc.c})
 	return ldAStackCCycles
 }
 
@@ -1090,7 +1090,7 @@ func ldAStackC(cpu *cpu) cycleCount {
 
 func ldStackCA(cpu *cpu) cycleCount {
 	// Put the value from the register A into the position of memory (0xFF00+C)
-	cpu.mmu.WriteByte(mmu.Address{High: 0xFF, Low: cpu.r.bc.c}, cpu.r.af.a)
+	cpu.mmu.WriteByte(types.Address{High: 0xFF, Low: cpu.r.bc.c}, cpu.r.af.a)
 	return ldStackCACycles
 }
 
@@ -1186,7 +1186,7 @@ func ldiMemHlA(cpu *cpu) cycleCount {
 func ldStackNA(cpu *cpu) cycleCount {
 	// Takes the value from the register A and put it into the stack the value indexed by the immediate value N.
 	n := cpu.fetch()
-	cpu.mmu.WriteByte(mmu.Address{High: 0xFF, Low: n}, cpu.r.af.a)
+	cpu.mmu.WriteByte(types.Address{High: 0xFF, Low: n}, cpu.r.af.a)
 	return ldStackNACycles
 }
 
@@ -1198,7 +1198,7 @@ func ldStackNA(cpu *cpu) cycleCount {
 func ldAStackN(cpu *cpu) cycleCount {
 	// Takes from the stack the value indexed by the immediate value N, and put it into register A.
 	n := cpu.fetch()
-	cpu.r.af.a = cpu.mmu.ReadByte(mmu.Address{High: 0xFF, Low: n})
+	cpu.r.af.a = cpu.mmu.ReadByte(types.Address{High: 0xFF, Low: n})
 	return ldAStackNCycles
 }
 
@@ -1308,8 +1308,8 @@ func ldMemNnSp(cpu *cpu) cycleCount {
 	// (LS byte comes first!)
 	low := cpu.fetch()
 	high := cpu.fetch()
-	cpu.mmu.WriteByte(mmu.Address{High: high, Low: low}, cpu.r.sp.low())
-	cpu.mmu.WriteByte(mmu.Address{High: high, Low: low}.NextAddress(), cpu.r.sp.high())
+	cpu.mmu.WriteByte(types.Address{High: high, Low: low}, cpu.r.sp.low())
+	cpu.mmu.WriteByte(types.Address{High: high, Low: low}.NextAddress(), cpu.r.sp.high())
 	return ldMemNnSpCycles
 }
 
@@ -5546,7 +5546,7 @@ func jp(cpu *cpu) cycleCount {
 	// (nn: parameter from immediate value)
 	low := cpu.fetch()
 	high := cpu.fetch()
-	cpu.r.pc = word(high)>>8 + word(low&0xFF)
+	cpu.r.pc = word(high)<<8 + word(low&0xFF)
 	return jpCycles
 }
 
@@ -5572,7 +5572,7 @@ func jpNZ(cpu *cpu) cycleCount {
 	low := cpu.fetch()
 	high := cpu.fetch()
 	if !cpu.r.af.f.z {
-		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		cpu.r.pc = word(high)<<8 + word(low&0xFF)
 		return jpCycles
 	}
 	return jpNZCycles
@@ -5583,7 +5583,7 @@ func jpZ(cpu *cpu) cycleCount {
 	low := cpu.fetch()
 	high := cpu.fetch()
 	if cpu.r.af.f.z {
-		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		cpu.r.pc = word(high)<<8 + word(low&0xFF)
 		return jpCycles
 	}
 	return jpZCycles
@@ -5594,7 +5594,7 @@ func jpNC(cpu *cpu) cycleCount {
 	low := cpu.fetch()
 	high := cpu.fetch()
 	if !cpu.r.af.f.c {
-		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		cpu.r.pc = word(high)<<8 + word(low&0xFF)
 		return jpCycles
 	}
 	return jpNCCycles
@@ -5605,7 +5605,7 @@ func jpC(cpu *cpu) cycleCount {
 	low := cpu.fetch()
 	high := cpu.fetch()
 	if cpu.r.af.f.c {
-		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		cpu.r.pc = word(high)<<8 + word(low&0xFF)
 		return jpCycles
 	}
 	return jpCCycles
@@ -5635,7 +5635,7 @@ func jpHl(cpu *cpu) cycleCount {
 func jr(cpu *cpu) cycleCount {
 	// Adds current address + n, and jumps to it
 	// (n: parameter from immediate value)
-	n := cpu.fetch()
+	n := int8(cpu.fetch())
 	cpu.r.pc += word(n)
 	return jrCycles
 }
@@ -5660,7 +5660,7 @@ func jrNZ(cpu *cpu) cycleCount {
 	// If the flag Z is reset, then
 	// adds current address + nn, and jumps to it
 	// (nn: parameter from immediate value)
-	n := cpu.fetch()
+	n := int8(cpu.fetch()) // reads as int8, because it can be if negative jump
 	if !cpu.r.af.f.z {
 		cpu.r.pc += word(n)
 		return jrCycles
@@ -5671,7 +5671,7 @@ func jrZ(cpu *cpu) cycleCount {
 	// If the flag Z is set, then
 	// adds current address + nn, and jumps to it
 	// (nn: parameter from immediate value)
-	n := cpu.fetch()
+	n := int8(cpu.fetch()) // reads as int8, because it can be if negative jump
 	if cpu.r.af.f.z {
 		cpu.r.pc += word(n)
 		return jrCycles
@@ -5682,7 +5682,7 @@ func jrNC(cpu *cpu) cycleCount {
 	// If the flag C is reset, then
 	// adds current address + nn, and jumps to it
 	// (nn: parameter from immediate value)
-	n := cpu.fetch()
+	n := int8(cpu.fetch()) // reads as int8, because it can be if negative jump
 	if !cpu.r.af.f.c {
 		cpu.r.pc += word(n)
 		return jrCycles
@@ -5693,7 +5693,7 @@ func jrC(cpu *cpu) cycleCount {
 	// If the flag C is set, then
 	// adds current address + nn, and jumps to it
 	// (nn: parameter from immediate value)
-	n := cpu.fetch()
+	n := int8(cpu.fetch()) // reads as int8, because it can be if negative jump
 	if cpu.r.af.f.c {
 		cpu.r.pc += word(n)
 		return jrCycles
@@ -5724,7 +5724,7 @@ func call(cpu *cpu) cycleCount {
 	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
 	cpu.r.sp--
 	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.low())
-	cpu.r.pc = word(high)>>8 + word(low&0xFF)
+	cpu.r.pc = word(high)<<8 + word(low&0xFF)
 	return callCycles
 }
 
@@ -5757,7 +5757,7 @@ func callNZ(cpu *cpu) cycleCount {
 		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
 		cpu.r.sp--
 		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.low())
-		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		cpu.r.pc = word(high)<<8 + word(low&0xFF)
 		return callCycles
 	}
 	return callNZCycles
@@ -5775,7 +5775,7 @@ func callZ(cpu *cpu) cycleCount {
 		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
 		cpu.r.sp--
 		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.low())
-		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		cpu.r.pc = word(high)<<8 + word(low&0xFF)
 		return callCycles
 	}
 	return callZCycles
@@ -5793,7 +5793,7 @@ func callNC(cpu *cpu) cycleCount {
 		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
 		cpu.r.sp--
 		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.low())
-		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		cpu.r.pc = word(high)<<8 + word(low&0xFF)
 		return callCycles
 	}
 	return callNCCycles
@@ -5811,7 +5811,7 @@ func callC(cpu *cpu) cycleCount {
 		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
 		cpu.r.sp--
 		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.low())
-		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		cpu.r.pc = word(high)<<8 + word(low&0xFF)
 		return callCycles
 	}
 	return callCCycles
@@ -5933,7 +5933,7 @@ func ret(cpu *cpu) cycleCount {
 	cpu.r.sp++
 	high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
 	cpu.r.sp++
-	cpu.r.pc = word(high)>>8 + word(low&0xFF)
+	cpu.r.pc = word(high)<<8 + word(low&0xFF)
 	return retCycles
 }
 
@@ -5962,7 +5962,7 @@ func retNZ(cpu *cpu) cycleCount {
 		cpu.r.sp++
 		high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
 		cpu.r.sp++
-		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		cpu.r.pc = word(high)<<8 + word(low&0xFF)
 		return retccTrueCycles
 	}
 	return retNZCycles
@@ -5977,7 +5977,7 @@ func retZ(cpu *cpu) cycleCount {
 		cpu.r.sp++
 		high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
 		cpu.r.sp++
-		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		cpu.r.pc = word(high)<<8 + word(low&0xFF)
 		return retccTrueCycles
 	}
 	return retZCycles
@@ -5992,7 +5992,7 @@ func retNC(cpu *cpu) cycleCount {
 		cpu.r.sp++
 		high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
 		cpu.r.sp++
-		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		cpu.r.pc = word(high)<<8 + word(low&0xFF)
 		return retccTrueCycles
 	}
 	return retNCCycles
@@ -6007,7 +6007,7 @@ func retC(cpu *cpu) cycleCount {
 		cpu.r.sp++
 		high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
 		cpu.r.sp++
-		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		cpu.r.pc = word(high)<<8 + word(low&0xFF)
 		return retccTrueCycles
 	}
 	return retCCycles
@@ -6029,7 +6029,7 @@ func reti(cpu *cpu) cycleCount {
 	cpu.r.sp++
 	high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
 	cpu.r.sp++
-	cpu.r.pc = word(high)>>8 + word(low&0xFF)
+	cpu.r.pc = word(high)<<8 + word(low&0xFF)
 	cpu.interruptsEnabled = true
 	return retiCycles
 }

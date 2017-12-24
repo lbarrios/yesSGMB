@@ -17,10 +17,12 @@ func main() {
 	flag.Parse()
 
 	// Loading the cartridge data
-	_, err := cartridge.NewCartridge(*romFile)
+	cart, err := cartridge.NewCartridge(*romFile)
 	if err != nil {
 		log.Fatalf("ERROR: %s", err)
 	}
-	var mmu = mmu.NewMMU()
-	cpu.NewCPU(mmu)
+	mmu := mmu.NewMMU()
+	mmu.LoadCartridge(cart)
+	cpu := cpu.NewCPU(mmu)
+	cpu.Run()
 }

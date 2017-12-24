@@ -1,5 +1,9 @@
 package cpu
 
+import "github.com/lbarrios/yesSGMB/mmu"
+
+type word uint16
+
 type Flags struct {
 	z bool // zero flag
 	n bool // subtract flag
@@ -28,26 +32,33 @@ type Registers struct {
 		h byte // high
 		l byte // low
 	}
-	sp uint16 // stack pointer
-	pc uint16 // program counter
+	sp word // stack pointer
+	pc word // program counter
 }
 
-func (r Registers) bcAsInt() uint16 {
-	res := uint16(r.bc.b) << 8
-	res += uint16(r.bc.c)
+func (r Registers) bcAsWord() word {
+	res := word(r.bc.b) << 8
+	res += word(r.bc.c)
 	return res
 }
 
-func (r Registers) deAsInt() uint16 {
-	res := uint16(r.de.d) << 8
-	res += uint16(r.de.e)
+func (r Registers) deAsWord() word {
+	res := word(r.de.d) << 8
+	res += word(r.de.e)
 	return res
 }
 
-func (r Registers) hlAsInt() uint16 {
-	res := uint16(r.hl.h) << 8
-	res += uint16(r.hl.l)
+func (r Registers) hlAsWord() word {
+	res := word(r.hl.h) << 8
+	res += word(r.hl.l)
 	return res
+}
+
+func (r Registers) hlAsAddress() mmu.Address {
+	var addr mmu.Address
+	addr.High = r.hl.h
+	addr.Low = r.hl.l
+	return addr
 }
 
 func (r Registers) spLow() byte {
@@ -78,7 +89,7 @@ func (r *Registers) setFlagC(condition bool) {
 	r.af.f.c = condition
 }
 
-func (r Registers) flagAsInt(flag bool) uint8 {
+func (r Registers) flagAsByte(flag bool) byte {
 	if flag {
 		return 1
 	} else {

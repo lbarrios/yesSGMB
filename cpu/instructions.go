@@ -66,7 +66,7 @@ const (
 	decSpCycles     = 8  // 0x3B
 	incACycles      = 4  // 0x3C
 	decACycles      = 4  // 0x3D
-	ldANCycles      = 0  // 0x3E
+	ldANCycles      = 8  // 0x3E
 	ccfCycles       = 4  // 0x3F
 	ldBBCycles      = 4  // 0x40
 	ldBCCycles      = 4  // 0x41
@@ -253,7 +253,7 @@ const (
 	orANCycles      = 8  // 0xF6
 	rst30HCycles    = 32 // 0xF7
 	ldHlSpNCycles   = 12 // 0xF8
-	ldSpHlCycles    = 0  // 0xF9
+	ldSpHlCycles    = 8  // 0xF9
 	ldAMemNnCycles  = 16 // 0xFA
 	eiCycles        = 4  // 0xFB
 	xFCCycles       = 0  // 0xFC
@@ -454,7 +454,7 @@ var op = [0x100] instructions{
 	cpAH,           //0xBC
 	cpAL,           //0xBD
 	cpAMemHl,       //0xBE
-	cpAN,           //0xBF
+	cpAA,           //0xBF
 	retNZ,          //0xC0
 	popBc,          //0xC1
 	jpNZ,           //0xC2
@@ -1144,7 +1144,7 @@ func ldSpNn(cpu *cpu) cycleCount {
 
 func ldSpHl(cpu *cpu) cycleCount {
 	// Put the value of the register HL into SP.
-	cpu.r.sp = cpu.r.hlAsInt()
+	cpu.r.sp = cpu.r.hlAsWord()
 	return ldSpHlCycles
 }
 
@@ -1405,7 +1405,7 @@ func adcAA(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
-	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	cpu.r.setFlagC(oldA < cpu.r.af.a)
 	return adcAACycles
 }
 func adcAB(cpu *cpu) cycleCount {
@@ -1414,7 +1414,7 @@ func adcAB(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
-	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	cpu.r.setFlagC(oldA < cpu.r.af.a)
 	return adcABCycles
 }
 func adcAC(cpu *cpu) cycleCount {
@@ -1423,7 +1423,7 @@ func adcAC(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
-	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	cpu.r.setFlagC(oldA < cpu.r.af.a)
 	return adcACCycles
 }
 func adcAD(cpu *cpu) cycleCount {
@@ -1432,7 +1432,7 @@ func adcAD(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
-	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	cpu.r.setFlagC(oldA < cpu.r.af.a)
 	return adcADCycles
 }
 func adcAE(cpu *cpu) cycleCount {
@@ -1441,7 +1441,7 @@ func adcAE(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
-	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	cpu.r.setFlagC(oldA < cpu.r.af.a)
 	return adcAECycles
 }
 func adcAH(cpu *cpu) cycleCount {
@@ -1450,7 +1450,7 @@ func adcAH(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
-	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	cpu.r.setFlagC(oldA < cpu.r.af.a)
 	return adcAHCycles
 }
 func adcAL(cpu *cpu) cycleCount {
@@ -1459,7 +1459,7 @@ func adcAL(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
-	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	cpu.r.setFlagC(oldA < cpu.r.af.a)
 	return adcALCycles
 }
 func adcAMemHl(cpu *cpu) cycleCount {
@@ -1468,7 +1468,7 @@ func adcAMemHl(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
-	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	cpu.r.setFlagC(oldA < cpu.r.af.a)
 	return adcAMemHlCycles
 }
 func adcANn(cpu *cpu) cycleCount {
@@ -1477,7 +1477,7 @@ func adcANn(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
-	cpu.r.setFlagC((oldA >> 4) < (cpu.r.af.a >> 4))
+	cpu.r.setFlagC(oldA < cpu.r.af.a)
 	return adcANnCycles
 }
 
@@ -1616,69 +1616,102 @@ func subANn(cpu *cpu) cycleCount {
 
 func sbcAA(cpu *cpu) cycleCount {
 	// Subtract from register A the value of register A plus carry flag
-	cpu.r.af.a -= byte(cpu.r.af.a)
-	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
-	// TODO: set flags
+	oldA := cpu.r.af.a
+	cpu.r.af.a -= cpu.r.af.a
+	cpu.r.af.a -= cpu.r.flagAsByte(cpu.r.af.f.c)
+	cpu.r.setFlagC(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA >> 4) > (cpu.r.af.a >> 4))
+	cpu.r.setFlagZ(oldA > cpu.r.af.a)
 	return sbcAACycles
 }
 
 func sbcAB(cpu *cpu) cycleCount {
 	// Subtract from register A the value of register B plus carry flag
-	cpu.r.af.a -= byte(cpu.r.bc.b)
-	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
-	// TODO: set flags
+	oldA := cpu.r.af.a
+	cpu.r.af.a -= cpu.r.bc.b
+	cpu.r.af.a -= cpu.r.flagAsByte(cpu.r.af.f.c)
+	cpu.r.setFlagC(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA >> 4) > (cpu.r.af.a >> 4))
+	cpu.r.setFlagZ(oldA > cpu.r.af.a)
 	return sbcABCycles
 }
 
 func sbcAC(cpu *cpu) cycleCount {
 	// Subtract from register A the value of register C plus carry flag
-	cpu.r.af.a -= byte(cpu.r.bc.c)
-	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
-	// TODO: set flags
+	oldA := cpu.r.af.a
+	cpu.r.af.a -= cpu.r.bc.c
+	cpu.r.af.a -= cpu.r.flagAsByte(cpu.r.af.f.c)
+	cpu.r.setFlagC(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA >> 4) > (cpu.r.af.a >> 4))
+	cpu.r.setFlagZ(oldA > cpu.r.af.a)
 	return sbcACCycles
 }
 
 func sbcAD(cpu *cpu) cycleCount {
 	// Subtract from register A the value of register D plus carry flag
-	cpu.r.af.a -= byte(cpu.r.de.d)
-	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
-	// TODO: set flags
+	oldA := cpu.r.af.a
+	cpu.r.af.a -= cpu.r.de.d
+	cpu.r.af.a -= cpu.r.flagAsByte(cpu.r.af.f.c)
+	cpu.r.setFlagC(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA >> 4) > (cpu.r.af.a >> 4))
+	cpu.r.setFlagZ(oldA > cpu.r.af.a)
 	return sbcADCycles
 }
 
 func sbcAE(cpu *cpu) cycleCount {
 	// Subtract from register A the value of register E plus carry flag
-	cpu.r.af.a -= byte(cpu.r.de.e)
-	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
-	// TODO: set flags
+	oldA := cpu.r.af.a
+	cpu.r.af.a -= cpu.r.de.e
+	cpu.r.af.a -= cpu.r.flagAsByte(cpu.r.af.f.c)
+	cpu.r.setFlagC(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA >> 4) > (cpu.r.af.a >> 4))
+	cpu.r.setFlagZ(oldA > cpu.r.af.a)
 	return sbcAECycles
 }
 
 func sbcAH(cpu *cpu) cycleCount {
 	// Subtract from register A the value of register H plus carry flag
-	cpu.r.af.a -= byte(cpu.r.hl.h)
-	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
-	// TODO: set flags
+	oldA := cpu.r.af.a
+	cpu.r.af.a -= cpu.r.hl.h
+	cpu.r.af.a -= cpu.r.flagAsByte(cpu.r.af.f.c)
+	cpu.r.setFlagC(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA >> 4) > (cpu.r.af.a >> 4))
+	cpu.r.setFlagZ(oldA > cpu.r.af.a)
 	return sbcAHCycles
 }
 
 func sbcAL(cpu *cpu) cycleCount {
 	// Subtract from register A the value of register L plus carry flag
-	cpu.r.af.a -= byte(cpu.r.hl.l)
-	cpu.r.af.a -= cpu.r.flagAsInt(cpu.r.af.f.c)
-	// TODO: set flags
+	oldA := cpu.r.af.a
+	cpu.r.af.a -= cpu.r.hl.l
+	cpu.r.af.a -= cpu.r.flagAsByte(cpu.r.af.f.c)
+	cpu.r.setFlagC(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA >> 4) > (cpu.r.af.a >> 4))
+	cpu.r.setFlagZ(oldA > cpu.r.af.a)
 	return sbcALCycles
 }
 
 func sbcAMemHl(cpu *cpu) cycleCount {
-	// Subtract from register A the value of memory pointed by HL plus carry flag
-	//cpu.r.af.a -= ...
-	//TODO: to implement
+	// Subtract from register A, the value of memory pointed by HL plus carry flag
+	oldA := cpu.r.af.a
+	cpu.r.af.a -= cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.af.a -= cpu.r.flagAsByte(cpu.r.af.f.c)
+	cpu.r.setFlagC(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA >> 4) > (cpu.r.af.a >> 4))
+	cpu.r.setFlagZ(oldA > cpu.r.af.a)
 	return sbcAMemHlCycles
 }
 
 func sbcANn(cpu *cpu) cycleCount {
-	// Subtract from register A the value of register # plus carry flag
+	// Subtract from register A, the value of immediate value nn plus carry flag
 	// cpu.r.af.a -= ...
 	//TODO: to implement
 	return sbcANnCycles
@@ -1708,7 +1741,7 @@ func sbcANn(cpu *cpu) cycleCount {
 
 func andAA(cpu *cpu) cycleCount {
 	// Stores into register A the result of (A & A) (bitwise AND)
-	cpu.r.af.a = cpu.r.af.a & cpu.r.af.a
+	cpu.r.af.a &= cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(true)
@@ -1717,7 +1750,7 @@ func andAA(cpu *cpu) cycleCount {
 }
 func andAB(cpu *cpu) cycleCount {
 	// Stores into register A the result of (A & B) (bitwise AND)
-	cpu.r.af.a = cpu.r.af.a & cpu.r.bc.b
+	cpu.r.af.a &= cpu.r.bc.b
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(true)
@@ -1726,7 +1759,7 @@ func andAB(cpu *cpu) cycleCount {
 }
 func andAC(cpu *cpu) cycleCount {
 	// Stores into register A the result of (A & C) (bitwise AND)
-	cpu.r.af.a = cpu.r.af.a & cpu.r.bc.c
+	cpu.r.af.a &= cpu.r.bc.c
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(true)
@@ -1735,7 +1768,7 @@ func andAC(cpu *cpu) cycleCount {
 }
 func andAD(cpu *cpu) cycleCount {
 	// Stores into register A the result of (A & D) (bitwise AND)
-	cpu.r.af.a = cpu.r.af.a & cpu.r.de.d
+	cpu.r.af.a &= cpu.r.de.d
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(true)
@@ -1744,7 +1777,7 @@ func andAD(cpu *cpu) cycleCount {
 }
 func andAE(cpu *cpu) cycleCount {
 	// Stores into register A the result of (A & E) (bitwise AND)
-	cpu.r.af.a = cpu.r.af.a & cpu.r.de.e
+	cpu.r.af.a &= cpu.r.de.e
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(true)
@@ -1753,7 +1786,7 @@ func andAE(cpu *cpu) cycleCount {
 }
 func andAH(cpu *cpu) cycleCount {
 	// Stores into register A the result of (A & H) (bitwise AND)
-	cpu.r.af.a = cpu.r.af.a & cpu.r.hl.h
+	cpu.r.af.a &= cpu.r.hl.h
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(true)
@@ -1762,7 +1795,7 @@ func andAH(cpu *cpu) cycleCount {
 }
 func andAL(cpu *cpu) cycleCount {
 	// Stores into register A the result of (A & L) (bitwise AND)
-	cpu.r.af.a = cpu.r.af.a & cpu.r.hl.l
+	cpu.r.af.a &= cpu.r.hl.l
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(true)
@@ -1771,17 +1804,16 @@ func andAL(cpu *cpu) cycleCount {
 }
 func andAMemHl(cpu *cpu) cycleCount {
 	// Stores into register A the result of (A & the value of memory pointed by HL) (bitwise AND)
-	// cpu.r.af.a = cpu.r.af.a & cpu.r.
+	cpu.r.af.a &= cpu.mmu.ReadByte(cpu.r.hlAsAddress())
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(true)
 	cpu.r.setFlagC(false)
-	// TODO: to implement
 	return andAMemHlCycles
 }
 func andAN(cpu *cpu) cycleCount {
 	// Stores into register A the result of (A & an immediate value) (bitwise AND)
-	// cpu.r.af.a = cpu.r.af.a & cpu.r.
+	// cpu.r.af.a &= cpu.r.
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(true)
@@ -1814,7 +1846,7 @@ func andAN(cpu *cpu) cycleCount {
 
 func orAA(cpu *cpu) cycleCount {
 	// Store into register A the result of (A | A) (bitwise OR)
-	cpu.r.af.a = cpu.r.af.a | cpu.r.af.a
+	cpu.r.af.a |= cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -1823,7 +1855,7 @@ func orAA(cpu *cpu) cycleCount {
 }
 func orAB(cpu *cpu) cycleCount {
 	// Store into register A the result of (A | B) (bitwise OR)
-	cpu.r.af.a = cpu.r.af.a | cpu.r.bc.b
+	cpu.r.af.a |= cpu.r.bc.b
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -1832,7 +1864,7 @@ func orAB(cpu *cpu) cycleCount {
 }
 func orAC(cpu *cpu) cycleCount {
 	// Store into register A the result of (A | C) (bitwise OR)
-	cpu.r.af.a = cpu.r.af.a | cpu.r.bc.c
+	cpu.r.af.a |= cpu.r.bc.c
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -1841,7 +1873,7 @@ func orAC(cpu *cpu) cycleCount {
 }
 func orAD(cpu *cpu) cycleCount {
 	// Store into register A the result of (A | D) (bitwise OR)
-	cpu.r.af.a = cpu.r.af.a | cpu.r.de.d
+	cpu.r.af.a |= cpu.r.de.d
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -1850,7 +1882,7 @@ func orAD(cpu *cpu) cycleCount {
 }
 func orAE(cpu *cpu) cycleCount {
 	// Store into register A the result of (A | E) (bitwise OR)
-	cpu.r.af.a = cpu.r.af.a | cpu.r.de.e
+	cpu.r.af.a |= cpu.r.de.e
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -1859,7 +1891,7 @@ func orAE(cpu *cpu) cycleCount {
 }
 func orAH(cpu *cpu) cycleCount {
 	// Store into register A the result of (A | H) (bitwise OR)
-	cpu.r.af.a = cpu.r.af.a | cpu.r.hl.h
+	cpu.r.af.a |= cpu.r.hl.h
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -1868,7 +1900,7 @@ func orAH(cpu *cpu) cycleCount {
 }
 func orAL(cpu *cpu) cycleCount {
 	// Store into register A the result of (A | L) (bitwise OR)
-	cpu.r.af.a = cpu.r.af.a | cpu.r.hl.l
+	cpu.r.af.a |= cpu.r.hl.l
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -1877,8 +1909,7 @@ func orAL(cpu *cpu) cycleCount {
 }
 func orAMemHl(cpu *cpu) cycleCount {
 	// Store into register A the result of (A | the memory position pointed by HL) (bitwise OR)
-	//cpu.r.af.a = cpu.r.af.a | cpu.r.
-	// TODO: to implement
+	cpu.r.af.a |= cpu.mmu.ReadByte(cpu.r.hlAsAddress())
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -1887,7 +1918,7 @@ func orAMemHl(cpu *cpu) cycleCount {
 }
 func orAN(cpu *cpu) cycleCount {
 	// Store into register A the result of (A | an immediate value) (bitwise OR)
-	//cpu.r.af.a = cpu.r.af.a | cpu.r.
+	//cpu.r.af.a |= cpu.r.
 	// TODO: to implement
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
@@ -1983,8 +2014,7 @@ func xorAL(cpu *cpu) cycleCount {
 }
 func xorAMemHl(cpu *cpu) cycleCount {
 	// Stores into register A the result of (A ^ the memory position pointed by HL) (bitwise XOR)
-	//cpu.r.af.a ^= cpu.r.
-	//TODO: to implement
+	cpu.r.af.a ^= cpu.mmu.ReadByte(cpu.r.hlAsAddress())
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -2030,15 +2060,15 @@ func cpAA(cpu *cpu) cycleCount {
 	// Compares A to A. The result is not stored; this function only affects flags.
 	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
 	cpu.r.setFlagN(true)
-	// TODO: cpu.r.setFlagH()
+	cpu.r.setFlagH((cpu.r.af.a >> 4) < (cpu.r.af.a >> 4))
 	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
 	return cpAACycles
 }
 func cpAB(cpu *cpu) cycleCount {
 	// Compares A to B. The result is not stored; this function only affects flags.
-	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.bc.b)
 	cpu.r.setFlagN(true)
-	// TODO: cpu.r.setFlagH()
+	cpu.r.setFlagH((cpu.r.af.a >> 4) < (cpu.r.bc.b >> 4))
 	cpu.r.setFlagC(cpu.r.af.a < cpu.r.bc.b)
 	return cpABCycles
 }
@@ -2046,56 +2076,59 @@ func cpAC(cpu *cpu) cycleCount {
 	// Compares A to C. The result is not stored; this function only affects flags.
 	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.bc.c)
 	cpu.r.setFlagN(true)
-	// TODO: cpu.r.setFlagH()
-	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	cpu.r.setFlagH((cpu.r.af.a >> 4) < (cpu.r.bc.c >> 4))
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.bc.c)
 	return cpACCycles
 }
 func cpAD(cpu *cpu) cycleCount {
 	// Compares A to D. The result is not stored; this function only affects flags.
-	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.de.d)
 	cpu.r.setFlagN(true)
-	// TODO: cpu.r.setFlagH()
-	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	cpu.r.setFlagH((cpu.r.af.a >> 4) < (cpu.r.de.d >> 4))
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.de.d)
 	return cpADCycles
 }
 func cpAE(cpu *cpu) cycleCount {
 	// Compares A to E. The result is not stored; this function only affects flags.
-	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.de.e)
 	cpu.r.setFlagN(true)
-	// TODO: cpu.r.setFlagH()
-	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	cpu.r.setFlagH((cpu.r.af.a >> 4) < (cpu.r.de.e >> 4))
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.de.e)
 	return cpAECycles
 }
 func cpAH(cpu *cpu) cycleCount {
 	// Compares A to H. The result is not stored; this function only affects flags.
-	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.hl.h)
 	cpu.r.setFlagN(true)
-	// TODO: cpu.r.setFlagH()
-	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	cpu.r.setFlagH((cpu.r.af.a >> 4) < (cpu.r.hl.h >> 4))
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.hl.h)
 	return cpAHCycles
 }
 func cpAL(cpu *cpu) cycleCount {
 	// Compares A to L. The result is not stored; this function only affects flags.
-	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.hl.l)
 	cpu.r.setFlagN(true)
-	// TODO: cpu.r.setFlagH()
-	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	cpu.r.setFlagH((cpu.r.af.a >> 4) < (cpu.r.hl.l >> 4))
+	cpu.r.setFlagC(cpu.r.af.a < cpu.r.hl.l)
 	return cpALCycles
 }
 func cpAMemHl(cpu *cpu) cycleCount {
 	// Compares A to (. The result is not stored; this function only affects flags.
-	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagZ(cpu.r.af.a == memHl)
 	cpu.r.setFlagN(true)
-	// TODO: cpu.r.setFlagH()
-	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	cpu.r.setFlagH((cpu.r.af.a >> 4) < (memHl >> 4))
+	cpu.r.setFlagC(cpu.r.af.a < memHl)
 	return cpAMemHlCycles
 }
 func cpAN(cpu *cpu) cycleCount {
 	// Compares A to #. The result is not stored; this function only affects flags.
-	cpu.r.setFlagZ(cpu.r.af.a == cpu.r.af.a)
+	nn := byte(0)
+	// TODO: Read NN
+	cpu.r.setFlagZ(cpu.r.af.a == nn)
 	cpu.r.setFlagN(true)
-	// TODO: cpu.r.setFlagH()
-	cpu.r.setFlagC(cpu.r.af.a < cpu.r.af.a)
+	cpu.r.setFlagH((cpu.r.af.a >> 4) < (nn >> 4))
+	cpu.r.setFlagC(cpu.r.af.a < nn)
 	return cpANCycles
 }
 
@@ -2184,9 +2217,14 @@ func incL(cpu *cpu) cycleCount {
 	return incLCycles
 }
 func incMemHl(cpu *cpu) cycleCount {
-	// Increment register (HL)
-	//cpu.r.
-	//TODO: to implement
+	// Increment the position of memory pointed by register HL
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	oldMemHl := memHl
+	memHl++
+	cpu.r.setFlagZ(memHl == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((memHl & 0xf) < (oldMemHl & 0xf))
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return incMemHlCycles
 }
 
@@ -2276,7 +2314,13 @@ func decL(cpu *cpu) cycleCount {
 }
 func decMemHl(cpu *cpu) cycleCount {
 	// Decrement memory position pointed by register HL
-	//TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	oldMemHl := memHl
+	memHl--
+	cpu.r.setFlagZ(memHl == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((memHl & 0xf) > (oldMemHl & 0xf))
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return decMemHlCycles
 }
 
@@ -2389,7 +2433,7 @@ func addSpN(cpu *cpu) cycleCount {
 
 func incBc(cpu *cpu) cycleCount {
 	// Increment register BC
-	bc := cpu.r.bcAsInt()
+	bc := cpu.r.bcAsWord()
 	bc++
 	cpu.r.bc.c = byte(bc & 0xff)
 	cpu.r.bc.b = byte(bc >> 8)
@@ -2397,7 +2441,7 @@ func incBc(cpu *cpu) cycleCount {
 }
 func incDe(cpu *cpu) cycleCount {
 	// Increment register DE
-	de := cpu.r.deAsInt()
+	de := cpu.r.deAsWord()
 	de++
 	cpu.r.de.e = byte(de & 0xff)
 	cpu.r.de.d = byte(de >> 8)
@@ -2405,7 +2449,7 @@ func incDe(cpu *cpu) cycleCount {
 }
 func incHl(cpu *cpu) cycleCount {
 	// Increment register HL
-	hl := cpu.r.hlAsInt()
+	hl := cpu.r.hlAsWord()
 	hl++
 	cpu.r.hl.l = byte(hl & 0xff)
 	cpu.r.hl.h = byte(hl >> 8)
@@ -2433,7 +2477,7 @@ func incSp(cpu *cpu) cycleCount {
 
 func decBc(cpu *cpu) cycleCount {
 	// Decrement register BC
-	bc := cpu.r.bcAsInt()
+	bc := cpu.r.bcAsWord()
 	bc--
 	cpu.r.bc.c = byte(bc & 0xff)
 	cpu.r.bc.b = byte(bc >> 8)
@@ -2441,7 +2485,7 @@ func decBc(cpu *cpu) cycleCount {
 }
 func decDe(cpu *cpu) cycleCount {
 	// Decrement register DE
-	de := cpu.r.deAsInt()
+	de := cpu.r.deAsWord()
 	de--
 	cpu.r.de.e = byte(de & 0xff)
 	cpu.r.de.d = byte(de >> 8)
@@ -2449,7 +2493,7 @@ func decDe(cpu *cpu) cycleCount {
 }
 func decHl(cpu *cpu) cycleCount {
 	// Decrement register HL
-	hl := cpu.r.hlAsInt()
+	hl := cpu.r.hlAsWord()
 	hl--
 	cpu.r.hl.l = byte(hl & 0xff)
 	cpu.r.hl.h = byte(hl >> 8)
@@ -2558,7 +2602,11 @@ func swapL(cpu *cpu) cycleCount {
 }
 func swapMemHl(cpu *cpu) cycleCount {
 	// Swap upper & lower nibles of the position of memory pointed by register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	oldMemHl := memHl
+	memHl = byte(oldMemHl<<4) + byte(oldMemHl<<4)
+	cpu.r.setFlagZ(memHl == 0)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return 16
 }
 
@@ -2726,7 +2774,7 @@ func rlcA(cpu *cpu) cycleCount {
 	// Rotate A left 1 bit; A[0] = pre(A)[7]
 	bit7 := bool(cpu.r.af.a&0x80 == 0x80)
 
-	cpu.r.af.a = cpu.r.af.a << 1
+	cpu.r.af.a <<= 1
 	if bit7 {
 		cpu.r.af.a |= 0x01 // set bit 0 to 1
 	}
@@ -2754,7 +2802,7 @@ func rlA(cpu *cpu) cycleCount {
 	// Note that Carry = A[7] and A[0] = Carry
 	bit7 := bool(cpu.r.af.a&0x80 == 0x80)
 
-	cpu.r.af.a = cpu.r.af.a << 1
+	cpu.r.af.a <<= 1
 	if cpu.r.af.f.c {
 		cpu.r.af.a |= 0x1 // set bit 0 to 1
 	}
@@ -2782,7 +2830,7 @@ func rrcA(cpu *cpu) cycleCount {
 	// Old bit 0 goes to Carry Flag
 	bit0 := bool(cpu.r.af.a&0x01 == 0x01)
 
-	cpu.r.af.a = cpu.r.af.a >> 1
+	cpu.r.af.a >>= 1
 	if bit0 {
 		cpu.r.af.a |= 0x80 // set bit 7 to 1
 	}
@@ -2810,7 +2858,7 @@ func rrA(cpu *cpu) cycleCount {
 	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
 	bit0 := bool(cpu.r.af.a&0x01 == 0x01)
 
-	cpu.r.af.a = cpu.r.af.a >> 1
+	cpu.r.af.a >>= 1
 	if cpu.r.af.f.c {
 		cpu.r.af.a |= 0x80 // set bit 7 to 1
 	}
@@ -3247,7 +3295,19 @@ func rlcL(cpu *cpu) cycleCount {
 }
 
 func rlcMemHl(cpu *cpu) cycleCount {
-	// TODO: To implement
+	// Rotate the position of memory pointed by HL, left 1 bit; MemHL[0] = pre(MemHL)[7]
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	bit7 := bool(memHl&0x80 == 0x80)
+
+	memHl = memHl << 1
+	if bit7 {
+		memHl |= 0x01 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(memHl == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
 	return rlcMemHlCycles
 }
 
@@ -3709,7 +3769,7 @@ func slaA(cpu *cpu) cycleCount {
 	// Shift A left into Carry
 	// A[0] set to 0
 	cpu.r.setFlagC((cpu.r.af.a & 0x80) == 0x80)
-	cpu.r.af.a = cpu.r.af.a << 1
+	cpu.r.af.a <<= 1
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -3947,7 +4007,7 @@ func srlA(cpu *cpu) cycleCount {
 	// Shift A right into Carry.
 	// A[7] = 0
 	cpu.r.setFlagC((cpu.r.af.a & 0x01) == 0x01)
-	cpu.r.af.a = cpu.r.af.a >> 1
+	cpu.r.af.a >>= 1
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -4476,330 +4536,346 @@ const (
 
 func set0A(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register A
-	cpu.r.af.a = cpu.r.af.a | (0x01 << 0)
+	cpu.r.af.a |= (0x01 << 0)
 	return setACycles
 }
 func set0B(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 0)
+	cpu.r.bc.b |= (0x01 << 0)
 	return setBCycles
 }
 func set0C(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 0)
+	cpu.r.bc.c |= (0x01 << 0)
 	return setCCycles
 }
 func set0D(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register D
-	cpu.r.de.d = cpu.r.de.d | (0x01 << 0)
+	cpu.r.de.d |= (0x01 << 0)
 	return setDCycles
 }
 func set0E(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register E
-	cpu.r.de.e = cpu.r.de.e | (0x01 << 0)
+	cpu.r.de.e |= (0x01 << 0)
 	return setECycles
 }
 func set0H(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 0)
+	cpu.r.hl.h |= (0x01 << 0)
 	return setHCycles
 }
 func set0L(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 0)
+	cpu.r.hl.l |= (0x01 << 0)
 	return setLCycles
 }
 
 func set1A(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register A
-	cpu.r.af.a = cpu.r.af.a | (0x01 << 1)
+	cpu.r.af.a |= (0x01 << 1)
 	return setACycles
 }
 func set1B(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 1)
+	cpu.r.bc.b |= (0x01 << 1)
 	return setBCycles
 }
 func set1C(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 1)
+	cpu.r.bc.c |= (0x01 << 1)
 	return setCCycles
 }
 func set1D(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register D
-	cpu.r.de.d = cpu.r.de.d | (0x01 << 1)
+	cpu.r.de.d |= (0x01 << 1)
 	return setDCycles
 }
 func set1E(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register E
-	cpu.r.de.e = cpu.r.de.e | (0x01 << 1)
+	cpu.r.de.e |= (0x01 << 1)
 	return setECycles
 }
 func set1H(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 1)
+	cpu.r.hl.h |= (0x01 << 1)
 	return setHCycles
 }
 func set1L(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 1)
+	cpu.r.hl.l |= (0x01 << 1)
 	return setLCycles
 }
 
 func set2A(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register A
-	cpu.r.af.a = cpu.r.af.a | (0x01 << 2)
+	cpu.r.af.a |= (0x01 << 2)
 	return setACycles
 }
 func set2B(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 2)
+	cpu.r.bc.b |= (0x01 << 2)
 	return setBCycles
 }
 func set2C(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 2)
+	cpu.r.bc.c |= (0x01 << 2)
 	return setCCycles
 }
 func set2D(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register D
-	cpu.r.de.d = cpu.r.de.d | (0x01 << 2)
+	cpu.r.de.d |= (0x01 << 2)
 	return setDCycles
 }
 func set2E(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register E
-	cpu.r.de.e = cpu.r.de.e | (0x01 << 2)
+	cpu.r.de.e |= (0x01 << 2)
 	return setECycles
 }
 func set2H(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 2)
+	cpu.r.hl.h |= (0x01 << 2)
 	return setHCycles
 }
 func set2L(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 2)
+	cpu.r.hl.l |= (0x01 << 2)
 	return setLCycles
 }
 
 func set3A(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register A
-	cpu.r.af.a = cpu.r.af.a | (0x01 << 3)
+	cpu.r.af.a |= (0x01 << 3)
 	return setACycles
 }
 func set3B(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 3)
+	cpu.r.bc.b |= (0x01 << 3)
 	return setBCycles
 }
 func set3C(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 3)
+	cpu.r.bc.c |= (0x01 << 3)
 	return setCCycles
 }
 func set3D(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register D
-	cpu.r.de.d = cpu.r.de.d | (0x01 << 3)
+	cpu.r.de.d |= (0x01 << 3)
 	return setDCycles
 }
 func set3E(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register E
-	cpu.r.de.e = cpu.r.de.e | (0x01 << 3)
+	cpu.r.de.e |= (0x01 << 3)
 	return setECycles
 }
 func set3H(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 3)
+	cpu.r.hl.h |= (0x01 << 3)
 	return setHCycles
 }
 func set3L(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 3)
+	cpu.r.hl.l |= (0x01 << 3)
 	return setLCycles
 }
 
 func set4A(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register A
-	cpu.r.af.a = cpu.r.af.a | (0x01 << 4)
+	cpu.r.af.a |= (0x01 << 4)
 	return setACycles
 }
 func set4B(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 4)
+	cpu.r.bc.b |= (0x01 << 4)
 	return setBCycles
 }
 func set4C(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 4)
+	cpu.r.bc.c |= (0x01 << 4)
 	return setCCycles
 }
 func set4D(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register D
-	cpu.r.de.d = cpu.r.de.d | (0x01 << 4)
+	cpu.r.de.d |= (0x01 << 4)
 	return setDCycles
 }
 func set4E(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register E
-	cpu.r.de.e = cpu.r.de.e | (0x01 << 4)
+	cpu.r.de.e |= (0x01 << 4)
 	return setECycles
 }
 func set4H(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 4)
+	cpu.r.hl.h |= (0x01 << 4)
 	return setHCycles
 }
 func set4L(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 4)
+	cpu.r.hl.l |= (0x01 << 4)
 	return setLCycles
 }
 
 func set5A(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register A
-	cpu.r.af.a = cpu.r.af.a | (0x01 << 5)
+	cpu.r.af.a |= (0x01 << 5)
 	return setACycles
 }
 func set5B(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 5)
+	cpu.r.bc.b |= (0x01 << 5)
 	return setBCycles
 }
 func set5C(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 5)
+	cpu.r.bc.c |= (0x01 << 5)
 	return setCCycles
 }
 func set5D(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register D
-	cpu.r.de.d = cpu.r.de.d | (0x01 << 5)
+	cpu.r.de.d |= (0x01 << 5)
 	return setDCycles
 }
 func set5E(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register E
-	cpu.r.de.e = cpu.r.de.e | (0x01 << 5)
+	cpu.r.de.e |= (0x01 << 5)
 	return setECycles
 }
 func set5H(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 5)
+	cpu.r.hl.h |= (0x01 << 5)
 	return setHCycles
 }
 func set5L(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 5)
+	cpu.r.hl.l |= (0x01 << 5)
 	return setLCycles
 }
 
 func set6A(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register A
-	cpu.r.af.a = cpu.r.af.a | (0x01 << 6)
+	cpu.r.af.a |= (0x01 << 6)
 	return setACycles
 }
 func set6B(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 6)
+	cpu.r.bc.b |= (0x01 << 6)
 	return setBCycles
 }
 func set6C(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 6)
+	cpu.r.bc.c |= (0x01 << 6)
 	return setCCycles
 }
 func set6D(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register D
-	cpu.r.de.d = cpu.r.de.d | (0x01 << 6)
+	cpu.r.de.d |= (0x01 << 6)
 	return setDCycles
 }
 func set6E(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register E
-	cpu.r.de.e = cpu.r.de.e | (0x01 << 6)
+	cpu.r.de.e |= (0x01 << 6)
 	return setECycles
 }
 func set6H(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 6)
+	cpu.r.hl.h |= (0x01 << 6)
 	return setHCycles
 }
 func set6L(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 6)
+	cpu.r.hl.l |= (0x01 << 6)
 	return setLCycles
 }
 
 func set7A(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register A
-	cpu.r.af.a = cpu.r.af.a | (0x01 << 7)
+	cpu.r.af.a |= (0x01 << 7)
 	return setACycles
 }
 func set7B(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b | (0x01 << 7)
+	cpu.r.bc.b |= (0x01 << 7)
 	return setBCycles
 }
 func set7C(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c | (0x01 << 7)
+	cpu.r.bc.c |= (0x01 << 7)
 	return setCCycles
 }
 func set7D(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register D
-	cpu.r.de.d = cpu.r.de.d | (0x01 << 7)
+	cpu.r.de.d |= (0x01 << 7)
 	return setDCycles
 }
 func set7E(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register E
-	cpu.r.de.e = cpu.r.de.e | (0x01 << 7)
+	cpu.r.de.e |= (0x01 << 7)
 	return setECycles
 }
 func set7H(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h | (0x01 << 7)
+	cpu.r.hl.h |= (0x01 << 7)
 	return setHCycles
 }
 func set7L(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l | (0x01 << 7)
+	cpu.r.hl.l |= (0x01 << 7)
 	return setLCycles
 }
 
 func set0MemHl(cpu *cpu) cycleCount {
 	// set the 0 bit of the position of memory pointed by register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl |= (0x01 << 0)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set1MemHl(cpu *cpu) cycleCount {
 	// set the 1 bit of the position of memory pointed by register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl |= (0x01 << 1)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set2MemHl(cpu *cpu) cycleCount {
 	// set the 2 bit of the position of memory pointed by register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl |= (0x01 << 2)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set3MemHl(cpu *cpu) cycleCount {
 	// set the 3 bit of the position of memory pointed by register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl |= (0x01 << 3)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set4MemHl(cpu *cpu) cycleCount {
 	// set the 4 bit of the position of memory pointed by register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl |= (0x01 << 4)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set5MemHl(cpu *cpu) cycleCount {
 	// set the 5 bit of the position of memory pointed by register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl |= (0x01 << 5)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set6MemHl(cpu *cpu) cycleCount {
 	// set the 6 bit of the position of memory pointed by register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl |= (0x01 << 6)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set7MemHl(cpu *cpu) cycleCount {
 	// set the 7 bit of the position of memory pointed by register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl |= (0x01 << 7)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 
@@ -4834,330 +4910,346 @@ const (
 
 func res0A(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register A
-	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 0))
+	cpu.r.af.a &= (0xFF ^ (0x01 << 0))
 	return resACycles
 }
 func res0B(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 0))
+	cpu.r.bc.b &= (0xFF ^ (0x01 << 0))
 	return resBCycles
 }
 func res0C(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 0))
+	cpu.r.bc.c &= (0xFF ^ (0x01 << 0))
 	return resCCycles
 }
 func res0D(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register D
-	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 0))
+	cpu.r.de.d &= (0xFF ^ (0x01 << 0))
 	return resDCycles
 }
 func res0E(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register E
-	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 0))
+	cpu.r.de.e &= (0xFF ^ (0x01 << 0))
 	return resECycles
 }
 func res0H(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 0))
+	cpu.r.hl.h &= (0xFF ^ (0x01 << 0))
 	return resHCycles
 }
 func res0L(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 0))
+	cpu.r.hl.l &= (0xFF ^ (0x01 << 0))
 	return resLCycles
 }
 
 func res1A(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register A
-	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 1))
+	cpu.r.af.a &= (0xFF ^ (0x01 << 1))
 	return resACycles
 }
 func res1B(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 1))
+	cpu.r.bc.b &= (0xFF ^ (0x01 << 1))
 	return resBCycles
 }
 func res1C(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 1))
+	cpu.r.bc.c &= (0xFF ^ (0x01 << 1))
 	return resCCycles
 }
 func res1D(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register D
-	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 1))
+	cpu.r.de.d &= (0xFF ^ (0x01 << 1))
 	return resDCycles
 }
 func res1E(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register E
-	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 1))
+	cpu.r.de.e &= (0xFF ^ (0x01 << 1))
 	return resECycles
 }
 func res1H(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 1))
+	cpu.r.hl.h &= (0xFF ^ (0x01 << 1))
 	return resHCycles
 }
 func res1L(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 1))
+	cpu.r.hl.l &= (0xFF ^ (0x01 << 1))
 	return resLCycles
 }
 
 func res2A(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register A
-	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 2))
+	cpu.r.af.a &= (0xFF ^ (0x01 << 2))
 	return resACycles
 }
 func res2B(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 2))
+	cpu.r.bc.b &= (0xFF ^ (0x01 << 2))
 	return resBCycles
 }
 func res2C(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 2))
+	cpu.r.bc.c &= (0xFF ^ (0x01 << 2))
 	return resCCycles
 }
 func res2D(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register D
-	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 2))
+	cpu.r.de.d &= (0xFF ^ (0x01 << 2))
 	return resDCycles
 }
 func res2E(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register E
-	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 2))
+	cpu.r.de.e &= (0xFF ^ (0x01 << 2))
 	return resECycles
 }
 func res2H(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 2))
+	cpu.r.hl.h &= (0xFF ^ (0x01 << 2))
 	return resHCycles
 }
 func res2L(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 2))
+	cpu.r.hl.l &= (0xFF ^ (0x01 << 2))
 	return resLCycles
 }
 
 func res3A(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register A
-	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 3))
+	cpu.r.af.a &= (0xFF ^ (0x01 << 3))
 	return resACycles
 }
 func res3B(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 3))
+	cpu.r.bc.b &= (0xFF ^ (0x01 << 3))
 	return resBCycles
 }
 func res3C(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 3))
+	cpu.r.bc.c &= (0xFF ^ (0x01 << 3))
 	return resCCycles
 }
 func res3D(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register D
-	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 3))
+	cpu.r.de.d &= (0xFF ^ (0x01 << 3))
 	return resDCycles
 }
 func res3E(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register E
-	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 3))
+	cpu.r.de.e &= (0xFF ^ (0x01 << 3))
 	return resECycles
 }
 func res3H(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 3))
+	cpu.r.hl.h &= (0xFF ^ (0x01 << 3))
 	return resHCycles
 }
 func res3L(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 3))
+	cpu.r.hl.l &= (0xFF ^ (0x01 << 3))
 	return resLCycles
 }
 
 func res4A(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register A
-	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 4))
+	cpu.r.af.a &= (0xFF ^ (0x01 << 4))
 	return resACycles
 }
 func res4B(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 4))
+	cpu.r.bc.b &= (0xFF ^ (0x01 << 4))
 	return resBCycles
 }
 func res4C(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 4))
+	cpu.r.bc.c &= (0xFF ^ (0x01 << 4))
 	return resCCycles
 }
 func res4D(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register D
-	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 4))
+	cpu.r.de.d &= (0xFF ^ (0x01 << 4))
 	return resDCycles
 }
 func res4E(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register E
-	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 4))
+	cpu.r.de.e &= (0xFF ^ (0x01 << 4))
 	return resECycles
 }
 func res4H(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 4))
+	cpu.r.hl.h &= (0xFF ^ (0x01 << 4))
 	return resHCycles
 }
 func res4L(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 4))
+	cpu.r.hl.l &= (0xFF ^ (0x01 << 4))
 	return resLCycles
 }
 
 func res5A(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register A
-	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 5))
+	cpu.r.af.a &= (0xFF ^ (0x01 << 5))
 	return resACycles
 }
 func res5B(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 5))
+	cpu.r.bc.b &= (0xFF ^ (0x01 << 5))
 	return resBCycles
 }
 func res5C(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 5))
+	cpu.r.bc.c &= (0xFF ^ (0x01 << 5))
 	return resCCycles
 }
 func res5D(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register D
-	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 5))
+	cpu.r.de.d &= (0xFF ^ (0x01 << 5))
 	return resDCycles
 }
 func res5E(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register E
-	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 5))
+	cpu.r.de.e &= (0xFF ^ (0x01 << 5))
 	return resECycles
 }
 func res5H(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 5))
+	cpu.r.hl.h &= (0xFF ^ (0x01 << 5))
 	return resHCycles
 }
 func res5L(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 5))
+	cpu.r.hl.l &= (0xFF ^ (0x01 << 5))
 	return resLCycles
 }
 
 func res6A(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register A
-	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 6))
+	cpu.r.af.a &= (0xFF ^ (0x01 << 6))
 	return resACycles
 }
 func res6B(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 6))
+	cpu.r.bc.b &= (0xFF ^ (0x01 << 6))
 	return resBCycles
 }
 func res6C(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 6))
+	cpu.r.bc.c &= (0xFF ^ (0x01 << 6))
 	return resCCycles
 }
 func res6D(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register D
-	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 6))
+	cpu.r.de.d &= (0xFF ^ (0x01 << 6))
 	return resDCycles
 }
 func res6E(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register E
-	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 6))
+	cpu.r.de.e &= (0xFF ^ (0x01 << 6))
 	return resECycles
 }
 func res6H(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 6))
+	cpu.r.hl.h &= (0xFF ^ (0x01 << 6))
 	return resHCycles
 }
 func res6L(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 6))
+	cpu.r.hl.l &= (0xFF ^ (0x01 << 6))
 	return resLCycles
 }
 
 func res7A(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register A
-	cpu.r.af.a = cpu.r.af.a & (0xFF ^ (0x01 << 7))
+	cpu.r.af.a &= (0xFF ^ (0x01 << 7))
 	return resACycles
 }
 func res7B(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register B
-	cpu.r.bc.b = cpu.r.bc.b & (0xFF ^ (0x01 << 7))
+	cpu.r.bc.b &= (0xFF ^ (0x01 << 7))
 	return resBCycles
 }
 func res7C(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register C
-	cpu.r.bc.c = cpu.r.bc.c & (0xFF ^ (0x01 << 7))
+	cpu.r.bc.c &= (0xFF ^ (0x01 << 7))
 	return resCCycles
 }
 func res7D(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register D
-	cpu.r.de.d = cpu.r.de.d & (0xFF ^ (0x01 << 7))
+	cpu.r.de.d &= (0xFF ^ (0x01 << 7))
 	return resDCycles
 }
 func res7E(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register E
-	cpu.r.de.e = cpu.r.de.e & (0xFF ^ (0x01 << 7))
+	cpu.r.de.e &= (0xFF ^ (0x01 << 7))
 	return resECycles
 }
 func res7H(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register H
-	cpu.r.hl.h = cpu.r.hl.h & (0xFF ^ (0x01 << 7))
+	cpu.r.hl.h &= (0xFF ^ (0x01 << 7))
 	return resHCycles
 }
 func res7L(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register L
-	cpu.r.hl.l = cpu.r.hl.l & (0xFF ^ (0x01 << 7))
+	cpu.r.hl.l &= (0xFF ^ (0x01 << 7))
 	return resLCycles
 }
 
 func res0MemHl(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the position of memory pointed by the register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl &= (0xFF ^ (0x01 << 0))
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res1MemHl(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the position of memory pointed by the register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl &= (0xFF ^ (0x01 << 1))
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res2MemHl(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the position of memory pointed by the register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl &= (0xFF ^ (0x01 << 2))
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res3MemHl(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the position of memory pointed by the register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl &= (0xFF ^ (0x01 << 3))
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res4MemHl(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the position of memory pointed by the register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl &= (0xFF ^ (0x01 << 4))
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res5MemHl(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the position of memory pointed by the register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl &= (0xFF ^ (0x01 << 5))
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res6MemHl(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the position of memory pointed by the register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl &= (0xFF ^ (0x01 << 6))
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res7MemHl(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the position of memory pointed by the register HL
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	memHl &= (0xFF ^ (0x01 << 7))
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 

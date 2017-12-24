@@ -1,9 +1,9 @@
 // package mmu implements the Memory Management Unit of the Gameboy
 package mmu
 
-type address struct {
-	high byte
-	low  byte
+type Address struct {
+	High byte
+	Low  byte
 }
 
 type mmu struct {
@@ -11,8 +11,8 @@ type mmu struct {
 }
 
 type MMU interface {
-	ReadByte(address address) byte
-	WriteByte(address address, value byte)
+	ReadByte(address Address) byte
+	WriteByte(address Address, value byte)
 }
 
 func NewMMU() *mmu {
@@ -20,9 +20,9 @@ func NewMMU() *mmu {
 	return mmu
 }
 
-func (mmu *mmu) ReadByte(address address) byte {
+func (mmu *mmu) ReadByte(address Address) byte {
 	return 0x00
 }
 
-func (mmu *mmu) WriteByte(address address, value byte) {
+func (mmu *mmu) WriteByte(address Address, value byte) {
 }

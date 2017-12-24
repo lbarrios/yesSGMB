@@ -6,11 +6,13 @@ package cartridge
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
+	"github.com/lbarrios/yesSGMB/logger"
 	"strings"
 	"errors"
 	"bytes"
 )
+
+var log = logger.Logger("CART: ")
 
 type Cartridge struct {
 	Filename            string

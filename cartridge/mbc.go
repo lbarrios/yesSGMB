@@ -2,7 +2,7 @@ package cartridge
 
 import (
 	"github.com/lbarrios/yesSGMB/types"
-	"log"
+	"github.com/lbarrios/yesSGMB/logger"
 )
 
 const (
@@ -38,7 +38,7 @@ const (
 
 type MemoryBankController interface {
 	Init([]byte)
-	Write(address types.Address)
+	Write(address types.Address, value byte)
 	Read(address types.Address) byte
 }
 
@@ -47,11 +47,17 @@ type MBCRomOnly struct {
 }
 
 func (mbc *MBCRomOnly) Init(data []byte) {
+	log = logger.Logger("MBC: ")
 	mbc.romBank = data[0x0000:0x8000]
 }
 
-func (mbc *MBCRomOnly) Write(address types.Address) {
-	log.Fatalf("MBC_ROMONLY: Cannot write to address: %x!", address.AsWord())
+func (mbc *MBCRomOnly) Write(address types.Address, value byte) {
+	if address.High >= 0x80 {
+		log.Fatalf("Cannot write to address: %.4x!", address.AsWord())
+		return
+	}
+	// TODO: Check this
+	log.Printf("Cannot write to address: %.4x!", address.AsWord())
 }
 
 func (mbc *MBCRomOnly) Read(address types.Address) byte {

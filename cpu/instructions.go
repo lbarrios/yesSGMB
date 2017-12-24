@@ -1,7 +1,6 @@
 package cpu
 
 import (
-	"log"
 	"github.com/lbarrios/yesSGMB/types"
 )
 

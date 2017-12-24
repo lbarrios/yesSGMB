@@ -2,10 +2,12 @@
 package cpu
 
 import (
-	"log"
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/types"
+	"github.com/lbarrios/yesSGMB/logger"
 )
+
+var log = logger.Logger("CPU: ")
 
 type cpu struct {
 	r                 Registers

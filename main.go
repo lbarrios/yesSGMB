@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"log"
+	"github.com/lbarrios/yesSGMB/logger"
 	"github.com/lbarrios/yesSGMB/cartridge"
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/cpu"
@@ -10,6 +10,7 @@ import (
 
 var (
 	romFile = flag.String("rom", "test.gb", "Path to rom file")
+	log = logger.Logger("MAIN: ")
 )
 
 func main() {
@@ -24,5 +25,6 @@ func main() {
 	mmu := mmu.NewMMU()
 	mmu.LoadCartridge(cart)
 	cpu := cpu.NewCPU(mmu)
+	log.Println("A")
 	cpu.Run()
 }

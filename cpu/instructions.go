@@ -2,6 +2,7 @@ package cpu
 
 import (
 	"github.com/lbarrios/yesSGMB/mmu"
+	"log"
 )
 
 // the comments are based on http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
@@ -35,7 +36,7 @@ const (
 	decDCycles      = 4  // 0x15
 	ldDNCycles      = 8  // 0x16
 	rlACycles       = 4  // 0x17
-	jrCycles        = 8  // 0x18
+	jrCycles        = 12 // 0x18
 	addHlDeCycles   = 8  // 0x19
 	ldAMemDeCycles  = 8  // 0x1A
 	decDeCycles     = 8  // 0x1B
@@ -206,17 +207,17 @@ const (
 	retNZCycles     = 8  // 0xC0
 	popBcCycles     = 12 // 0xC1
 	jpNZCycles      = 12 // 0xC2
-	jpCycles        = 8  // 0xC3
+	jpCycles        = 16  // 0xC3
 	callNZCycles    = 12 // 0xC4
 	pushBcCycles    = 16 // 0xC5
 	addANnCycles    = 8  // 0xC6
 	rst00HCycles    = 32 // 0xC7
 	retZCycles      = 8  // 0xC8
-	retCycles       = 8  // 0xC9
+	retCycles       = 16  // 0xC9
 	jpZCycles       = 12 // 0xCA
 	rxNCycles       = 8  // 0xCB
 	callZCycles     = 12 // 0xCC
-	callCycles      = 12 // 0xCD
+	callCycles      = 24 // 0xCD
 	adcANnCycles    = 8  // 0xCE
 	rst08HCycles    = 32 // 0xCF
 	retNCCycles     = 8  // 0xD0
@@ -228,7 +229,7 @@ const (
 	subANnCycles    = 8  // 0xD6
 	rst10HCycles    = 32 // 0xD7
 	retCCycles      = 8  // 0xD8
-	retiCycles      = 8  // 0xD9
+	retiCycles      = 16  // 0xD9
 	jpCCycles       = 12 // 0xDA
 	xDBCycles       = 0  // 0xDB
 	callCCycles     = 12 // 0xDC
@@ -270,278 +271,274 @@ const (
 )
 
 var operations = [0x100] instruction{
-	nop,            //0x00
-	ldBcNn,         //0x01
-	ldMemBcA,       //0x02
-	incBc,          //0x03
-	incB,           //0x04
-	decB,           //0x05
-	ldBN,           //0x06
-	rlcA,           //0x07
-	ldMemNnSp,      //0x08
-	addHlBc,        //0x09
-	ldAMemBc,       //0x0A
-	decBc,          //0x0B
-	incC,           //0x0C
-	decC,           //0x0D
-	ldCN,           //0x0E
-	rrcA,           //0x0F
-	stop,           //0x10
-	ldDeNn,         //0x11
-	ldMemDeA,       //0x12
-	incDe,          //0x13
-	incD,           //0x14
-	decD,           //0x15
-	ldDN,           //0x16
-	rlA,            //0x17
-	jr,             //0x18
-	addHlDe,        //0x19
-	ldAMemDe,       //0x1A
-	decDe,          //0x1B
-	incE,           //0x1C
-	decE,           //0x1D
-	ldEN,           //0x1E
-	rrA,            //0x1F
-	jrNZ,           //0x20
-	ldHlNn,         //0x21
-	ldiMemHlA,      //0x22
-	incHl,          //0x23
-	incH,           //0x24
-	decH,           //0x25
-	ldHN,           //0x26
-	daA,            //0x27
-	jrZ,            //0x28
-	addHlHl,        //0x29
-	ldiAMemHl,      //0x2A
-	decHl,          //0x2B
-	incL,           //0x2C
-	decL,           //0x2D
-	ldLN,           //0x2E
-	cplA,           //0x2F
-	jrNC,           //0x30
-	ldSpNn,         //0x31
-	lddMemHlA,      //0x32
-	incSp,          //0x33
-	incMemHl,       //0x34
-	decMemHl,       //0x35
-	ldMemHlN,       //0x36
-	scf,            //0x37
-	jrC,            //0x38
-	addHlSp,        //0x39
-	lddAMemHl,      //0x3A
-	decSp,          //0x3B
-	incA,           //0x3C
-	decA,           //0x3D
-	ldAN,           //0x3E
-	ccf,            //0x3F
-	ldBB,           //0x40
-	ldBC,           //0x41
-	ldBD,           //0x42
-	ldBE,           //0x43
-	ldBH,           //0x44
-	ldBL,           //0x45
-	ldBHl,          //0x46
-	ldBA,           //0x47
-	ldCB,           //0x48
-	ldCC,           //0x49
-	ldCD,           //0x4A
-	ldCE,           //0x4B
-	ldCH,           //0x4C
-	ldCL,           //0x4D
-	ldCHl,          //0x4E
-	ldCA,           //0x4F
-	ldDB,           //0x50
-	ldDC,           //0x51
-	ldDD,           //0x52
-	ldDE,           //0x53
-	ldDH,           //0x54
-	ldDL,           //0x55
-	ldDHl,          //0x56
-	ldDA,           //0x57
-	ldEB,           //0x58
-	ldEC,           //0x59
-	ldED,           //0x5A
-	ldEE,           //0x5B
-	ldEH,           //0x5C
-	ldEL,           //0x5D
-	ldEHl,          //0x5E
-	ldEA,           //0x5F
-	ldHB,           //0x60
-	ldHC,           //0x61
-	ldHD,           //0x62
-	ldHE,           //0x63
-	ldHH,           //0x64
-	ldHL,           //0x65
-	ldHMemHl,       //0x66
-	ldHA,           //0x67
-	ldLB,           //0x68
-	ldLC,           //0x69
-	ldLD,           //0x6A
-	ldLE,           //0x6B
-	ldLH,           //0x6C
-	ldLL,           //0x6D
-	ldLHl,          //0x6E
-	ldLA,           //0x6F
-	ldMemHlB,       //0x70
-	ldMemHlC,       //0x71
-	ldMemHlD,       //0x72
-	ldMemHlE,       //0x73
-	ldMemHlL,       //0x74
-	ldMemHlH,       //0x75
-	halt,           //0x76
-	ldMemHlA,       //0x77
-	ldAB,           //0x78
-	ldAC,           //0x79
-	ldAD,           //0x7A
-	ldAE,           //0x7B
-	ldAH,           //0x7C
-	ldAL,           //0x7D
-	ldAMemHl,       //0x7E
-	ldAA,           //0x7F
-	addAB,          //0x80
-	addAC,          //0x81
-	addAD,          //0x82
-	addAE,          //0x83
-	addAH,          //0x84
-	addAL,          //0x85
-	addAMemHl,      //0x86
-	addAA,          //0x87
-	adcAB,          //0x88
-	adcAC,          //0x89
-	adcAD,          //0x8A
-	adcAE,          //0x8B
-	adcAH,          //0x8C
-	adcAL,          //0x8D
-	adcAMemHl,      //0x8E
-	adcAA,          //0x8F
-	subAB,          //0x90
-	subAC,          //0x91
-	subAD,          //0x92
-	subAE,          //0x93
-	subAH,          //0x94
-	subAL,          //0x95
-	subAMemHl,      //0x96
-	subAA,          //0x97
-	sbcAB,          //0x98
-	sbcAC,          //0x99
-	sbcAD,          //0x9A
-	sbcAE,          //0x9B
-	sbcAH,          //0x9C
-	sbcAL,          //0x9D
-	sbcAMemHl,      //0x9E
-	sbcAA,          //0x9F
-	andAB,          //0xA0
-	andAC,          //0xA1
-	andAD,          //0xA2
-	andAE,          //0xA3
-	andAH,          //0xA4
-	andAL,          //0xA5
-	andAMemHl,      //0xA6
-	andAA,          //0xA7
-	xorAB,          //0xA8
-	xorAC,          //0xA9
-	xorAD,          //0xAA
-	xorAE,          //0xAB
-	xorAH,          //0xAC
-	xorAL,          //0xAD
-	xorAMemHl,      //0xAE
-	xorAA,          //0xAF
-	orAB,           //0xB0
-	orAC,           //0xB1
-	orAD,           //0xB2
-	orAE,           //0xB3
-	orAH,           //0xB4
-	orAL,           //0xB5
-	orAMemHl,       //0xB6
-	orAN,           //0xB7
-	cpAB,           //0xB8
-	cpAC,           //0xB9
-	cpAD,           //0xBA
-	cpAE,           //0xBB
-	cpAH,           //0xBC
-	cpAL,           //0xBD
-	cpAMemHl,       //0xBE
-	cpAA,           //0xBF
-	retNZ,          //0xC0
-	popBc,          //0xC1
-	jpNZ,           //0xC2
-	jp,             //0xC3
-	callNZ,         //0xC4
-	pushBc,         //0xC5
-	addANn,         //0xC6
-	rst00H,         //0xC7
-	retZ,           //0xC8
-	ret,            //0xC9
-	jpZ,            //0xCA
-	rxN,            //0xCB
-	callZ,          //0xCC
-	call,           //0xCD
-	adcANn,         //0xCE
-	rst08H,         //0xCF
-	retNC,          //0xD0
-	popDe,          //0xD1
-	jpNC,           //0xD2
-	nonImplemented, //0xD3
-	callNC,         //0xD4
-	pushDe,         //0xD5
-	subANn,         //0xD6
-	rst10H,         //0xD7
-	retC,           //0xD8
-	reti,           //0xD9
-	jpC,            //0xDA
-	nonImplemented, //0xDB
-	callC,          //0xDC
-	nonImplemented, //0xDD
-	sbcANn,         //0xDE
-	rst18H,         //0xDF
-	ldStackNA,      //0xE0
-	popHl,          //0xE1
-	ldStackCA,      //0xE2
-	nonImplemented, //0xE3
-	nonImplemented, //0xE4
-	pushHl,         //0xE5
-	andAN,          //0xE6
-	rst20H,         //0xE7
-	addSpN,         //0xE8
-	jpMemHl,        //0xE9
-	ldMemNnA,       //0xEA
-	nonImplemented, //0xEB
-	nonImplemented, //0xEC
-	nonImplemented, //0xED
-	xorAN,          //0xEE
-	rst28H,         //0xEF
-	ldAStackN,      //0xF0
-	popAf,          //0xF1
-	ldAStackC,      //0xF2
-	di,             //0xF3
-	nonImplemented, //0xF4
-	pushAf,         //0xF5
-	orAN,           //0xF6
-	rst30H,         //0xF7
-	ldHlSpN,        //0xF8
-	ldSpHl,         //0xF9
-	ldAMemNn,       //0xFA
-	ei,             //0xFB
-	nonImplemented, //0xFC
-	nonImplemented, //0xFD
-	cpAN,           //0xFE
-	rst38H,         //0xFF
-}
-
-func TODO(cpu *cpu) cycleCount {
-	// This function is not defined!
-	return 0
+	nop,            // 0x00
+	ldBcNn,         // 0x01
+	ldMemBcA,       // 0x02
+	incBc,          // 0x03
+	incB,           // 0x04
+	decB,           // 0x05
+	ldBN,           // 0x06
+	rlcA,           // 0x07
+	ldMemNnSp,      // 0x08
+	addHlBc,        // 0x09
+	ldAMemBc,       // 0x0A
+	decBc,          // 0x0B
+	incC,           // 0x0C
+	decC,           // 0x0D
+	ldCN,           // 0x0E
+	rrcA,           // 0x0F
+	stop,           // 0x10
+	ldDeNn,         // 0x11
+	ldMemDeA,       // 0x12
+	incDe,          // 0x13
+	incD,           // 0x14
+	decD,           // 0x15
+	ldDN,           // 0x16
+	rlA,            // 0x17
+	jr,             // 0x18
+	addHlDe,        // 0x19
+	ldAMemDe,       // 0x1A
+	decDe,          // 0x1B
+	incE,           // 0x1C
+	decE,           // 0x1D
+	ldEN,           // 0x1E
+	rrA,            // 0x1F
+	jrNZ,           // 0x20
+	ldHlNn,         // 0x21
+	ldiMemHlA,      // 0x22
+	incHl,          // 0x23
+	incH,           // 0x24
+	decH,           // 0x25
+	ldHN,           // 0x26
+	daA,            // 0x27
+	jrZ,            // 0x28
+	addHlHl,        // 0x29
+	ldiAMemHl,      // 0x2A
+	decHl,          // 0x2B
+	incL,           // 0x2C
+	decL,           // 0x2D
+	ldLN,           // 0x2E
+	cplA,           // 0x2F
+	jrNC,           // 0x30
+	ldSpNn,         // 0x31
+	lddMemHlA,      // 0x32
+	incSp,          // 0x33
+	incMemHl,       // 0x34
+	decMemHl,       // 0x35
+	ldMemHlN,       // 0x36
+	scf,            // 0x37
+	jrC,            // 0x38
+	addHlSp,        // 0x39
+	lddAMemHl,      // 0x3A
+	decSp,          // 0x3B
+	incA,           // 0x3C
+	decA,           // 0x3D
+	ldAN,           // 0x3E
+	ccf,            // 0x3F
+	ldBB,           // 0x40
+	ldBC,           // 0x41
+	ldBD,           // 0x42
+	ldBE,           // 0x43
+	ldBH,           // 0x44
+	ldBL,           // 0x45
+	ldBHl,          // 0x46
+	ldBA,           // 0x47
+	ldCB,           // 0x48
+	ldCC,           // 0x49
+	ldCD,           // 0x4A
+	ldCE,           // 0x4B
+	ldCH,           // 0x4C
+	ldCL,           // 0x4D
+	ldCHl,          // 0x4E
+	ldCA,           // 0x4F
+	ldDB,           // 0x50
+	ldDC,           // 0x51
+	ldDD,           // 0x52
+	ldDE,           // 0x53
+	ldDH,           // 0x54
+	ldDL,           // 0x55
+	ldDHl,          // 0x56
+	ldDA,           // 0x57
+	ldEB,           // 0x58
+	ldEC,           // 0x59
+	ldED,           // 0x5A
+	ldEE,           // 0x5B
+	ldEH,           // 0x5C
+	ldEL,           // 0x5D
+	ldEHl,          // 0x5E
+	ldEA,           // 0x5F
+	ldHB,           // 0x60
+	ldHC,           // 0x61
+	ldHD,           // 0x62
+	ldHE,           // 0x63
+	ldHH,           // 0x64
+	ldHL,           // 0x65
+	ldHMemHl,       // 0x66
+	ldHA,           // 0x67
+	ldLB,           // 0x68
+	ldLC,           // 0x69
+	ldLD,           // 0x6A
+	ldLE,           // 0x6B
+	ldLH,           // 0x6C
+	ldLL,           // 0x6D
+	ldLHl,          // 0x6E
+	ldLA,           // 0x6F
+	ldMemHlB,       // 0x70
+	ldMemHlC,       // 0x71
+	ldMemHlD,       // 0x72
+	ldMemHlE,       // 0x73
+	ldMemHlL,       // 0x74
+	ldMemHlH,       // 0x75
+	halt,           // 0x76
+	ldMemHlA,       // 0x77
+	ldAB,           // 0x78
+	ldAC,           // 0x79
+	ldAD,           // 0x7A
+	ldAE,           // 0x7B
+	ldAH,           // 0x7C
+	ldAL,           // 0x7D
+	ldAMemHl,       // 0x7E
+	ldAA,           // 0x7F
+	addAB,          // 0x80
+	addAC,          // 0x81
+	addAD,          // 0x82
+	addAE,          // 0x83
+	addAH,          // 0x84
+	addAL,          // 0x85
+	addAMemHl,      // 0x86
+	addAA,          // 0x87
+	adcAB,          // 0x88
+	adcAC,          // 0x89
+	adcAD,          // 0x8A
+	adcAE,          // 0x8B
+	adcAH,          // 0x8C
+	adcAL,          // 0x8D
+	adcAMemHl,      // 0x8E
+	adcAA,          // 0x8F
+	subAB,          // 0x90
+	subAC,          // 0x91
+	subAD,          // 0x92
+	subAE,          // 0x93
+	subAH,          // 0x94
+	subAL,          // 0x95
+	subAMemHl,      // 0x96
+	subAA,          // 0x97
+	sbcAB,          // 0x98
+	sbcAC,          // 0x99
+	sbcAD,          // 0x9A
+	sbcAE,          // 0x9B
+	sbcAH,          // 0x9C
+	sbcAL,          // 0x9D
+	sbcAMemHl,      // 0x9E
+	sbcAA,          // 0x9F
+	andAB,          // 0xA0
+	andAC,          // 0xA1
+	andAD,          // 0xA2
+	andAE,          // 0xA3
+	andAH,          // 0xA4
+	andAL,          // 0xA5
+	andAMemHl,      // 0xA6
+	andAA,          // 0xA7
+	xorAB,          // 0xA8
+	xorAC,          // 0xA9
+	xorAD,          // 0xAA
+	xorAE,          // 0xAB
+	xorAH,          // 0xAC
+	xorAL,          // 0xAD
+	xorAMemHl,      // 0xAE
+	xorAA,          // 0xAF
+	orAB,           // 0xB0
+	orAC,           // 0xB1
+	orAD,           // 0xB2
+	orAE,           // 0xB3
+	orAH,           // 0xB4
+	orAL,           // 0xB5
+	orAMemHl,       // 0xB6
+	orAA,           // 0xB7
+	cpAB,           // 0xB8
+	cpAC,           // 0xB9
+	cpAD,           // 0xBA
+	cpAE,           // 0xBB
+	cpAH,           // 0xBC
+	cpAL,           // 0xBD
+	cpAMemHl,       // 0xBE
+	cpAA,           // 0xBF
+	retNZ,          // 0xC0
+	popBc,          // 0xC1
+	jpNZ,           // 0xC2
+	jp,             // 0xC3
+	callNZ,         // 0xC4
+	pushBc,         // 0xC5
+	addAN,          // 0xC6
+	rst00H,         // 0xC7
+	retZ,           // 0xC8
+	ret,            // 0xC9
+	jpZ,            // 0xCA
+	rxN,            // 0xCB
+	callZ,          // 0xCC
+	call,           // 0xCD
+	adcANn,         // 0xCE
+	rst08H,         // 0xCF
+	retNC,          // 0xD0
+	popDe,          // 0xD1
+	jpNC,           // 0xD2
+	nonImplemented, // 0xD3
+	callNC,         // 0xD4
+	pushDe,         // 0xD5
+	subAN,          // 0xD6
+	rst10H,         // 0xD7
+	retC,           // 0xD8
+	reti,           // 0xD9
+	jpC,            // 0xDA
+	nonImplemented, // 0xDB
+	callC,          // 0xDC
+	nonImplemented, // 0xDD
+	sbcAN,          // 0xDE
+	rst18H,         // 0xDF
+	ldStackNA,      // 0xE0
+	popHl,          // 0xE1
+	ldStackCA,      // 0xE2
+	nonImplemented, // 0xE3
+	nonImplemented, // 0xE4
+	pushHl,         // 0xE5
+	andAN,          // 0xE6
+	rst20H,         // 0xE7
+	addSpN,         // 0xE8
+	jpHl,           // 0xE9
+	ldMemNnA,       // 0xEA
+	nonImplemented, // 0xEB
+	nonImplemented, // 0xEC
+	nonImplemented, // 0xED
+	xorAN,          // 0xEE
+	rst28H,         // 0xEF
+	ldAStackN,      // 0xF0
+	popAf,          // 0xF1
+	ldAStackC,      // 0xF2
+	di,             // 0xF3
+	nonImplemented, // 0xF4
+	pushAf,         // 0xF5
+	orAN,           // 0xF6
+	rst30H,         // 0xF7
+	ldHlSpN,        // 0xF8
+	ldSpHl,         // 0xF9
+	ldAMemNn,       // 0xFA
+	ei,             // 0xFB
+	nonImplemented, // 0xFC
+	nonImplemented, // 0xFD
+	cpAN,           // 0xFE
+	rst38H,         // 0xFF
 }
 
 func nonImplemented(cpu *cpu) cycleCount {
 	// This function is not intended to be implemented
 	// if the execution of the rom reaches this point
 	// then whe have a problem..!!
-	// TODO: Throw exception?
+	log.Println("Non implemented function executed.")
 	var cycles cycleCount
 	cycles = 0xDEAD // lol
 	// ret is the sum of all the unused cycles-constants... just to use them and prevent the compiler to detect it as a warning
 	cycles += xDThreeCycles + xDBCycles + xDDCycles + xEThreeCycles + xEFourCycles + xEBCycles + xECCycles + xEDCycles + xFFourCycles + xFCCycles + xFDCycles
+	cpu.Stop()
 	return cycles
 }
 
@@ -670,7 +667,8 @@ func ldLN(cpu *cpu) cycleCount {
 
 func ldAA(cpu *cpu) cycleCount {
 	// Put value of register A into register A
-	cpu.r.af.a = cpu.r.af.a
+	// cpu.r.af.a = cpu.r.af.a
+	nop(cpu)
 	return ldAACycles
 }
 
@@ -718,7 +716,8 @@ func ldAMemHl(cpu *cpu) cycleCount {
 
 func ldBB(cpu *cpu) cycleCount {
 	// Put value of register B into register B
-	cpu.r.bc.b = cpu.r.bc.b
+	// cpu.r.bc.b = cpu.r.bc.b
+	nop(cpu)
 	return ldBBCycles
 }
 
@@ -765,7 +764,8 @@ func ldCB(cpu *cpu) cycleCount {
 }
 func ldCC(cpu *cpu) cycleCount {
 	// Put value of register C into register C
-	cpu.r.bc.c = cpu.r.bc.c
+	// cpu.r.bc.c = cpu.r.bc.c
+	nop(cpu)
 	return ldCCCycles
 }
 func ldCD(cpu *cpu) cycleCount {
@@ -805,7 +805,8 @@ func ldDC(cpu *cpu) cycleCount {
 }
 func ldDD(cpu *cpu) cycleCount {
 	// Put value of register D into register D
-	cpu.r.de.d = cpu.r.de.d
+	// cpu.r.de.d = cpu.r.de.d
+	nop(cpu)
 	return ldDDCycles
 }
 func ldDE(cpu *cpu) cycleCount {
@@ -845,7 +846,8 @@ func ldED(cpu *cpu) cycleCount {
 }
 func ldEE(cpu *cpu) cycleCount {
 	// Put value of register E into register E
-	cpu.r.de.e = cpu.r.de.e
+	// cpu.r.de.e = cpu.r.de.e
+	nop(cpu)
 	return ldEECycles
 }
 func ldEH(cpu *cpu) cycleCount {
@@ -885,7 +887,8 @@ func ldHE(cpu *cpu) cycleCount {
 }
 func ldHH(cpu *cpu) cycleCount {
 	// Put value of register H into register H
-	cpu.r.hl.h = cpu.r.hl.h
+	// cpu.r.hl.h = cpu.r.hl.h
+	nop(cpu)
 	return ldHHCycles
 }
 func ldHL(cpu *cpu) cycleCount {
@@ -925,7 +928,8 @@ func ldLH(cpu *cpu) cycleCount {
 }
 func ldLL(cpu *cpu) cycleCount {
 	// Put value of register L into register L
-	cpu.r.hl.l = cpu.r.hl.l
+	// cpu.r.hl.l = cpu.r.hl.l
+	nop(cpu)
 	return ldLLCycles
 }
 func ldLHl(cpu *cpu) cycleCount {
@@ -1102,9 +1106,12 @@ func ldStackCA(cpu *cpu) cycleCount {
 // Same as: LD A,(HL) - DEC HL
 
 func lddAMemHl(cpu *cpu) cycleCount {
-	// Put the value from the position of memory in HL into the register A.
+	// Put the value from the position of memory pointed by HL, into the register A.
 	// Then, decrement HL.
-	// TODO: to implement
+	cpu.r.af.a = cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	hl := cpu.r.hlAsWord() - 0x0001
+	cpu.r.hl.h = byte(hl >> 4)
+	cpu.r.hl.l = byte(hl & 0x0F)
 	return lddAMemHlCycles
 }
 
@@ -1122,7 +1129,10 @@ func lddAMemHl(cpu *cpu) cycleCount {
 func lddMemHlA(cpu *cpu) cycleCount {
 	// Put value of the register A into the memory address pointed by HL.
 	// Then, decrement HL.
-	// TODO: to implement
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), cpu.r.af.a)
+	hl := cpu.r.hlAsWord() - 0x0001
+	cpu.r.hl.h = byte(hl >> 4)
+	cpu.r.hl.l = byte(hl & 0x0F)
 	return lddMemHlACycles
 }
 
@@ -1140,7 +1150,10 @@ func lddMemHlA(cpu *cpu) cycleCount {
 func ldiAMemHl(cpu *cpu) cycleCount {
 	// Put the value from the position of memory pointed by HL into the register A.
 	// Then, increment  HL.
-	// TODO: to implement
+	cpu.r.af.a = cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	hl := cpu.r.hlAsWord() + 0x0001
+	cpu.r.hl.h = byte(hl >> 4)
+	cpu.r.hl.l = byte(hl & 0x0F)
 	return ldiAMemHlCycles
 }
 
@@ -1158,7 +1171,10 @@ func ldiAMemHl(cpu *cpu) cycleCount {
 func ldiMemHlA(cpu *cpu) cycleCount {
 	// Put value of the register A into the memory address pointed by HL.
 	// Then, increment HL.
-	// TODO: to implement
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), cpu.r.af.a)
+	hl := cpu.r.hlAsWord() + 0x0001
+	cpu.r.hl.h = byte(hl >> 4)
+	cpu.r.hl.l = byte(hl & 0x0F)
 	return ldiMemHlACycles
 }
 
@@ -1168,8 +1184,9 @@ func ldiMemHlA(cpu *cpu) cycleCount {
 // Use with:
 //		n = one byte immediate value.
 func ldStackNA(cpu *cpu) cycleCount {
-	// Takes from the stack the value indexed by the immediate value N, and put it into register A.
-	//TODO: to implement
+	// Takes the value from the register A and put it into the stack the value indexed by the immediate value N.
+	n := cpu.fetch()
+	cpu.mmu.WriteByte(mmu.Address{High: 0xFF, Low: n}, cpu.r.af.a)
 	return ldStackNACycles
 }
 
@@ -1179,8 +1196,9 @@ func ldStackNA(cpu *cpu) cycleCount {
 // Use with:
 //		n = one byte immediate value.
 func ldAStackN(cpu *cpu) cycleCount {
-	// Takes the value from the register A and put it into the stack the value indexed by the immediate value N.
-	//TODO: to implement
+	// Takes from the stack the value indexed by the immediate value N, and put it into register A.
+	n := cpu.fetch()
+	cpu.r.af.a = cpu.mmu.ReadByte(mmu.Address{High: 0xFF, Low: n})
 	return ldAStackNCycles
 }
 
@@ -1192,28 +1210,49 @@ func ldAStackN(cpu *cpu) cycleCount {
 // Use with:
 // 		n = BC,DE,HL,SP
 // 		nn = 16 bit immediate value
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		LD 				BC,nn 			01 			12
+// 		LD 				DE,nn 			11 			12
+// 		LD 				HL,nn 			21 			12
+// 		LD 				SP,nn 			31 			12
 
 func ldBcNn(cpu *cpu) cycleCount {
 	// Takes a 16-bit immediate value and put it into the register BC.
-	//TODO: to implement
+	// (LS byte comes first!)
+	low := cpu.fetch()
+	high := cpu.fetch()
+	cpu.r.bc.b = high
+	cpu.r.bc.c = low
 	return ldBcNnCycles
 }
 
 func ldDeNn(cpu *cpu) cycleCount {
 	// Takes a 16-bit immediate value and put it into the register DE.
-	//TODO: to implement
+	// (LS byte comes first!)
+	low := cpu.fetch()
+	high := cpu.fetch()
+	cpu.r.de.d = high
+	cpu.r.de.e = low
 	return ldDeNnCycles
 }
 
 func ldHlNn(cpu *cpu) cycleCount {
 	// Takes a 16-bit immediate value and put it into the register HL.
-	//TODO: to implement
+	// (LS byte comes first!)
+	low := cpu.fetch()
+	high := cpu.fetch()
+	cpu.r.hl.h = high
+	cpu.r.hl.l = low
 	return ldHlNnCycles
 }
 
 func ldSpNn(cpu *cpu) cycleCount {
 	// Takes a 16-bit immediate value and put it into the register SP.
-	//TODO: to implement
+	// (LS byte comes first!)
+	low := cpu.fetch()
+	high := cpu.fetch()
+	cpu.r.sp = word(high<<8) + word(low)
 	return ldSpNnCycles
 }
 
@@ -1243,8 +1282,15 @@ func ldSpHl(cpu *cpu) cycleCount {
 
 func ldHlSpN(cpu *cpu) cycleCount {
 	// Put the value addressed by Stack Pointer (SP) + N, into register HL
-	// cpu.r.hl = ??
-	// TODO: to implement
+	oldHl := cpu.r.hlAsWord()
+	n := cpu.fetch()
+	hl := cpu.r.sp + word(n)
+	cpu.r.hl.h = hl.high()
+	cpu.r.hl.l = hl.low()
+	cpu.r.setFlagZ(false)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((oldHl & 0xF) > (hl & 0xF))
+	cpu.r.setFlagC((oldHl & 0xFF) > (hl & 0xFF))
 	return ldHlSpNCycles
 }
 
@@ -1259,7 +1305,11 @@ func ldHlSpN(cpu *cpu) cycleCount {
 
 func ldMemNnSp(cpu *cpu) cycleCount {
 	// Put the value of Stack Pointer into the memory position addressed by immediate value nn
-	// TODO: to implement
+	// (LS byte comes first!)
+	low := cpu.fetch()
+	high := cpu.fetch()
+	cpu.mmu.WriteByte(mmu.Address{High: high, Low: low}, cpu.r.sp.low())
+	cpu.mmu.WriteByte(mmu.Address{High: high, Low: low}.NextAddress(), cpu.r.sp.high())
 	return ldMemNnSpCycles
 }
 
@@ -1276,30 +1326,42 @@ func ldMemNnSp(cpu *cpu) cycleCount {
 // 		PUSH			HL			E5        	16
 
 func pushAf(cpu *cpu) cycleCount {
-	// Put the value of register AF into the stack.
-	// Then, decrement SP twice
-	// TODO: to implement
+	// Decrement SP twice
+	// Then, put the value of register AF into the stack.
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.af.a)
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.af.f.asByte())
 	return pushAfCycles
 }
 
 func pushBc(cpu *cpu) cycleCount {
-	// Put the value of register BC into the stack.
-	// Then, decrement SP twice
-	// TODO: to implement
+	// Decrement SP twice
+	// Then, put the value of register BC into the stack.
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.bc.b)
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.bc.c)
 	return pushBcCycles
 }
 
 func pushDe(cpu *cpu) cycleCount {
-	// Put the value of register DE into the stack.
-	// Then, decrement SP twice
-	// TODO: to implement
+	// Decrement SP twice
+	// Then, put the value of register DE into the stack.
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.de.d)
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.de.e)
 	return pushDeCycles
 }
 
 func pushHl(cpu *cpu) cycleCount {
-	// Put the value of register HL into the stack.
-	// Then, decrement SP twice
-	// TODO: to implement
+	// Decrement SP twice
+	// Then, put the value of register HL into the stack.
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.hl.h)
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.hl.l)
 	return pushHlCycles
 }
 
@@ -1318,28 +1380,40 @@ func pushHl(cpu *cpu) cycleCount {
 func popAf(cpu *cpu) cycleCount {
 	// Take two bytes from the stack into register AF
 	// Then, increment SP twice
-	// TODO: to implement
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.af.a)
+	cpu.r.sp++
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.af.f.asByte())
+	cpu.r.sp++
 	return popAfCycles
 }
 
 func popBc(cpu *cpu) cycleCount {
 	// Take two bytes from the stack into register BC
 	// Then, increment SP twice
-	// TODO: to implement
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.bc.b)
+	cpu.r.sp++
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.bc.c)
+	cpu.r.sp++
 	return popBcCycles
 }
 
 func popDe(cpu *cpu) cycleCount {
 	// Take two bytes from the stack into register DE
 	// Then, increment SP twice
-	// TODO: to implement
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.de.d)
+	cpu.r.sp++
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.de.e)
+	cpu.r.sp++
 	return popDeCycles
 }
 
 func popHl(cpu *cpu) cycleCount {
 	// Take two bytes from the stack into register HL
 	// Then, increment SP twice
-	// TODO: to implement
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.hl.h)
+	cpu.r.sp++
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.hl.l)
+	cpu.r.sp++
 	return popHlCycles
 }
 
@@ -1374,7 +1448,7 @@ func addAA(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
-	cpu.r.setFlagC((cpu.r.af.a < oldA))
+	cpu.r.setFlagC(cpu.r.af.a < oldA)
 	return addAACycles
 }
 
@@ -1385,7 +1459,7 @@ func addAB(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
-	cpu.r.setFlagC((cpu.r.af.a < oldA))
+	cpu.r.setFlagC(cpu.r.af.a < oldA)
 	return addABCycles
 }
 
@@ -1396,7 +1470,7 @@ func addAC(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
-	cpu.r.setFlagC((cpu.r.af.a < oldA))
+	cpu.r.setFlagC(cpu.r.af.a < oldA)
 	return addACCycles
 }
 
@@ -1407,7 +1481,7 @@ func addAD(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
-	cpu.r.setFlagC((cpu.r.af.a < oldA))
+	cpu.r.setFlagC(cpu.r.af.a < oldA)
 	return addADCycles
 }
 
@@ -1418,7 +1492,7 @@ func addAE(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
-	cpu.r.setFlagC((cpu.r.af.a < oldA))
+	cpu.r.setFlagC(cpu.r.af.a < oldA)
 	return addAECycles
 }
 
@@ -1429,7 +1503,7 @@ func addAH(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
-	cpu.r.setFlagC((cpu.r.af.a < oldA))
+	cpu.r.setFlagC(cpu.r.af.a < oldA)
 	return addAHCycles
 }
 
@@ -1440,19 +1514,30 @@ func addAL(cpu *cpu) cycleCount {
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((cpu.r.af.a & 0xf) < (oldA & 0xf))
-	cpu.r.setFlagC((cpu.r.af.a < oldA))
+	cpu.r.setFlagC(cpu.r.af.a < oldA)
 	return addALCycles
 }
 
 func addAMemHl(cpu *cpu) cycleCount {
 	// Add the value of the memory pointed by register HL into register A
-	// TODO: To implement
+	oldA := cpu.r.af.a
+	cpu.r.af.a += cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.af.a & 0x0f) < (oldA & 0x0f))
+	cpu.r.setFlagC(cpu.r.af.a < oldA)
 	return addAMemHlCycles
 }
 
-func addANn(cpu *cpu) cycleCount {
+func addAN(cpu *cpu) cycleCount {
 	// Add the value of immediate value NN into register A
-	// TODO: To implement
+	n := cpu.fetch()
+	oldA := cpu.r.af.a
+	cpu.r.af.a += n
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH((cpu.r.af.a & 0x0f) < (oldA & 0x0f))
+	cpu.r.setFlagC(cpu.r.af.a < oldA)
 	return addANnCycles
 }
 
@@ -1661,13 +1746,24 @@ func subAL(cpu *cpu) cycleCount {
 
 func subAMemHl(cpu *cpu) cycleCount {
 	// Subtract the value of the memory pointed by register HL to register A
-	// TODO: to implement
+	oldA := cpu.r.af.a
+	cpu.r.af.a -= cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA & 0xf) > (cpu.r.af.a & 0xf))
+	cpu.r.setFlagC(oldA > cpu.r.af.a)
 	return subAMemHlCycles
 }
 
-func subANn(cpu *cpu) cycleCount {
+func subAN(cpu *cpu) cycleCount {
 	// Subtract the value of the immediate value NN to register A
-	// TODO: to implement
+	n := cpu.fetch()
+	oldA := cpu.r.af.a
+	cpu.r.af.a -= n
+	cpu.r.setFlagZ(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA & 0xf) > (cpu.r.af.a & 0xf))
+	cpu.r.setFlagC(oldA > cpu.r.af.a)
 	return subANnCycles
 }
 
@@ -1789,10 +1885,16 @@ func sbcAMemHl(cpu *cpu) cycleCount {
 	return sbcAMemHlCycles
 }
 
-func sbcANn(cpu *cpu) cycleCount {
+func sbcAN(cpu *cpu) cycleCount {
 	// Subtract from register A, the value of immediate value nn plus carry flag
-	// cpu.r.af.a -= ...
-	//TODO: to implement
+	n := cpu.fetch()
+	oldA := cpu.r.af.a
+	cpu.r.af.a -= n
+	cpu.r.af.a -= cpu.r.flagAsByte(cpu.r.af.f.c)
+	cpu.r.setFlagC(cpu.r.af.a == 0)
+	cpu.r.setFlagN(true)
+	cpu.r.setFlagH((oldA >> 4) > (cpu.r.af.a >> 4))
+	cpu.r.setFlagZ(oldA > cpu.r.af.a)
 	return sbcANnCycles
 }
 
@@ -1892,12 +1994,12 @@ func andAMemHl(cpu *cpu) cycleCount {
 }
 func andAN(cpu *cpu) cycleCount {
 	// Stores into register A the result of (A & an immediate value) (bitwise AND)
-	// cpu.r.af.a &= cpu.r.
+	n := cpu.fetch()
+	cpu.r.af.a &= n
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(true)
 	cpu.r.setFlagC(false)
-	// TODO: to implement
 	return andANCycles
 }
 
@@ -1997,8 +2099,8 @@ func orAMemHl(cpu *cpu) cycleCount {
 }
 func orAN(cpu *cpu) cycleCount {
 	// Store into register A the result of (A | an immediate value) (bitwise OR)
-	//cpu.r.af.a |= cpu.r.
-	// TODO: to implement
+	n := cpu.fetch()
+	cpu.r.af.a |= n
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -2102,8 +2204,8 @@ func xorAMemHl(cpu *cpu) cycleCount {
 }
 func xorAN(cpu *cpu) cycleCount {
 	// Stores into register A the result of (A ^ an immediate value) (bitwise XOR)
-	// cpu.r.af.a ^= cpu.r.
-	//TODO: to implement
+	n := cpu.fetch()
+	cpu.r.af.a ^= n
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -2202,12 +2304,11 @@ func cpAMemHl(cpu *cpu) cycleCount {
 }
 func cpAN(cpu *cpu) cycleCount {
 	// Compares A to #. The result is not stored; this function only affects flags.
-	nn := byte(0)
-	// TODO: Read NN
-	cpu.r.setFlagZ(cpu.r.af.a == nn)
+	n := cpu.fetch()
+	cpu.r.setFlagZ(cpu.r.af.a == n)
 	cpu.r.setFlagN(true)
-	cpu.r.setFlagH((cpu.r.af.a >> 4) < (nn >> 4))
-	cpu.r.setFlagC(cpu.r.af.a < nn)
+	cpu.r.setFlagH((cpu.r.af.a >> 4) < (n >> 4))
+	cpu.r.setFlagC(cpu.r.af.a < n)
 	return cpANCycles
 }
 
@@ -2313,7 +2414,7 @@ func incMemHl(cpu *cpu) cycleCount {
 // Use with:
 //	n = A,B,C,D,E,H,L,(HL)
 // Flags affected:
-//	Z - Set if reselt is zero.
+//	Z - Set if result is zero.
 //	N - Set.
 //	H - Set if no borrow from bit 4.
 //	C - Not affected.
@@ -2460,10 +2561,10 @@ func addHlHl(cpu *cpu) cycleCount {
 
 func addHlSp(cpu *cpu) cycleCount {
 	// Add the value of register SP into register HL
-	carry := byte((uint16(cpu.r.hl.l) + uint16(byte(cpu.r.spLow()))) >> 8)
+	carry := byte((uint16(cpu.r.hl.l) + uint16(byte(cpu.r.sp.low()))) >> 8)
 	oldH := cpu.r.hl.h
-	cpu.r.hl.l += cpu.r.spLow()
-	cpu.r.hl.h += carry + cpu.r.spHigh()
+	cpu.r.hl.l += cpu.r.sp.low()
+	cpu.r.hl.h += carry + cpu.r.sp.high()
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((cpu.r.hl.h & 0xf) < (oldH & 0xf))
 	cpu.r.setFlagC(cpu.r.hl.h < oldH)
@@ -2486,13 +2587,13 @@ func addHlSp(cpu *cpu) cycleCount {
 
 func addSpN(cpu *cpu) cycleCount {
 	// Add the immediate value N to Stack Pointer (SP)
-	oldSpHigh := cpu.r.spHigh()
-	//cpu.r.sp += N
-	// TODO: To implement
+	oldSp := cpu.r.sp
+	n := cpu.fetch()
+	cpu.r.sp += word(n)
 	cpu.r.setFlagZ(false)
 	cpu.r.setFlagN(false)
-	cpu.r.setFlagH((cpu.r.spHigh() & 0xf) < (oldSpHigh & 0xf))
-	cpu.r.setFlagC(cpu.r.spHigh() < oldSpHigh)
+	cpu.r.setFlagH((cpu.r.sp.low() & 0xf) < (oldSp.low() & 0xf))
+	cpu.r.setFlagC(cpu.r.sp.low() < oldSp.low())
 	return addSpNCycles
 }
 
@@ -2588,7 +2689,7 @@ func decSp(cpu *cpu) cycleCount {
 
 // 3.3.5.1. SWAP n
 // Description:
-// 	Swap upper & lower nibles of n.
+// 	Swap upper & lower nibbles of n.
 // Use with:
 // 	n = A,B,C,D,E,H,L,(HL)
 // Flags affected:
@@ -2608,56 +2709,56 @@ func decSp(cpu *cpu) cycleCount {
 // 		SWAP 			(HL) 			CB 36 			16
 
 func swapA(cpu *cpu) cycleCount {
-	// Swap upper & lower nibles of register A
+	// Swap upper & lower nibbles of register A
 	oldA := cpu.r.af.a
 	cpu.r.af.a = byte(oldA<<4) + byte(oldA<<4)
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	return 8
 }
 func swapB(cpu *cpu) cycleCount {
-	// Swap upper & lower nibles of register B
+	// Swap upper & lower nibbles of register B
 	oldB := cpu.r.bc.b
 	cpu.r.bc.b = byte(oldB<<4) + byte(oldB<<4)
 	cpu.r.setFlagZ(cpu.r.bc.b == 0)
 	return 8
 }
 func swapC(cpu *cpu) cycleCount {
-	// Swap upper & lower nibles of register C
+	// Swap upper & lower nibbles of register C
 	oldC := cpu.r.bc.c
 	cpu.r.bc.c = byte(oldC<<4) + byte(oldC<<4)
 	cpu.r.setFlagZ(cpu.r.bc.c == 0)
 	return 8
 }
 func swapD(cpu *cpu) cycleCount {
-	// Swap upper & lower nibles of register D
+	// Swap upper & lower nibbles of register D
 	oldD := cpu.r.de.d
 	cpu.r.de.d = byte(oldD<<4) + byte(oldD<<4)
 	cpu.r.setFlagZ(cpu.r.de.d == 0)
 	return 8
 }
 func swapE(cpu *cpu) cycleCount {
-	// Swap upper & lower nibles of register E
+	// Swap upper & lower nibbles of register E
 	oldE := cpu.r.de.e
 	cpu.r.de.e = byte(oldE<<4) + byte(oldE<<4)
 	cpu.r.setFlagZ(cpu.r.de.e == 0)
 	return 8
 }
 func swapH(cpu *cpu) cycleCount {
-	// Swap upper & lower nibles of register H
+	// Swap upper & lower nibbles of register H
 	oldH := cpu.r.hl.h
 	cpu.r.hl.h = byte(oldH<<4) + byte(oldH<<4)
 	cpu.r.setFlagZ(cpu.r.hl.h == 0)
 	return 8
 }
 func swapL(cpu *cpu) cycleCount {
-	// Swap upper & lower nibles of register L
+	// Swap upper & lower nibbles of register L
 	oldL := cpu.r.hl.l
 	cpu.r.hl.l = byte(oldL<<4) + byte(oldL<<4)
 	cpu.r.setFlagZ(cpu.r.hl.l == 0)
 	return 8
 }
 func swapMemHl(cpu *cpu) cycleCount {
-	// Swap upper & lower nibles of the position of memory pointed by register HL
+	// Swap upper & lower nibbles of the position of memory pointed by register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
 	oldMemHl := memHl
 	memHl = byte(oldMemHl<<4) + byte(oldMemHl<<4)
@@ -2683,7 +2784,30 @@ func swapMemHl(cpu *cpu) cycleCount {
 // 		DAA 			-/- 			27 			4
 
 func daA(cpu *cpu) cycleCount {
-	// TODO: To implement
+	// look at http://forums.nesdev.com/viewtopic.php?t=9088
+	var a = word(cpu.r.af.a)
+	if cpu.r.af.f.n {
+		if cpu.r.af.f.h {
+			a = (a - 6) & 0xff
+		}
+		if cpu.r.af.f.c {
+			a -= 0x60
+		}
+	} else {
+		if cpu.r.af.f.h || a&0x0f > 9 {
+			a += 0x06
+		}
+		if cpu.r.af.f.c || a > 0x9F {
+			a += 0x60
+		}
+	}
+
+	cpu.r.setFlagZ(a&0xFF == 0x00)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(a&0x100 == 0x100)
+
+	cpu.r.af.a = byte(a)
+
 	return daACycles
 }
 
@@ -2753,6 +2877,7 @@ func scf(cpu *cpu) cycleCount {
 // 		NOP 			-/- 			00 			4
 func nop(cpu *cpu) cycleCount {
 	// Does nothing
+	log.Printf("CPU: nop at... %d", cpu.cycle)
 	return nopCycles
 }
 
@@ -2765,7 +2890,7 @@ func nop(cpu *cpu) cycleCount {
 // 	HALT 			-/- 			76 			4
 func halt(cpu *cpu) cycleCount {
 	// Power down CPU until an interrupt occurs
-	// TODO: To implement
+	cpu.halted = true
 	return haltCycles
 }
 
@@ -2777,7 +2902,8 @@ func halt(cpu *cpu) cycleCount {
 // 		STOP 			-/- 			10 00 		4
 func stop(cpu *cpu) cycleCount {
 	// Stops the CPU until an interrupt occurs
-	// TODO: To implement
+	cpu.fetch()
+	log.Println("CPU: Stopping...")
 	return stopCycles
 }
 
@@ -2793,13 +2919,13 @@ func stop(cpu *cpu) cycleCount {
 // 		DI 				-/- 			F3 			4
 func di(cpu *cpu) cycleCount {
 	// Disables Interruptions
-	// TODO: To implement
+	cpu.interruptsEnabled = false
 	return diCycles
 }
 
 // 3.3.5.10. EI
 // Description:
-// 	Enable interrupts. This intruction enables interrupts
+// 	Enable interrupts. This instruction enables interrupts
 // 	but not immediately. Interrupts are enabled after
 // 	instruction after EI is executed.
 // Flags affected:
@@ -2809,7 +2935,7 @@ func di(cpu *cpu) cycleCount {
 // 		EI 				-/- 			FB 			4
 func ei(cpu *cpu) cycleCount {
 	// Enables Interruptions
-	// TODO: To implement
+	cpu.interruptsEnabled = true
 	return eiCycles
 }
 
@@ -3512,7 +3638,21 @@ func rlL(cpu *cpu) cycleCount {
 }
 
 func rlMemHl(cpu *cpu) cycleCount {
-	// TODO: To implement
+	// Rotate the memory position pointed by HL left 1 bit, but through Carry Flag
+	// Note that Carry = L[7] and L[0] = Carry
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	bit7 := bool(memHl&0x80 == 0x80)
+
+	memHl = memHl << 1
+	if cpu.r.af.f.c {
+		memHl |= 0x1 // set bit 0 to 1
+	}
+
+	cpu.r.setFlagZ(memHl == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit7)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return rlMemHlCycles
 }
 
@@ -3653,7 +3793,21 @@ func rrcL(cpu *cpu) cycleCount {
 }
 
 func rrcMemHl(cpu *cpu) cycleCount {
-	// TODO: To implement
+	// Rotate the memory position pointed by HL right 1 bit
+	// Old bit 0 goes to Carry Flag
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	bit0 := bool(memHl&0x01 == 0x01)
+
+	memHl = memHl >> 1
+	if bit0 {
+		memHl |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(memHl == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return rrcMemHlCycles
 }
 
@@ -3794,6 +3948,21 @@ func rrL(cpu *cpu) cycleCount {
 }
 
 func rrMemHl(cpu *cpu) cycleCount {
+	// Rotate the memory position pointed by HL right 1 bit, but through Carry Flag
+	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	bit0 := bool(memHl&0x01 == 0x01)
+
+	memHl = memHl >> 1
+	if cpu.r.af.f.c {
+		memHl |= 0x80 // set bit 7 to 1
+	}
+
+	cpu.r.setFlagZ(memHl == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.r.setFlagC(bit0)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return rrMemHlCycles
 }
 
@@ -3907,9 +4076,15 @@ func slaL(cpu *cpu) cycleCount {
 }
 
 func slaMemHl(cpu *cpu) cycleCount {
-	// Shift MemHl left into Carry
+	// Shift the memory position pointed by HL left into Carry
 	// MemHl[0] set to 0
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagC((memHl & 0x80) == 0x80)
+	memHl = memHl << 1
+	cpu.r.setFlagZ(memHl == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return slaMemHlCycles
 }
 
@@ -4030,8 +4205,16 @@ func sraL(cpu *cpu) cycleCount {
 }
 
 func sraMemHl(cpu *cpu) cycleCount {
-	// Shift MemHl right into carry
+	// Shift the memory position pointed by HL right into carry
 	// MemHl[7] doesn't change
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	msb := memHl & 0x80
+	cpu.r.setFlagC((memHl & 0x01) == 0x01)
+	memHl = (memHl >> 1) | msb // restores MSB
+	cpu.r.setFlagZ(memHl == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return sraMemHlCycles
 }
 
@@ -4145,8 +4328,15 @@ func srlL(cpu *cpu) cycleCount {
 }
 
 func srlMemHl(cpu *cpu) cycleCount {
-	// Shift MemHl right into Carry.
+	// Shift the memory position pointed by HL right into Carry.
 	// MemHl[7] = 0
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagC((memHl & 0x01) == 0x01)
+	memHl = memHl >> 1
+	cpu.r.setFlagZ(memHl == 0)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(false)
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return srlMemHlCycles
 }
 
@@ -4528,35 +4718,59 @@ func bit7L(cpu *cpu) cycleCount {
 }
 
 func bit0MemHl(cpu *cpu) cycleCount {
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagZ(memHl&0x01 == 0x01)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
 	return bitMemHlCycles
 }
 func bit1MemHl(cpu *cpu) cycleCount {
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagZ(memHl&0x01 == 0x01)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
 	return bitMemHlCycles
 }
 func bit2MemHl(cpu *cpu) cycleCount {
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagZ(memHl&0x01 == 0x01)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
 	return bitMemHlCycles
 }
 func bit3MemHl(cpu *cpu) cycleCount {
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagZ(memHl&0x01 == 0x01)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
 	return bitMemHlCycles
 }
 func bit4MemHl(cpu *cpu) cycleCount {
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagZ(memHl&0x01 == 0x01)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
 	return bitMemHlCycles
 }
 func bit5MemHl(cpu *cpu) cycleCount {
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagZ(memHl&0x01 == 0x01)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
 	return bitMemHlCycles
 }
 func bit6MemHl(cpu *cpu) cycleCount {
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagZ(memHl&0x01 == 0x01)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
 	return bitMemHlCycles
 }
 func bit7MemHl(cpu *cpu) cycleCount {
-	// TODO: To implement
+	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	cpu.r.setFlagZ(memHl&0x01 == 0x01)
+	cpu.r.setFlagN(false)
+	cpu.r.setFlagH(true)
 	return bitMemHlCycles
 }
 
@@ -4600,345 +4814,345 @@ const (
 
 func set0A(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register A
-	cpu.r.af.a |= (0x01 << 0)
+	cpu.r.af.a |= 0x01 << 0
 	return setACycles
 }
 func set0B(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register B
-	cpu.r.bc.b |= (0x01 << 0)
+	cpu.r.bc.b |= 0x01 << 0
 	return setBCycles
 }
 func set0C(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register C
-	cpu.r.bc.c |= (0x01 << 0)
+	cpu.r.bc.c |= 0x01 << 0
 	return setCCycles
 }
 func set0D(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register D
-	cpu.r.de.d |= (0x01 << 0)
+	cpu.r.de.d |= 0x01 << 0
 	return setDCycles
 }
 func set0E(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register E
-	cpu.r.de.e |= (0x01 << 0)
+	cpu.r.de.e |= 0x01 << 0
 	return setECycles
 }
 func set0H(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register H
-	cpu.r.hl.h |= (0x01 << 0)
+	cpu.r.hl.h |= 0x01 << 0
 	return setHCycles
 }
 func set0L(cpu *cpu) cycleCount {
 	// Sets the 0 bit of the register L
-	cpu.r.hl.l |= (0x01 << 0)
+	cpu.r.hl.l |= 0x01 << 0
 	return setLCycles
 }
 
 func set1A(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register A
-	cpu.r.af.a |= (0x01 << 1)
+	cpu.r.af.a |= 0x01 << 1
 	return setACycles
 }
 func set1B(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register B
-	cpu.r.bc.b |= (0x01 << 1)
+	cpu.r.bc.b |= 0x01 << 1
 	return setBCycles
 }
 func set1C(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register C
-	cpu.r.bc.c |= (0x01 << 1)
+	cpu.r.bc.c |= 0x01 << 1
 	return setCCycles
 }
 func set1D(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register D
-	cpu.r.de.d |= (0x01 << 1)
+	cpu.r.de.d |= 0x01 << 1
 	return setDCycles
 }
 func set1E(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register E
-	cpu.r.de.e |= (0x01 << 1)
+	cpu.r.de.e |= 0x01 << 1
 	return setECycles
 }
 func set1H(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register H
-	cpu.r.hl.h |= (0x01 << 1)
+	cpu.r.hl.h |= 0x01 << 1
 	return setHCycles
 }
 func set1L(cpu *cpu) cycleCount {
 	// Sets the 1 bit of the register L
-	cpu.r.hl.l |= (0x01 << 1)
+	cpu.r.hl.l |= 0x01 << 1
 	return setLCycles
 }
 
 func set2A(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register A
-	cpu.r.af.a |= (0x01 << 2)
+	cpu.r.af.a |= 0x01 << 2
 	return setACycles
 }
 func set2B(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register B
-	cpu.r.bc.b |= (0x01 << 2)
+	cpu.r.bc.b |= 0x01 << 2
 	return setBCycles
 }
 func set2C(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register C
-	cpu.r.bc.c |= (0x01 << 2)
+	cpu.r.bc.c |= 0x01 << 2
 	return setCCycles
 }
 func set2D(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register D
-	cpu.r.de.d |= (0x01 << 2)
+	cpu.r.de.d |= 0x01 << 2
 	return setDCycles
 }
 func set2E(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register E
-	cpu.r.de.e |= (0x01 << 2)
+	cpu.r.de.e |= 0x01 << 2
 	return setECycles
 }
 func set2H(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register H
-	cpu.r.hl.h |= (0x01 << 2)
+	cpu.r.hl.h |= 0x01 << 2
 	return setHCycles
 }
 func set2L(cpu *cpu) cycleCount {
 	// Sets the 2 bit of the register L
-	cpu.r.hl.l |= (0x01 << 2)
+	cpu.r.hl.l |= 0x01 << 2
 	return setLCycles
 }
 
 func set3A(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register A
-	cpu.r.af.a |= (0x01 << 3)
+	cpu.r.af.a |= 0x01 << 3
 	return setACycles
 }
 func set3B(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register B
-	cpu.r.bc.b |= (0x01 << 3)
+	cpu.r.bc.b |= 0x01 << 3
 	return setBCycles
 }
 func set3C(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register C
-	cpu.r.bc.c |= (0x01 << 3)
+	cpu.r.bc.c |= 0x01 << 3
 	return setCCycles
 }
 func set3D(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register D
-	cpu.r.de.d |= (0x01 << 3)
+	cpu.r.de.d |= 0x01 << 3
 	return setDCycles
 }
 func set3E(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register E
-	cpu.r.de.e |= (0x01 << 3)
+	cpu.r.de.e |= 0x01 << 3
 	return setECycles
 }
 func set3H(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register H
-	cpu.r.hl.h |= (0x01 << 3)
+	cpu.r.hl.h |= 0x01 << 3
 	return setHCycles
 }
 func set3L(cpu *cpu) cycleCount {
 	// Sets the 3 bit of the register L
-	cpu.r.hl.l |= (0x01 << 3)
+	cpu.r.hl.l |= 0x01 << 3
 	return setLCycles
 }
 
 func set4A(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register A
-	cpu.r.af.a |= (0x01 << 4)
+	cpu.r.af.a |= 0x01 << 4
 	return setACycles
 }
 func set4B(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register B
-	cpu.r.bc.b |= (0x01 << 4)
+	cpu.r.bc.b |= 0x01 << 4
 	return setBCycles
 }
 func set4C(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register C
-	cpu.r.bc.c |= (0x01 << 4)
+	cpu.r.bc.c |= 0x01 << 4
 	return setCCycles
 }
 func set4D(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register D
-	cpu.r.de.d |= (0x01 << 4)
+	cpu.r.de.d |= 0x01 << 4
 	return setDCycles
 }
 func set4E(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register E
-	cpu.r.de.e |= (0x01 << 4)
+	cpu.r.de.e |= 0x01 << 4
 	return setECycles
 }
 func set4H(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register H
-	cpu.r.hl.h |= (0x01 << 4)
+	cpu.r.hl.h |= 0x01 << 4
 	return setHCycles
 }
 func set4L(cpu *cpu) cycleCount {
 	// Sets the 4 bit of the register L
-	cpu.r.hl.l |= (0x01 << 4)
+	cpu.r.hl.l |= 0x01 << 4
 	return setLCycles
 }
 
 func set5A(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register A
-	cpu.r.af.a |= (0x01 << 5)
+	cpu.r.af.a |= 0x01 << 5
 	return setACycles
 }
 func set5B(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register B
-	cpu.r.bc.b |= (0x01 << 5)
+	cpu.r.bc.b |= 0x01 << 5
 	return setBCycles
 }
 func set5C(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register C
-	cpu.r.bc.c |= (0x01 << 5)
+	cpu.r.bc.c |= 0x01 << 5
 	return setCCycles
 }
 func set5D(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register D
-	cpu.r.de.d |= (0x01 << 5)
+	cpu.r.de.d |= 0x01 << 5
 	return setDCycles
 }
 func set5E(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register E
-	cpu.r.de.e |= (0x01 << 5)
+	cpu.r.de.e |= 0x01 << 5
 	return setECycles
 }
 func set5H(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register H
-	cpu.r.hl.h |= (0x01 << 5)
+	cpu.r.hl.h |= 0x01 << 5
 	return setHCycles
 }
 func set5L(cpu *cpu) cycleCount {
 	// Sets the 5 bit of the register L
-	cpu.r.hl.l |= (0x01 << 5)
+	cpu.r.hl.l |= 0x01 << 5
 	return setLCycles
 }
 
 func set6A(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register A
-	cpu.r.af.a |= (0x01 << 6)
+	cpu.r.af.a |= 0x01 << 6
 	return setACycles
 }
 func set6B(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register B
-	cpu.r.bc.b |= (0x01 << 6)
+	cpu.r.bc.b |= 0x01 << 6
 	return setBCycles
 }
 func set6C(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register C
-	cpu.r.bc.c |= (0x01 << 6)
+	cpu.r.bc.c |= 0x01 << 6
 	return setCCycles
 }
 func set6D(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register D
-	cpu.r.de.d |= (0x01 << 6)
+	cpu.r.de.d |= 0x01 << 6
 	return setDCycles
 }
 func set6E(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register E
-	cpu.r.de.e |= (0x01 << 6)
+	cpu.r.de.e |= 0x01 << 6
 	return setECycles
 }
 func set6H(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register H
-	cpu.r.hl.h |= (0x01 << 6)
+	cpu.r.hl.h |= 0x01 << 6
 	return setHCycles
 }
 func set6L(cpu *cpu) cycleCount {
 	// Sets the 6 bit of the register L
-	cpu.r.hl.l |= (0x01 << 6)
+	cpu.r.hl.l |= 0x01 << 6
 	return setLCycles
 }
 
 func set7A(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register A
-	cpu.r.af.a |= (0x01 << 7)
+	cpu.r.af.a |= 0x01 << 7
 	return setACycles
 }
 func set7B(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register B
-	cpu.r.bc.b |= (0x01 << 7)
+	cpu.r.bc.b |= 0x01 << 7
 	return setBCycles
 }
 func set7C(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register C
-	cpu.r.bc.c |= (0x01 << 7)
+	cpu.r.bc.c |= 0x01 << 7
 	return setCCycles
 }
 func set7D(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register D
-	cpu.r.de.d |= (0x01 << 7)
+	cpu.r.de.d |= 0x01 << 7
 	return setDCycles
 }
 func set7E(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register E
-	cpu.r.de.e |= (0x01 << 7)
+	cpu.r.de.e |= 0x01 << 7
 	return setECycles
 }
 func set7H(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register H
-	cpu.r.hl.h |= (0x01 << 7)
+	cpu.r.hl.h |= 0x01 << 7
 	return setHCycles
 }
 func set7L(cpu *cpu) cycleCount {
 	// Sets the 7 bit of the register L
-	cpu.r.hl.l |= (0x01 << 7)
+	cpu.r.hl.l |= 0x01 << 7
 	return setLCycles
 }
 
 func set0MemHl(cpu *cpu) cycleCount {
 	// set the 0 bit of the position of memory pointed by register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl |= (0x01 << 0)
+	memHl |= 0x01 << 0
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set1MemHl(cpu *cpu) cycleCount {
 	// set the 1 bit of the position of memory pointed by register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl |= (0x01 << 1)
+	memHl |= 0x01 << 1
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set2MemHl(cpu *cpu) cycleCount {
 	// set the 2 bit of the position of memory pointed by register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl |= (0x01 << 2)
+	memHl |= 0x01 << 2
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set3MemHl(cpu *cpu) cycleCount {
 	// set the 3 bit of the position of memory pointed by register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl |= (0x01 << 3)
+	memHl |= 0x01 << 3
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set4MemHl(cpu *cpu) cycleCount {
 	// set the 4 bit of the position of memory pointed by register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl |= (0x01 << 4)
+	memHl |= 0x01 << 4
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set5MemHl(cpu *cpu) cycleCount {
 	// set the 5 bit of the position of memory pointed by register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl |= (0x01 << 5)
+	memHl |= 0x01 << 5
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set6MemHl(cpu *cpu) cycleCount {
 	// set the 6 bit of the position of memory pointed by register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl |= (0x01 << 6)
+	memHl |= 0x01 << 6
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
 func set7MemHl(cpu *cpu) cycleCount {
 	// set the 7 bit of the position of memory pointed by register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl |= (0x01 << 7)
+	memHl |= 0x01 << 7
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return setMemHlCycles
 }
@@ -4974,345 +5188,345 @@ const (
 
 func res0A(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register A
-	cpu.r.af.a &= (0xFF ^ (0x01 << 0))
+	cpu.r.af.a &= 0xFF ^ (0x01 << 0)
 	return resACycles
 }
 func res0B(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register B
-	cpu.r.bc.b &= (0xFF ^ (0x01 << 0))
+	cpu.r.bc.b &= 0xFF ^ (0x01 << 0)
 	return resBCycles
 }
 func res0C(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register C
-	cpu.r.bc.c &= (0xFF ^ (0x01 << 0))
+	cpu.r.bc.c &= 0xFF ^ (0x01 << 0)
 	return resCCycles
 }
 func res0D(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register D
-	cpu.r.de.d &= (0xFF ^ (0x01 << 0))
+	cpu.r.de.d &= 0xFF ^ (0x01 << 0)
 	return resDCycles
 }
 func res0E(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register E
-	cpu.r.de.e &= (0xFF ^ (0x01 << 0))
+	cpu.r.de.e &= 0xFF ^ (0x01 << 0)
 	return resECycles
 }
 func res0H(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register H
-	cpu.r.hl.h &= (0xFF ^ (0x01 << 0))
+	cpu.r.hl.h &= 0xFF ^ (0x01 << 0)
 	return resHCycles
 }
 func res0L(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the register L
-	cpu.r.hl.l &= (0xFF ^ (0x01 << 0))
+	cpu.r.hl.l &= 0xFF ^ (0x01 << 0)
 	return resLCycles
 }
 
 func res1A(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register A
-	cpu.r.af.a &= (0xFF ^ (0x01 << 1))
+	cpu.r.af.a &= 0xFF ^ (0x01 << 1)
 	return resACycles
 }
 func res1B(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register B
-	cpu.r.bc.b &= (0xFF ^ (0x01 << 1))
+	cpu.r.bc.b &= 0xFF ^ (0x01 << 1)
 	return resBCycles
 }
 func res1C(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register C
-	cpu.r.bc.c &= (0xFF ^ (0x01 << 1))
+	cpu.r.bc.c &= 0xFF ^ (0x01 << 1)
 	return resCCycles
 }
 func res1D(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register D
-	cpu.r.de.d &= (0xFF ^ (0x01 << 1))
+	cpu.r.de.d &= 0xFF ^ (0x01 << 1)
 	return resDCycles
 }
 func res1E(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register E
-	cpu.r.de.e &= (0xFF ^ (0x01 << 1))
+	cpu.r.de.e &= 0xFF ^ (0x01 << 1)
 	return resECycles
 }
 func res1H(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register H
-	cpu.r.hl.h &= (0xFF ^ (0x01 << 1))
+	cpu.r.hl.h &= 0xFF ^ (0x01 << 1)
 	return resHCycles
 }
 func res1L(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the register L
-	cpu.r.hl.l &= (0xFF ^ (0x01 << 1))
+	cpu.r.hl.l &= 0xFF ^ (0x01 << 1)
 	return resLCycles
 }
 
 func res2A(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register A
-	cpu.r.af.a &= (0xFF ^ (0x01 << 2))
+	cpu.r.af.a &= 0xFF ^ (0x01 << 2)
 	return resACycles
 }
 func res2B(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register B
-	cpu.r.bc.b &= (0xFF ^ (0x01 << 2))
+	cpu.r.bc.b &= 0xFF ^ (0x01 << 2)
 	return resBCycles
 }
 func res2C(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register C
-	cpu.r.bc.c &= (0xFF ^ (0x01 << 2))
+	cpu.r.bc.c &= 0xFF ^ (0x01 << 2)
 	return resCCycles
 }
 func res2D(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register D
-	cpu.r.de.d &= (0xFF ^ (0x01 << 2))
+	cpu.r.de.d &= 0xFF ^ (0x01 << 2)
 	return resDCycles
 }
 func res2E(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register E
-	cpu.r.de.e &= (0xFF ^ (0x01 << 2))
+	cpu.r.de.e &= 0xFF ^ (0x01 << 2)
 	return resECycles
 }
 func res2H(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register H
-	cpu.r.hl.h &= (0xFF ^ (0x01 << 2))
+	cpu.r.hl.h &= 0xFF ^ (0x01 << 2)
 	return resHCycles
 }
 func res2L(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the register L
-	cpu.r.hl.l &= (0xFF ^ (0x01 << 2))
+	cpu.r.hl.l &= 0xFF ^ (0x01 << 2)
 	return resLCycles
 }
 
 func res3A(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register A
-	cpu.r.af.a &= (0xFF ^ (0x01 << 3))
+	cpu.r.af.a &= 0xFF ^ (0x01 << 3)
 	return resACycles
 }
 func res3B(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register B
-	cpu.r.bc.b &= (0xFF ^ (0x01 << 3))
+	cpu.r.bc.b &= 0xFF ^ (0x01 << 3)
 	return resBCycles
 }
 func res3C(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register C
-	cpu.r.bc.c &= (0xFF ^ (0x01 << 3))
+	cpu.r.bc.c &= 0xFF ^ (0x01 << 3)
 	return resCCycles
 }
 func res3D(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register D
-	cpu.r.de.d &= (0xFF ^ (0x01 << 3))
+	cpu.r.de.d &= 0xFF ^ (0x01 << 3)
 	return resDCycles
 }
 func res3E(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register E
-	cpu.r.de.e &= (0xFF ^ (0x01 << 3))
+	cpu.r.de.e &= 0xFF ^ (0x01 << 3)
 	return resECycles
 }
 func res3H(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register H
-	cpu.r.hl.h &= (0xFF ^ (0x01 << 3))
+	cpu.r.hl.h &= 0xFF ^ (0x01 << 3)
 	return resHCycles
 }
 func res3L(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the register L
-	cpu.r.hl.l &= (0xFF ^ (0x01 << 3))
+	cpu.r.hl.l &= 0xFF ^ (0x01 << 3)
 	return resLCycles
 }
 
 func res4A(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register A
-	cpu.r.af.a &= (0xFF ^ (0x01 << 4))
+	cpu.r.af.a &= 0xFF ^ (0x01 << 4)
 	return resACycles
 }
 func res4B(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register B
-	cpu.r.bc.b &= (0xFF ^ (0x01 << 4))
+	cpu.r.bc.b &= 0xFF ^ (0x01 << 4)
 	return resBCycles
 }
 func res4C(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register C
-	cpu.r.bc.c &= (0xFF ^ (0x01 << 4))
+	cpu.r.bc.c &= 0xFF ^ (0x01 << 4)
 	return resCCycles
 }
 func res4D(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register D
-	cpu.r.de.d &= (0xFF ^ (0x01 << 4))
+	cpu.r.de.d &= 0xFF ^ (0x01 << 4)
 	return resDCycles
 }
 func res4E(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register E
-	cpu.r.de.e &= (0xFF ^ (0x01 << 4))
+	cpu.r.de.e &= 0xFF ^ (0x01 << 4)
 	return resECycles
 }
 func res4H(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register H
-	cpu.r.hl.h &= (0xFF ^ (0x01 << 4))
+	cpu.r.hl.h &= 0xFF ^ (0x01 << 4)
 	return resHCycles
 }
 func res4L(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the register L
-	cpu.r.hl.l &= (0xFF ^ (0x01 << 4))
+	cpu.r.hl.l &= 0xFF ^ (0x01 << 4)
 	return resLCycles
 }
 
 func res5A(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register A
-	cpu.r.af.a &= (0xFF ^ (0x01 << 5))
+	cpu.r.af.a &= 0xFF ^ (0x01 << 5)
 	return resACycles
 }
 func res5B(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register B
-	cpu.r.bc.b &= (0xFF ^ (0x01 << 5))
+	cpu.r.bc.b &= 0xFF ^ (0x01 << 5)
 	return resBCycles
 }
 func res5C(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register C
-	cpu.r.bc.c &= (0xFF ^ (0x01 << 5))
+	cpu.r.bc.c &= 0xFF ^ (0x01 << 5)
 	return resCCycles
 }
 func res5D(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register D
-	cpu.r.de.d &= (0xFF ^ (0x01 << 5))
+	cpu.r.de.d &= 0xFF ^ (0x01 << 5)
 	return resDCycles
 }
 func res5E(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register E
-	cpu.r.de.e &= (0xFF ^ (0x01 << 5))
+	cpu.r.de.e &= 0xFF ^ (0x01 << 5)
 	return resECycles
 }
 func res5H(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register H
-	cpu.r.hl.h &= (0xFF ^ (0x01 << 5))
+	cpu.r.hl.h &= 0xFF ^ (0x01 << 5)
 	return resHCycles
 }
 func res5L(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the register L
-	cpu.r.hl.l &= (0xFF ^ (0x01 << 5))
+	cpu.r.hl.l &= 0xFF ^ (0x01 << 5)
 	return resLCycles
 }
 
 func res6A(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register A
-	cpu.r.af.a &= (0xFF ^ (0x01 << 6))
+	cpu.r.af.a &= 0xFF ^ (0x01 << 6)
 	return resACycles
 }
 func res6B(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register B
-	cpu.r.bc.b &= (0xFF ^ (0x01 << 6))
+	cpu.r.bc.b &= 0xFF ^ (0x01 << 6)
 	return resBCycles
 }
 func res6C(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register C
-	cpu.r.bc.c &= (0xFF ^ (0x01 << 6))
+	cpu.r.bc.c &= 0xFF ^ (0x01 << 6)
 	return resCCycles
 }
 func res6D(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register D
-	cpu.r.de.d &= (0xFF ^ (0x01 << 6))
+	cpu.r.de.d &= 0xFF ^ (0x01 << 6)
 	return resDCycles
 }
 func res6E(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register E
-	cpu.r.de.e &= (0xFF ^ (0x01 << 6))
+	cpu.r.de.e &= 0xFF ^ (0x01 << 6)
 	return resECycles
 }
 func res6H(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register H
-	cpu.r.hl.h &= (0xFF ^ (0x01 << 6))
+	cpu.r.hl.h &= 0xFF ^ (0x01 << 6)
 	return resHCycles
 }
 func res6L(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the register L
-	cpu.r.hl.l &= (0xFF ^ (0x01 << 6))
+	cpu.r.hl.l &= 0xFF ^ (0x01 << 6)
 	return resLCycles
 }
 
 func res7A(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register A
-	cpu.r.af.a &= (0xFF ^ (0x01 << 7))
+	cpu.r.af.a &= 0xFF ^ (0x01 << 7)
 	return resACycles
 }
 func res7B(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register B
-	cpu.r.bc.b &= (0xFF ^ (0x01 << 7))
+	cpu.r.bc.b &= 0xFF ^ (0x01 << 7)
 	return resBCycles
 }
 func res7C(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register C
-	cpu.r.bc.c &= (0xFF ^ (0x01 << 7))
+	cpu.r.bc.c &= 0xFF ^ (0x01 << 7)
 	return resCCycles
 }
 func res7D(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register D
-	cpu.r.de.d &= (0xFF ^ (0x01 << 7))
+	cpu.r.de.d &= 0xFF ^ (0x01 << 7)
 	return resDCycles
 }
 func res7E(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register E
-	cpu.r.de.e &= (0xFF ^ (0x01 << 7))
+	cpu.r.de.e &= 0xFF ^ (0x01 << 7)
 	return resECycles
 }
 func res7H(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register H
-	cpu.r.hl.h &= (0xFF ^ (0x01 << 7))
+	cpu.r.hl.h &= 0xFF ^ (0x01 << 7)
 	return resHCycles
 }
 func res7L(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the register L
-	cpu.r.hl.l &= (0xFF ^ (0x01 << 7))
+	cpu.r.hl.l &= 0xFF ^ (0x01 << 7)
 	return resLCycles
 }
 
 func res0MemHl(cpu *cpu) cycleCount {
 	// Reset the 0 bit of the position of memory pointed by the register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl &= (0xFF ^ (0x01 << 0))
+	memHl &= 0xFF ^ (0x01 << 0)
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res1MemHl(cpu *cpu) cycleCount {
 	// Reset the 1 bit of the position of memory pointed by the register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl &= (0xFF ^ (0x01 << 1))
+	memHl &= 0xFF ^ (0x01 << 1)
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res2MemHl(cpu *cpu) cycleCount {
 	// Reset the 2 bit of the position of memory pointed by the register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl &= (0xFF ^ (0x01 << 2))
+	memHl &= 0xFF ^ (0x01 << 2)
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res3MemHl(cpu *cpu) cycleCount {
 	// Reset the 3 bit of the position of memory pointed by the register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl &= (0xFF ^ (0x01 << 3))
+	memHl &= 0xFF ^ (0x01 << 3)
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res4MemHl(cpu *cpu) cycleCount {
 	// Reset the 4 bit of the position of memory pointed by the register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl &= (0xFF ^ (0x01 << 4))
+	memHl &= 0xFF ^ (0x01 << 4)
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res5MemHl(cpu *cpu) cycleCount {
 	// Reset the 5 bit of the position of memory pointed by the register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl &= (0xFF ^ (0x01 << 5))
+	memHl &= 0xFF ^ (0x01 << 5)
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res6MemHl(cpu *cpu) cycleCount {
 	// Reset the 6 bit of the position of memory pointed by the register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl &= (0xFF ^ (0x01 << 6))
+	memHl &= 0xFF ^ (0x01 << 6)
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
 func res7MemHl(cpu *cpu) cycleCount {
 	// Reset the 7 bit of the position of memory pointed by the register HL
 	memHl := cpu.mmu.ReadByte(cpu.r.hlAsAddress())
-	memHl &= (0xFF ^ (0x01 << 7))
+	memHl &= 0xFF ^ (0x01 << 7)
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), memHl)
 	return resMemHlCycles
 }
@@ -5330,7 +5544,9 @@ func res7MemHl(cpu *cpu) cycleCount {
 func jp(cpu *cpu) cycleCount {
 	// Jump to address nn
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	low := cpu.fetch()
+	high := cpu.fetch()
+	cpu.r.pc = word(high)>>8 + word(low&0xFF)
 	return jpCycles
 }
 
@@ -5353,25 +5569,45 @@ func jp(cpu *cpu) cycleCount {
 func jpNZ(cpu *cpu) cycleCount {
 	// Jump to address nn if the flag Z is reset
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	low := cpu.fetch()
+	high := cpu.fetch()
+	if !cpu.r.af.f.z {
+		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		return jpCycles
+	}
 	return jpNZCycles
 }
 func jpZ(cpu *cpu) cycleCount {
 	// Jump to address nn if the flag Z is set
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	low := cpu.fetch()
+	high := cpu.fetch()
+	if cpu.r.af.f.z {
+		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		return jpCycles
+	}
 	return jpZCycles
 }
 func jpNC(cpu *cpu) cycleCount {
 	// Jump to address nn if the flag C is reset
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	low := cpu.fetch()
+	high := cpu.fetch()
+	if !cpu.r.af.f.c {
+		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		return jpCycles
+	}
 	return jpNCCycles
 }
 func jpC(cpu *cpu) cycleCount {
 	// Jump to address nn if the flag C is set
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	low := cpu.fetch()
+	high := cpu.fetch()
+	if cpu.r.af.f.c {
+		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		return jpCycles
+	}
 	return jpCCycles
 }
 
@@ -5382,9 +5618,9 @@ func jpC(cpu *cpu) cycleCount {
 // 		Instruction 	Parameters 		Opcode 		Cycles
 // 		JP 				(HL) 			E9 			4
 
-func jpMemHl(cpu *cpu) cycleCount {
+func jpHl(cpu *cpu) cycleCount {
 	// Jump to address contained in register HL
-	// TODO: To implement
+	cpu.r.pc = cpu.r.hlAsWord()
 	return jpMemHlCycles
 }
 
@@ -5397,9 +5633,10 @@ func jpMemHl(cpu *cpu) cycleCount {
 // 		Instruction 	Parameters 		Opcode 		Cycles
 // 		JR 				n 				18 			8
 func jr(cpu *cpu) cycleCount {
-	// Adds current address + nn, and jumps to it
-	// (nn: parameter from immediate value)
-	// TODO: To implement
+	// Adds current address + n, and jumps to it
+	// (n: parameter from immediate value)
+	n := cpu.fetch()
+	cpu.r.pc += word(n)
 	return jrCycles
 }
 
@@ -5423,28 +5660,44 @@ func jrNZ(cpu *cpu) cycleCount {
 	// If the flag Z is reset, then
 	// adds current address + nn, and jumps to it
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	n := cpu.fetch()
+	if !cpu.r.af.f.z {
+		cpu.r.pc += word(n)
+		return jrCycles
+	}
 	return jrNZCycles
 }
 func jrZ(cpu *cpu) cycleCount {
 	// If the flag Z is set, then
 	// adds current address + nn, and jumps to it
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	n := cpu.fetch()
+	if cpu.r.af.f.z {
+		cpu.r.pc += word(n)
+		return jrCycles
+	}
 	return jrZCycles
 }
 func jrNC(cpu *cpu) cycleCount {
 	// If the flag C is reset, then
 	// adds current address + nn, and jumps to it
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	n := cpu.fetch()
+	if !cpu.r.af.f.c {
+		cpu.r.pc += word(n)
+		return jrCycles
+	}
 	return jrNCCycles
 }
 func jrC(cpu *cpu) cycleCount {
 	// If the flag C is set, then
 	// adds current address + nn, and jumps to it
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	n := cpu.fetch()
+	if cpu.r.af.f.c {
+		cpu.r.pc += word(n)
+		return jrCycles
+	}
 	return jrCCycles
 }
 
@@ -5464,7 +5717,14 @@ func call(cpu *cpu) cycleCount {
 	// Push the address of the next instruction onto stack
 	// and jump to address nn
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	low := cpu.fetch()
+	high := cpu.fetch()
+	nextInstruction := cpu.r.pc+1
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.low())
+	cpu.r.pc = word(high)>>8 + word(low&0xFF)
 	return callCycles
 }
 
@@ -5489,7 +5749,17 @@ func callNZ(cpu *cpu) cycleCount {
 	// push the address of the next instruction onto stack
 	// and jump to address nn
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	low := cpu.fetch()
+	high := cpu.fetch()
+	if !cpu.r.af.f.z {
+		nextInstruction := cpu.r.pc+1
+		cpu.r.sp--
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
+		cpu.r.sp--
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.low())
+		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		return callCycles
+	}
 	return callNZCycles
 }
 func callZ(cpu *cpu) cycleCount {
@@ -5497,7 +5767,17 @@ func callZ(cpu *cpu) cycleCount {
 	// push the address of the next instruction onto stack
 	// and jump to address nn
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	low := cpu.fetch()
+	high := cpu.fetch()
+	if cpu.r.af.f.z {
+		nextInstruction := cpu.r.pc+1
+		cpu.r.sp--
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
+		cpu.r.sp--
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.low())
+		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		return callCycles
+	}
 	return callZCycles
 }
 func callNC(cpu *cpu) cycleCount {
@@ -5505,7 +5785,17 @@ func callNC(cpu *cpu) cycleCount {
 	// push the address of the next instruction onto stack
 	// and jump to address nn
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	low := cpu.fetch()
+	high := cpu.fetch()
+	if !cpu.r.af.f.c {
+		nextInstruction := cpu.r.pc+1
+		cpu.r.sp--
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
+		cpu.r.sp--
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.low())
+		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		return callCycles
+	}
 	return callNCCycles
 }
 func callC(cpu *cpu) cycleCount {
@@ -5513,11 +5803,21 @@ func callC(cpu *cpu) cycleCount {
 	// push the address of the next instruction onto stack
 	// and jump to address nn
 	// (nn: parameter from immediate value)
-	// TODO: To implement
+	low := cpu.fetch()
+	high := cpu.fetch()
+	if cpu.r.af.f.c {
+		nextInstruction := cpu.r.pc+1
+		cpu.r.sp--
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
+		cpu.r.sp--
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.low())
+		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		return callCycles
+	}
 	return callCCycles
 }
 
-//3.3.10. Restarts
+// 3.3.10. Restarts
 
 // 3.3.10.1. RST n
 // Description:
@@ -5539,49 +5839,81 @@ func callC(cpu *cpu) cycleCount {
 func rst00H(cpu *cpu) cycleCount {
 	// Push current address to stack
 	// and jumps to 0x00
-	// TODO: To implement
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.high())
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.low())
+	cpu.r.pc = 0x00
 	return rst00HCycles
 }
 func rst08H(cpu *cpu) cycleCount {
 	// Push current address to stack
 	// and jumps to 0x08
-	// TODO: To implement
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.high())
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.low())
+	cpu.r.pc = 0x08
 	return rst08HCycles
 }
 func rst10H(cpu *cpu) cycleCount {
 	// Push current address to stack
 	// and jumps to 0x10
-	// TODO: To implement
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.high())
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.low())
+	cpu.r.pc = 0x10
 	return rst10HCycles
 }
 func rst18H(cpu *cpu) cycleCount {
 	// Push current address to stack
 	// and jumps to 0x18
-	// TODO: To implement
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.high())
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.low())
+	cpu.r.pc = 0x18
 	return rst18HCycles
 }
 func rst20H(cpu *cpu) cycleCount {
 	// Push current address to stack
 	// and jumps to 0x20
-	// TODO: To implement
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.high())
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.low())
+	cpu.r.pc = 0x20
 	return rst20HCycles
 }
 func rst28H(cpu *cpu) cycleCount {
 	// Push current address to stack
 	// and jumps to 0x28
-	// TODO: To implement
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.high())
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.low())
+	cpu.r.pc = 0x28
 	return rst28HCycles
 }
 func rst30H(cpu *cpu) cycleCount {
 	// Push current address to stack
 	// and jumps to 0x30
-	// TODO: To implement
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.high())
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.low())
+	cpu.r.pc = 0x30
 	return rst30HCycles
 }
 func rst38H(cpu *cpu) cycleCount {
 	// Push current address to stack
 	// and jumps to 0x38
-	// TODO: To implement
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.high())
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.low())
+	cpu.r.pc = 0x38
 	return rst38HCycles
 }
 
@@ -5597,7 +5929,11 @@ func rst38H(cpu *cpu) cycleCount {
 func ret(cpu *cpu) cycleCount {
 	// Pop two bytes from stack,
 	// and jump to that address.
-	// TODO: To implement
+	low := cpu.mmu.ReadByte(cpu.r.spAsAddress())
+	cpu.r.sp++
+	high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
+	cpu.r.sp++
+	cpu.r.pc = word(high)>>8 + word(low&0xFF)
 	return retCycles
 }
 
@@ -5615,12 +5951,20 @@ func ret(cpu *cpu) cycleCount {
 // 		RET 			Z 				C8 			8
 // 		RET 			NC 				D0 			8
 // 		RET 			C 				D8 			8
+const retccTrueCycles = 20
 
 func retNZ(cpu *cpu) cycleCount {
 	// If Z flag is reset, then
 	// pop two bytes from stack,
 	// and jump to that address.
-	// TODO: To implement
+	if !cpu.r.af.f.z{
+		low := cpu.mmu.ReadByte(cpu.r.spAsAddress())
+		cpu.r.sp++
+		high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
+		cpu.r.sp++
+		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		return retccTrueCycles
+	}
 	return retNZCycles
 }
 
@@ -5628,7 +5972,14 @@ func retZ(cpu *cpu) cycleCount {
 	// If Z flag is set, then
 	// pop two bytes from stack,
 	// and jump to that address.
-	// TODO: To implement
+	if cpu.r.af.f.z{
+		low := cpu.mmu.ReadByte(cpu.r.spAsAddress())
+		cpu.r.sp++
+		high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
+		cpu.r.sp++
+		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		return retccTrueCycles
+	}
 	return retZCycles
 }
 
@@ -5636,7 +5987,14 @@ func retNC(cpu *cpu) cycleCount {
 	// If C flag is reset, then
 	// pop two bytes from stack,
 	// and jump to that address.
-	// TODO: To implement
+	if !cpu.r.af.f.c{
+		low := cpu.mmu.ReadByte(cpu.r.spAsAddress())
+		cpu.r.sp++
+		high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
+		cpu.r.sp++
+		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		return retccTrueCycles
+	}
 	return retNCCycles
 }
 
@@ -5644,7 +6002,14 @@ func retC(cpu *cpu) cycleCount {
 	// If C flag is set, then
 	// pop two bytes from stack,
 	// and jump to that address.
-	// TODO: To implement
+	if !cpu.r.af.f.c{
+		low := cpu.mmu.ReadByte(cpu.r.spAsAddress())
+		cpu.r.sp++
+		high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
+		cpu.r.sp++
+		cpu.r.pc = word(high)>>8 + word(low&0xFF)
+		return retccTrueCycles
+	}
 	return retCCycles
 }
 
@@ -5660,6 +6025,11 @@ func reti(cpu *cpu) cycleCount {
 	// Pop two bytes from stack
 	// and jump to that address.
 	// Then, enable interrumpts
-	// TODO: To implement
+	low := cpu.mmu.ReadByte(cpu.r.spAsAddress())
+	cpu.r.sp++
+	high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
+	cpu.r.sp++
+	cpu.r.pc = word(high)>>8 + word(low&0xFF)
+	cpu.interruptsEnabled = true
 	return retiCycles
 }

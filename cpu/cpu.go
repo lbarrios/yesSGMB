@@ -10,7 +10,8 @@ type cpu struct {
 	r                 Registers
 	mmu               mmu.MMU
 	cycle             cycleCount
-	InterruptsEnabled bool
+	interruptsEnabled bool
+	halted            bool
 }
 
 func NewCPU(mmu mmu.MMU) *cpu {
@@ -34,6 +35,11 @@ func (cpu *cpu) Reset() {
 	cpu.r.hl.l = 0
 }
 
+func (cpu *cpu) Stop() {
+	// TODO: to implement
+	cpu.Reset()
+}
+
 func (cpu *cpu) Step() {
 	op := cpu.fetch()
 	instr := cpu.decode(op)
@@ -42,7 +48,7 @@ func (cpu *cpu) Step() {
 }
 
 func (cpu *cpu) fetch() byte {
-	address := mmu.Address{High: cpu.r.pcHigh(), Low: cpu.r.pcLow()}
+	address := mmu.Address{High: cpu.r.pc.high(), Low: cpu.r.pc.low()}
 	opcode := cpu.mmu.ReadByte(address)
 	cpu.r.pc++
 	return opcode

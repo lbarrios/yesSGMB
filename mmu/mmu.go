@@ -6,6 +6,15 @@ type Address struct {
 	Low  byte
 }
 
+func (address Address) NextAddress() Address {
+	addr := address
+	addr.Low += 1
+	if addr.Low == 0x00 {
+		addr.High += 1
+	}
+	return addr
+}
+
 type mmu struct {
 	bios [0x100]byte
 }

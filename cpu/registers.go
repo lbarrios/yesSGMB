@@ -15,6 +15,23 @@ type Flags struct {
 	_ bool // to complete 1 byte
 }
 
+func (f *Flags) asByte() byte {
+	var r byte
+	if f.z {
+		r += 1 >> 8
+	}
+	if f.n {
+		r += 1 >> 7
+	}
+	if f.h {
+		r += 1 >> 6
+	}
+	if f.c {
+		r += 1 >> 5
+	}
+	return r
+}
+
 type Registers struct {
 	af struct {
 		a byte  // high
@@ -72,24 +89,32 @@ func (r Registers) hlAsAddress() mmu.Address {
 	addr := mmu.Address{High: r.hl.h, Low: r.hl.l}
 	return addr
 }
+func (r Registers) spAsAddress() mmu.Address {
+	addr := mmu.Address{High: r.sp.high(), Low: r.sp.low()}
+	return addr
+}
 
 /**
 	Registers as Low or High nibbles
+	(get low or high nibbles of a Byte)
  */
-func (r Registers) spLow() byte {
-	return byte(r.sp & 0x0f)
+func lowNibble(b byte) byte {
+	return byte(b & 0x0F)
 }
 
-func (r Registers) spHigh() byte {
-	return byte(r.sp >> 8)
+func highNibble(b byte) byte {
+	return byte((b & 0xF0) >> 4)
 }
 
-func (r Registers) pcLow() byte {
-	return byte(r.sp & 0x0f)
+/**
+	Registers as Low or High bytes
+	(get low or high parts of a Word)
+ */
+func (w *word) low() byte {
+	return byte(*w & 0xFF)
 }
-
-func (r Registers) pcHigh() byte {
-	return byte(r.sp >> 8)
+func (w *word) high() byte {
+	return byte(*w >> 8)
 }
 
 /*

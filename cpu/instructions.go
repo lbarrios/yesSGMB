@@ -226,7 +226,7 @@ const (
 	xDBCycles       = 0  // 0xDB
 	callCCycles     = 12 // 0xDC
 	xDDCycles       = 0  // 0xDD
-	sbcANnCycles       = 8  // 0xDE
+	sbcANnCycles    = 8  // 0xDE
 	rst18HCycles    = 32 // 0xDF
 	ldStackNACycles = 12 // 0xE0
 	popHlCycles     = 12 // 0xE1
@@ -398,7 +398,7 @@ var op = [0x100] instructions{
 	addAH,          //0x84
 	addAL,          //0x85
 	addAMemHl,      //0x86
-	addAA,           //0x87
+	addAA,          //0x87
 	adcAB,          //0x88
 	adcAC,          //0x89
 	adcAD,          //0x8A
@@ -422,7 +422,7 @@ var op = [0x100] instructions{
 	sbcAH,          //0x9C
 	sbcAL,          //0x9D
 	sbcAMemHl,      //0x9E
-	sbcAA,           //0x9F
+	sbcAA,          //0x9F
 	andAB,          //0xA0
 	andAC,          //0xA1
 	andAD,          //0xA2
@@ -485,7 +485,7 @@ var op = [0x100] instructions{
 	nonImplemented, //0xDB
 	callC,          //0xDC
 	nonImplemented, //0xDD
-	sbcANn,           //0xDE
+	sbcANn,         //0xDE
 	rst18H,         //0xDF
 	ldStackNA,      //0xE0
 	popHl,          //0xE1
@@ -1290,7 +1290,7 @@ func popHl(cpu *cpu) cycleCount {
 
 func addAA(cpu *cpu) cycleCount {
 	// Add the value of register A into register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a += cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
@@ -1301,7 +1301,7 @@ func addAA(cpu *cpu) cycleCount {
 
 func addAB(cpu *cpu) cycleCount {
 	// Add the value of register B into register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a += cpu.r.bc.b
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
@@ -1312,7 +1312,7 @@ func addAB(cpu *cpu) cycleCount {
 
 func addAC(cpu *cpu) cycleCount {
 	// Add the value of register C into register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a += cpu.r.bc.c
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
@@ -1323,7 +1323,7 @@ func addAC(cpu *cpu) cycleCount {
 
 func addAD(cpu *cpu) cycleCount {
 	// Add the value of register D into register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a += cpu.r.de.d
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
@@ -1334,7 +1334,7 @@ func addAD(cpu *cpu) cycleCount {
 
 func addAE(cpu *cpu) cycleCount {
 	// Add the value of register E into register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a += cpu.r.de.e
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
@@ -1345,7 +1345,7 @@ func addAE(cpu *cpu) cycleCount {
 
 func addAH(cpu *cpu) cycleCount {
 	// Add the value of register H into register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a += cpu.r.hl.h
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
@@ -1356,7 +1356,7 @@ func addAH(cpu *cpu) cycleCount {
 
 func addAL(cpu *cpu) cycleCount {
 	// Add the value of register L into register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a += cpu.r.hl.l
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
@@ -1401,7 +1401,7 @@ func addANn(cpu *cpu) cycleCount {
 
 func adcAA(cpu *cpu) cycleCount {
 	// Add (A+Carry) into register A.
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
@@ -1410,7 +1410,7 @@ func adcAA(cpu *cpu) cycleCount {
 }
 func adcAB(cpu *cpu) cycleCount {
 	// Add (B+Carry) into register A.
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
@@ -1419,7 +1419,7 @@ func adcAB(cpu *cpu) cycleCount {
 }
 func adcAC(cpu *cpu) cycleCount {
 	// Add (C+Carry) into register A.
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
@@ -1428,7 +1428,7 @@ func adcAC(cpu *cpu) cycleCount {
 }
 func adcAD(cpu *cpu) cycleCount {
 	// Add (D+Carry) into register A.
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
@@ -1437,7 +1437,7 @@ func adcAD(cpu *cpu) cycleCount {
 }
 func adcAE(cpu *cpu) cycleCount {
 	// Add (E+Carry) into register A.
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
@@ -1446,7 +1446,7 @@ func adcAE(cpu *cpu) cycleCount {
 }
 func adcAH(cpu *cpu) cycleCount {
 	// Add (H+Carry) into register A.
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
@@ -1455,7 +1455,7 @@ func adcAH(cpu *cpu) cycleCount {
 }
 func adcAL(cpu *cpu) cycleCount {
 	// Add (L+Carry) into register A.
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
@@ -1464,7 +1464,7 @@ func adcAL(cpu *cpu) cycleCount {
 }
 func adcAMemHl(cpu *cpu) cycleCount {
 	// Add (MemHl+Carry) into register A.
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
@@ -1473,7 +1473,7 @@ func adcAMemHl(cpu *cpu) cycleCount {
 }
 func adcANn(cpu *cpu) cycleCount {
 	// Add (Nn+Carry) into register A.
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH((oldA & 0x0F) < (cpu.r.af.a & 0x0F))
@@ -1505,7 +1505,7 @@ func adcANn(cpu *cpu) cycleCount {
 
 func subAA(cpu *cpu) cycleCount {
 	// Subtract the value of register A to register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a -= cpu.r.af.a
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(true)
@@ -1516,7 +1516,7 @@ func subAA(cpu *cpu) cycleCount {
 
 func subAB(cpu *cpu) cycleCount {
 	// Subtract the value of register A to register B
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a -= cpu.r.bc.b
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(true)
@@ -1527,7 +1527,7 @@ func subAB(cpu *cpu) cycleCount {
 
 func subAC(cpu *cpu) cycleCount {
 	// Subtract the value of register C to register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a -= cpu.r.bc.c
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(true)
@@ -1538,7 +1538,7 @@ func subAC(cpu *cpu) cycleCount {
 
 func subAD(cpu *cpu) cycleCount {
 	// Subtract the value of register D to register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a -= cpu.r.de.d
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(true)
@@ -1549,7 +1549,7 @@ func subAD(cpu *cpu) cycleCount {
 
 func subAE(cpu *cpu) cycleCount {
 	// Subtract the value of register E to register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a -= cpu.r.de.e
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(true)
@@ -1560,7 +1560,7 @@ func subAE(cpu *cpu) cycleCount {
 
 func subAH(cpu *cpu) cycleCount {
 	// Subtract the value of register H to register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a -= cpu.r.hl.h
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(true)
@@ -1571,7 +1571,7 @@ func subAH(cpu *cpu) cycleCount {
 
 func subAL(cpu *cpu) cycleCount {
 	// Subtract the value of register L to register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a -= cpu.r.hl.l
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(true)
@@ -2122,7 +2122,7 @@ func cpAN(cpu *cpu) cycleCount {
 
 func incA(cpu *cpu) cycleCount {
 	// Increment register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a++
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(false)
@@ -2131,7 +2131,7 @@ func incA(cpu *cpu) cycleCount {
 }
 func incB(cpu *cpu) cycleCount {
 	// Increment register B
-	var oldB = cpu.r.bc.b
+	oldB := cpu.r.bc.b
 	cpu.r.bc.b++
 	cpu.r.setFlagZ(cpu.r.bc.b == 0)
 	cpu.r.setFlagN(false)
@@ -2140,7 +2140,7 @@ func incB(cpu *cpu) cycleCount {
 }
 func incC(cpu *cpu) cycleCount {
 	// Increment register C
-	var oldC = cpu.r.bc.c
+	oldC := cpu.r.bc.c
 	cpu.r.bc.c++
 	cpu.r.setFlagZ(cpu.r.bc.c == 0)
 	cpu.r.setFlagN(false)
@@ -2149,7 +2149,7 @@ func incC(cpu *cpu) cycleCount {
 }
 func incD(cpu *cpu) cycleCount {
 	// Increment register D
-	var oldD = cpu.r.de.d
+	oldD := cpu.r.de.d
 	cpu.r.de.d++
 	cpu.r.setFlagZ(cpu.r.de.d == 0)
 	cpu.r.setFlagN(false)
@@ -2158,7 +2158,7 @@ func incD(cpu *cpu) cycleCount {
 }
 func incE(cpu *cpu) cycleCount {
 	// Increment register E
-	var oldE = cpu.r.de.e
+	oldE := cpu.r.de.e
 	cpu.r.de.e++
 	cpu.r.setFlagZ(cpu.r.de.e == 0)
 	cpu.r.setFlagN(false)
@@ -2167,7 +2167,7 @@ func incE(cpu *cpu) cycleCount {
 }
 func incH(cpu *cpu) cycleCount {
 	// Increment register H
-	var oldH = cpu.r.hl.h
+	oldH := cpu.r.hl.h
 	cpu.r.hl.h++
 	cpu.r.setFlagZ(cpu.r.hl.h == 0)
 	cpu.r.setFlagN(false)
@@ -2176,7 +2176,7 @@ func incH(cpu *cpu) cycleCount {
 }
 func incL(cpu *cpu) cycleCount {
 	// Increment register L
-	var oldL = cpu.r.hl.l
+	oldL := cpu.r.hl.l
 	cpu.r.hl.l++
 	cpu.r.setFlagZ(cpu.r.hl.l == 0)
 	cpu.r.setFlagN(false)
@@ -2213,7 +2213,7 @@ func incMemHl(cpu *cpu) cycleCount {
 
 func decA(cpu *cpu) cycleCount {
 	// Decrement register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a--
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	cpu.r.setFlagN(true)
@@ -2222,7 +2222,7 @@ func decA(cpu *cpu) cycleCount {
 }
 func decB(cpu *cpu) cycleCount {
 	// Decrement register B
-	var oldB = cpu.r.bc.b
+	oldB := cpu.r.bc.b
 	cpu.r.bc.b--
 	cpu.r.setFlagZ(cpu.r.bc.b == 0)
 	cpu.r.setFlagN(true)
@@ -2231,7 +2231,7 @@ func decB(cpu *cpu) cycleCount {
 }
 func decC(cpu *cpu) cycleCount {
 	// Decrement register C
-	var oldC = cpu.r.bc.c
+	oldC := cpu.r.bc.c
 	cpu.r.bc.c--
 	cpu.r.setFlagZ(cpu.r.bc.c == 0)
 	cpu.r.setFlagN(true)
@@ -2240,7 +2240,7 @@ func decC(cpu *cpu) cycleCount {
 }
 func decD(cpu *cpu) cycleCount {
 	// Decrement register D
-	var oldD = cpu.r.de.d
+	oldD := cpu.r.de.d
 	cpu.r.de.d--
 	cpu.r.setFlagZ(cpu.r.de.d == 0)
 	cpu.r.setFlagN(true)
@@ -2249,7 +2249,7 @@ func decD(cpu *cpu) cycleCount {
 }
 func decE(cpu *cpu) cycleCount {
 	// Decrement register E
-	var oldE = cpu.r.de.e
+	oldE := cpu.r.de.e
 	cpu.r.de.e--
 	cpu.r.setFlagZ(cpu.r.de.e == 0)
 	cpu.r.setFlagN(true)
@@ -2258,7 +2258,7 @@ func decE(cpu *cpu) cycleCount {
 }
 func decH(cpu *cpu) cycleCount {
 	// Decrement register H
-	var oldH = cpu.r.hl.h
+	oldH := cpu.r.hl.h
 	cpu.r.hl.h--
 	cpu.r.setFlagZ(cpu.r.hl.h == 0)
 	cpu.r.setFlagN(true)
@@ -2267,7 +2267,7 @@ func decH(cpu *cpu) cycleCount {
 }
 func decL(cpu *cpu) cycleCount {
 	// Decrement register L
-	var oldL = cpu.r.hl.l
+	oldL := cpu.r.hl.l
 	cpu.r.hl.l--
 	cpu.r.setFlagZ(cpu.r.hl.l == 0)
 	cpu.r.setFlagN(true)
@@ -2301,8 +2301,8 @@ func decMemHl(cpu *cpu) cycleCount {
 
 func addHlBc(cpu *cpu) cycleCount {
 	// Add the value of register BC into register HL
-	var carry = byte((uint16(cpu.r.hl.l) + uint16(cpu.r.bc.c)) >> 8)
-	var oldH = cpu.r.hl.h
+	carry := byte((uint16(cpu.r.hl.l) + uint16(cpu.r.bc.c)) >> 8)
+	oldH := cpu.r.hl.h
 	cpu.r.hl.l += cpu.r.bc.c
 	cpu.r.hl.h += carry + cpu.r.bc.b
 	cpu.r.setFlagN(false)
@@ -2313,8 +2313,8 @@ func addHlBc(cpu *cpu) cycleCount {
 
 func addHlDe(cpu *cpu) cycleCount {
 	// Add the value of register DE into register HL
-	var carry = byte((uint16(cpu.r.hl.l) + uint16(cpu.r.de.e)) >> 8)
-	var oldH = cpu.r.hl.h
+	carry := byte((uint16(cpu.r.hl.l) + uint16(cpu.r.de.e)) >> 8)
+	oldH := cpu.r.hl.h
 	cpu.r.hl.l += cpu.r.de.e
 	cpu.r.hl.h += carry + cpu.r.de.d
 	cpu.r.setFlagN(false)
@@ -2325,8 +2325,8 @@ func addHlDe(cpu *cpu) cycleCount {
 
 func addHlHl(cpu *cpu) cycleCount {
 	// Add the value of register HL into register HL
-	var carry = byte((uint16(cpu.r.hl.l) + uint16(cpu.r.hl.l)) >> 8)
-	var oldH = cpu.r.hl.h
+	carry := byte((uint16(cpu.r.hl.l) + uint16(cpu.r.hl.l)) >> 8)
+	oldH := cpu.r.hl.h
 	cpu.r.hl.l += cpu.r.hl.l
 	cpu.r.hl.h += carry + cpu.r.hl.h
 	cpu.r.setFlagN(false)
@@ -2337,8 +2337,8 @@ func addHlHl(cpu *cpu) cycleCount {
 
 func addHlSp(cpu *cpu) cycleCount {
 	// Add the value of register SP into register HL
-	var carry = byte((uint16(cpu.r.hl.l) + uint16(byte(cpu.r.spLow()))) >> 8)
-	var oldH = cpu.r.hl.h
+	carry := byte((uint16(cpu.r.hl.l) + uint16(byte(cpu.r.spLow()))) >> 8)
+	oldH := cpu.r.hl.h
 	cpu.r.hl.l += cpu.r.spLow()
 	cpu.r.hl.h += carry + cpu.r.spHigh()
 	cpu.r.setFlagN(false)
@@ -2363,7 +2363,7 @@ func addHlSp(cpu *cpu) cycleCount {
 
 func addSpN(cpu *cpu) cycleCount {
 	// Add the immediate value N to Stack Pointer (SP)
-	var oldSpHigh = cpu.r.spHigh()
+	oldSpHigh := cpu.r.spHigh()
 	//cpu.r.sp += N
 	// TODO: To implement
 	cpu.r.setFlagZ(false)
@@ -2389,7 +2389,7 @@ func addSpN(cpu *cpu) cycleCount {
 
 func incBc(cpu *cpu) cycleCount {
 	// Increment register BC
-	var bc = cpu.r.bcAsInt()
+	bc := cpu.r.bcAsInt()
 	bc++
 	cpu.r.bc.c = byte(bc & 0xff)
 	cpu.r.bc.b = byte(bc >> 8)
@@ -2397,7 +2397,7 @@ func incBc(cpu *cpu) cycleCount {
 }
 func incDe(cpu *cpu) cycleCount {
 	// Increment register DE
-	var de = cpu.r.deAsInt()
+	de := cpu.r.deAsInt()
 	de++
 	cpu.r.de.e = byte(de & 0xff)
 	cpu.r.de.d = byte(de >> 8)
@@ -2405,7 +2405,7 @@ func incDe(cpu *cpu) cycleCount {
 }
 func incHl(cpu *cpu) cycleCount {
 	// Increment register HL
-	var hl = cpu.r.hlAsInt()
+	hl := cpu.r.hlAsInt()
 	hl++
 	cpu.r.hl.l = byte(hl & 0xff)
 	cpu.r.hl.h = byte(hl >> 8)
@@ -2433,7 +2433,7 @@ func incSp(cpu *cpu) cycleCount {
 
 func decBc(cpu *cpu) cycleCount {
 	// Decrement register BC
-	var bc = cpu.r.bcAsInt()
+	bc := cpu.r.bcAsInt()
 	bc--
 	cpu.r.bc.c = byte(bc & 0xff)
 	cpu.r.bc.b = byte(bc >> 8)
@@ -2441,7 +2441,7 @@ func decBc(cpu *cpu) cycleCount {
 }
 func decDe(cpu *cpu) cycleCount {
 	// Decrement register DE
-	var de = cpu.r.deAsInt()
+	de := cpu.r.deAsInt()
 	de--
 	cpu.r.de.e = byte(de & 0xff)
 	cpu.r.de.d = byte(de >> 8)
@@ -2449,7 +2449,7 @@ func decDe(cpu *cpu) cycleCount {
 }
 func decHl(cpu *cpu) cycleCount {
 	// Decrement register HL
-	var hl = cpu.r.hlAsInt()
+	hl := cpu.r.hlAsInt()
 	hl--
 	cpu.r.hl.l = byte(hl & 0xff)
 	cpu.r.hl.h = byte(hl >> 8)
@@ -2499,7 +2499,7 @@ func swap(cpu *cpu) cycleCount {
 	// Swap upper & lower nibles
 	// This function gets the next opcode from memory,
 	// and calls to the corresponding function
-	var nextOpcode = byte(0)
+	nextOpcode := byte(0)
 	// TODO: Read the next opcode from memory
 	cpu.r.setFlagN(false)
 	cpu.r.setFlagH(false)
@@ -2509,49 +2509,49 @@ func swap(cpu *cpu) cycleCount {
 
 func swapA(cpu *cpu) cycleCount {
 	// Swap upper & lower nibles of register A
-	var oldA = cpu.r.af.a
+	oldA := cpu.r.af.a
 	cpu.r.af.a = byte(oldA<<4) + byte(oldA<<4)
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
 	return 8
 }
 func swapB(cpu *cpu) cycleCount {
 	// Swap upper & lower nibles of register B
-	var oldB = cpu.r.bc.b
+	oldB := cpu.r.bc.b
 	cpu.r.bc.b = byte(oldB<<4) + byte(oldB<<4)
 	cpu.r.setFlagZ(cpu.r.bc.b == 0)
 	return 8
 }
 func swapC(cpu *cpu) cycleCount {
 	// Swap upper & lower nibles of register C
-	var oldC = cpu.r.bc.c
+	oldC := cpu.r.bc.c
 	cpu.r.bc.c = byte(oldC<<4) + byte(oldC<<4)
 	cpu.r.setFlagZ(cpu.r.bc.c == 0)
 	return 8
 }
 func swapD(cpu *cpu) cycleCount {
 	// Swap upper & lower nibles of register D
-	var oldD = cpu.r.de.d
+	oldD := cpu.r.de.d
 	cpu.r.de.d = byte(oldD<<4) + byte(oldD<<4)
 	cpu.r.setFlagZ(cpu.r.de.d == 0)
 	return 8
 }
 func swapE(cpu *cpu) cycleCount {
 	// Swap upper & lower nibles of register E
-	var oldE = cpu.r.de.e
+	oldE := cpu.r.de.e
 	cpu.r.de.e = byte(oldE<<4) + byte(oldE<<4)
 	cpu.r.setFlagZ(cpu.r.de.e == 0)
 	return 8
 }
 func swapH(cpu *cpu) cycleCount {
 	// Swap upper & lower nibles of register H
-	var oldH = cpu.r.hl.h
+	oldH := cpu.r.hl.h
 	cpu.r.hl.h = byte(oldH<<4) + byte(oldH<<4)
 	cpu.r.setFlagZ(cpu.r.hl.h == 0)
 	return 8
 }
 func swapL(cpu *cpu) cycleCount {
 	// Swap upper & lower nibles of register L
-	var oldL = cpu.r.hl.l
+	oldL := cpu.r.hl.l
 	cpu.r.hl.l = byte(oldL<<4) + byte(oldL<<4)
 	cpu.r.setFlagZ(cpu.r.hl.l == 0)
 	return 8
@@ -2724,7 +2724,7 @@ func ei(cpu *cpu) cycleCount {
 // 		RLCA 			-/- 			07 			4
 func rlcA(cpu *cpu) cycleCount {
 	// Rotate A left 1 bit; A[0] = pre(A)[7]
-	var bit7 = bool(cpu.r.af.a&0x80 == 0x80)
+	bit7 := bool(cpu.r.af.a&0x80 == 0x80)
 
 	cpu.r.af.a = cpu.r.af.a << 1
 	if bit7 {
@@ -2752,7 +2752,7 @@ func rlcA(cpu *cpu) cycleCount {
 func rlA(cpu *cpu) cycleCount {
 	// Rotate A left 1 bit, but through Carry Flag
 	// Note that Carry = A[7] and A[0] = Carry
-	var bit7 = bool(cpu.r.af.a&0x80 == 0x80)
+	bit7 := bool(cpu.r.af.a&0x80 == 0x80)
 
 	cpu.r.af.a = cpu.r.af.a << 1
 	if cpu.r.af.f.c {
@@ -2780,7 +2780,7 @@ func rlA(cpu *cpu) cycleCount {
 func rrcA(cpu *cpu) cycleCount {
 	// Rotate A right 1 bit
 	// Old bit 0 goes to Carry Flag
-	var bit0 = bool(cpu.r.af.a&0x01 == 0x01)
+	bit0 := bool(cpu.r.af.a&0x01 == 0x01)
 
 	cpu.r.af.a = cpu.r.af.a >> 1
 	if bit0 {
@@ -2808,7 +2808,7 @@ func rrcA(cpu *cpu) cycleCount {
 func rrA(cpu *cpu) cycleCount {
 	// Rotate A right 1 bit, but through Carry Flag
 	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
-	var bit0 = bool(cpu.r.af.a&0x01 == 0x01)
+	bit0 := bool(cpu.r.af.a&0x01 == 0x01)
 
 	cpu.r.af.a = cpu.r.af.a >> 1
 	if cpu.r.af.f.c {
@@ -3138,9 +3138,9 @@ const (
 func rxN(cpu *cpu) cycleCount {
 	// Reads one opcode from memory,
 	// and decides which RL/RLC/RR/RRC function to call
-	var nextOpcode = byte(0)
+	nextOpcode := byte(0)
 	// TODO: Read the next opcode from memory
-	var cycles = rxNInstructions[nextOpcode](cpu)
+	cycles := rxNInstructions[nextOpcode](cpu)
 	if cycles < rxNCycles {
 		return rxNCycles
 	}
@@ -3152,7 +3152,7 @@ func rxN(cpu *cpu) cycleCount {
 
 func rlcB(cpu *cpu) cycleCount {
 	// Rotate B left 1 bit; B[0] = pre(B)[7]
-	var bit7 = bool(cpu.r.bc.b&0x80 == 0x80)
+	bit7 := bool(cpu.r.bc.b&0x80 == 0x80)
 
 	cpu.r.bc.b = cpu.r.bc.b << 1
 	if bit7 {
@@ -3168,7 +3168,7 @@ func rlcB(cpu *cpu) cycleCount {
 
 func rlcC(cpu *cpu) cycleCount {
 	// Rotate C left 1 bit; C[0] = pre(C)[7]
-	var bit7 = bool(cpu.r.bc.c&0x80 == 0x80)
+	bit7 := bool(cpu.r.bc.c&0x80 == 0x80)
 
 	cpu.r.bc.c = cpu.r.bc.c << 1
 	if bit7 {
@@ -3184,7 +3184,7 @@ func rlcC(cpu *cpu) cycleCount {
 
 func rlcD(cpu *cpu) cycleCount {
 	// Rotate D left 1 bit; D[0] = pre(D)[7]
-	var bit7 = bool(cpu.r.de.d&0x80 == 0x80)
+	bit7 := bool(cpu.r.de.d&0x80 == 0x80)
 
 	cpu.r.de.d = cpu.r.de.d << 1
 	if bit7 {
@@ -3200,7 +3200,7 @@ func rlcD(cpu *cpu) cycleCount {
 
 func rlcE(cpu *cpu) cycleCount {
 	// Rotate E left 1 bit; E[0] = pre(E)[7]
-	var bit7 = bool(cpu.r.de.e&0x80 == 0x80)
+	bit7 := bool(cpu.r.de.e&0x80 == 0x80)
 
 	cpu.r.de.e = cpu.r.de.e << 1
 	if bit7 {
@@ -3216,7 +3216,7 @@ func rlcE(cpu *cpu) cycleCount {
 
 func rlcH(cpu *cpu) cycleCount {
 	// Rotate H left 1 bit; H[0] = pre(H)[7]
-	var bit7 = bool(cpu.r.hl.h&0x80 == 0x80)
+	bit7 := bool(cpu.r.hl.h&0x80 == 0x80)
 
 	cpu.r.hl.h = cpu.r.hl.h << 1
 	if bit7 {
@@ -3232,7 +3232,7 @@ func rlcH(cpu *cpu) cycleCount {
 
 func rlcL(cpu *cpu) cycleCount {
 	// Rotate L left 1 bit; L[0] = pre(L)[7]
-	var bit7 = bool(cpu.r.hl.l&0x80 == 0x80)
+	bit7 := bool(cpu.r.hl.l&0x80 == 0x80)
 
 	cpu.r.hl.l = cpu.r.hl.l << 1
 	if bit7 {
@@ -3288,7 +3288,7 @@ const (
 func rlB(cpu *cpu) cycleCount {
 	// Rotate B left 1 bit, but through Carry Flag
 	// Note that Carry = B[7] and B[0] = Carry
-	var bit7 = bool(cpu.r.bc.b&0x80 == 0x80)
+	bit7 := bool(cpu.r.bc.b&0x80 == 0x80)
 
 	cpu.r.bc.b = cpu.r.bc.b << 1
 	if cpu.r.af.f.c {
@@ -3305,7 +3305,7 @@ func rlB(cpu *cpu) cycleCount {
 func rlC(cpu *cpu) cycleCount {
 	// Rotate C left 1 bit, but through Carry Flag
 	// Note that Carry = C[7] and C[0] = Carry
-	var bit7 = bool(cpu.r.bc.c&0x80 == 0x80)
+	bit7 := bool(cpu.r.bc.c&0x80 == 0x80)
 
 	cpu.r.bc.c = cpu.r.bc.c << 1
 	if cpu.r.af.f.c {
@@ -3322,7 +3322,7 @@ func rlC(cpu *cpu) cycleCount {
 func rlD(cpu *cpu) cycleCount {
 	// Rotate D left 1 bit, but through Carry Flag
 	// Note that Carry = D[7] and D[0] = Carry
-	var bit7 = bool(cpu.r.de.d&0x80 == 0x80)
+	bit7 := bool(cpu.r.de.d&0x80 == 0x80)
 
 	cpu.r.de.d = cpu.r.de.d << 1
 	if cpu.r.af.f.c {
@@ -3339,7 +3339,7 @@ func rlD(cpu *cpu) cycleCount {
 func rlE(cpu *cpu) cycleCount {
 	// Rotate E left 1 bit, but through Carry Flag
 	// Note that Carry = E[7] and E[0] = Carry
-	var bit7 = bool(cpu.r.de.e&0x80 == 0x80)
+	bit7 := bool(cpu.r.de.e&0x80 == 0x80)
 
 	cpu.r.de.e = cpu.r.de.e << 1
 	if cpu.r.af.f.c {
@@ -3356,7 +3356,7 @@ func rlE(cpu *cpu) cycleCount {
 func rlH(cpu *cpu) cycleCount {
 	// Rotate H left 1 bit, but through Carry Flag
 	// Note that Carry = H[7] and H[0] = Carry
-	var bit7 = bool(cpu.r.hl.h&0x80 == 0x80)
+	bit7 := bool(cpu.r.hl.h&0x80 == 0x80)
 
 	cpu.r.hl.h = cpu.r.hl.h << 1
 	if cpu.r.af.f.c {
@@ -3373,7 +3373,7 @@ func rlH(cpu *cpu) cycleCount {
 func rlL(cpu *cpu) cycleCount {
 	// Rotate L left 1 bit, but through Carry Flag
 	// Note that Carry = L[7] and L[0] = Carry
-	var bit7 = bool(cpu.r.hl.l&0x80 == 0x80)
+	bit7 := bool(cpu.r.hl.l&0x80 == 0x80)
 
 	cpu.r.hl.l = cpu.r.hl.l << 1
 	if cpu.r.af.f.c {
@@ -3429,7 +3429,7 @@ const (
 func rrcB(cpu *cpu) cycleCount {
 	// Rotate B right 1 bit
 	// Old bit 0 goes to Carry Flag
-	var bit0 = bool(cpu.r.bc.b&0x01 == 0x01)
+	bit0 := bool(cpu.r.bc.b&0x01 == 0x01)
 
 	cpu.r.bc.b = cpu.r.bc.b >> 1
 	if bit0 {
@@ -3446,7 +3446,7 @@ func rrcB(cpu *cpu) cycleCount {
 func rrcC(cpu *cpu) cycleCount {
 	// Rotate C right 1 bit
 	// Old bit 0 goes to Carry Flag
-	var bit0 = bool(cpu.r.bc.c&0x01 == 0x01)
+	bit0 := bool(cpu.r.bc.c&0x01 == 0x01)
 
 	cpu.r.bc.c = cpu.r.bc.c >> 1
 	if bit0 {
@@ -3463,7 +3463,7 @@ func rrcC(cpu *cpu) cycleCount {
 func rrcD(cpu *cpu) cycleCount {
 	// Rotate D right 1 bit
 	// Old bit 0 goes to Carry Flag
-	var bit0 = bool(cpu.r.de.d&0x01 == 0x01)
+	bit0 := bool(cpu.r.de.d&0x01 == 0x01)
 
 	cpu.r.de.d = cpu.r.de.d >> 1
 	if bit0 {
@@ -3480,7 +3480,7 @@ func rrcD(cpu *cpu) cycleCount {
 func rrcE(cpu *cpu) cycleCount {
 	// Rotate E right 1 bit
 	// Old bit 0 goes to Carry Flag
-	var bit0 = bool(cpu.r.de.e&0x01 == 0x01)
+	bit0 := bool(cpu.r.de.e&0x01 == 0x01)
 
 	cpu.r.de.e = cpu.r.de.e >> 1
 	if bit0 {
@@ -3497,7 +3497,7 @@ func rrcE(cpu *cpu) cycleCount {
 func rrcH(cpu *cpu) cycleCount {
 	// Rotate H right 1 bit
 	// Old bit 0 goes to Carry Flag
-	var bit0 = bool(cpu.r.hl.h&0x01 == 0x01)
+	bit0 := bool(cpu.r.hl.h&0x01 == 0x01)
 
 	cpu.r.hl.h = cpu.r.hl.h >> 1
 	if bit0 {
@@ -3514,7 +3514,7 @@ func rrcH(cpu *cpu) cycleCount {
 func rrcL(cpu *cpu) cycleCount {
 	// Rotate L right 1 bit
 	// Old bit 0 goes to Carry Flag
-	var bit0 = bool(cpu.r.hl.l&0x01 == 0x01)
+	bit0 := bool(cpu.r.hl.l&0x01 == 0x01)
 
 	cpu.r.hl.l = cpu.r.hl.l >> 1
 	if bit0 {
@@ -3570,7 +3570,7 @@ const (
 func rrB(cpu *cpu) cycleCount {
 	// Rotate B right 1 bit, but through Carry Flag
 	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
-	var bit0 = bool(cpu.r.bc.b&0x01 == 0x01)
+	bit0 := bool(cpu.r.bc.b&0x01 == 0x01)
 
 	cpu.r.bc.b = cpu.r.bc.b >> 1
 	if cpu.r.af.f.c {
@@ -3587,7 +3587,7 @@ func rrB(cpu *cpu) cycleCount {
 func rrC(cpu *cpu) cycleCount {
 	// Rotate C right 1 bit, but through Carry Flag
 	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
-	var bit0 = bool(cpu.r.bc.c&0x01 == 0x01)
+	bit0 := bool(cpu.r.bc.c&0x01 == 0x01)
 
 	cpu.r.bc.c = cpu.r.bc.c >> 1
 	if cpu.r.af.f.c {
@@ -3604,7 +3604,7 @@ func rrC(cpu *cpu) cycleCount {
 func rrD(cpu *cpu) cycleCount {
 	// Rotate D right 1 bit, but through Carry Flag
 	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
-	var bit0 = bool(cpu.r.de.d&0x01 == 0x01)
+	bit0 := bool(cpu.r.de.d&0x01 == 0x01)
 
 	cpu.r.de.d = cpu.r.de.d >> 1
 	if cpu.r.af.f.c {
@@ -3621,7 +3621,7 @@ func rrD(cpu *cpu) cycleCount {
 func rrE(cpu *cpu) cycleCount {
 	// Rotate E right 1 bit, but through Carry Flag
 	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
-	var bit0 = bool(cpu.r.de.e&0x01 == 0x01)
+	bit0 := bool(cpu.r.de.e&0x01 == 0x01)
 
 	cpu.r.de.e = cpu.r.de.e >> 1
 	if cpu.r.af.f.c {
@@ -3638,7 +3638,7 @@ func rrE(cpu *cpu) cycleCount {
 func rrH(cpu *cpu) cycleCount {
 	// Rotate H right 1 bit, but through Carry Flag
 	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
-	var bit0 = bool(cpu.r.hl.h&0x01 == 0x01)
+	bit0 := bool(cpu.r.hl.h&0x01 == 0x01)
 
 	cpu.r.hl.h = cpu.r.hl.h >> 1
 	if cpu.r.af.f.c {
@@ -3655,7 +3655,7 @@ func rrH(cpu *cpu) cycleCount {
 func rrL(cpu *cpu) cycleCount {
 	// Rotate L right 1 bit, but through Carry Flag
 	// Old bit 0 goes to Carry Flag, and old Carry Flag goes to bit 7
-	var bit0 = bool(cpu.r.hl.l&0x01 == 0x01)
+	bit0 := bool(cpu.r.hl.l&0x01 == 0x01)
 
 	cpu.r.hl.l = cpu.r.hl.l >> 1
 	if cpu.r.af.f.c {
@@ -3824,7 +3824,7 @@ const (
 func sraA(cpu *cpu) cycleCount {
 	// Shift A right into carry
 	// A[7] doesn't change
-	var msb = cpu.r.af.a & 0x80
+	msb := cpu.r.af.a & 0x80
 	cpu.r.setFlagC((cpu.r.af.a & 0x01) == 0x01)
 	cpu.r.af.a = (cpu.r.af.a >> 1) | msb // restores MSB
 	cpu.r.setFlagZ(cpu.r.af.a == 0)
@@ -3836,7 +3836,7 @@ func sraA(cpu *cpu) cycleCount {
 func sraB(cpu *cpu) cycleCount {
 	// Shift B right into carry
 	// B[7] doesn't change
-	var msb = cpu.r.bc.b & 0x80
+	msb := cpu.r.bc.b & 0x80
 	cpu.r.setFlagC((cpu.r.bc.b & 0x01) == 0x01)
 	cpu.r.bc.b = (cpu.r.bc.b >> 1) | msb // restores MSB
 	cpu.r.setFlagZ(cpu.r.bc.b == 0)
@@ -3848,7 +3848,7 @@ func sraB(cpu *cpu) cycleCount {
 func sraC(cpu *cpu) cycleCount {
 	// Shift C right into carry
 	// C[7] doesn't change
-	var msb = cpu.r.bc.c & 0x80
+	msb := cpu.r.bc.c & 0x80
 	cpu.r.setFlagC((cpu.r.bc.c & 0x01) == 0x01)
 	cpu.r.bc.c = (cpu.r.bc.c >> 1) | msb // restores MSB
 	cpu.r.setFlagZ(cpu.r.bc.c == 0)
@@ -3860,7 +3860,7 @@ func sraC(cpu *cpu) cycleCount {
 func sraD(cpu *cpu) cycleCount {
 	// Shift D right into carry
 	// D[7] doesn't change
-	var msb = cpu.r.de.d & 0x80
+	msb := cpu.r.de.d & 0x80
 	cpu.r.setFlagC((cpu.r.de.d & 0x01) == 0x01)
 	cpu.r.de.d = (cpu.r.de.d >> 1) | msb // restores MSB
 	cpu.r.setFlagZ(cpu.r.de.d == 0)
@@ -3872,7 +3872,7 @@ func sraD(cpu *cpu) cycleCount {
 func sraE(cpu *cpu) cycleCount {
 	// Shift E right into carry
 	// E[7] doesn't change
-	var msb = cpu.r.de.e & 0x80
+	msb := cpu.r.de.e & 0x80
 	cpu.r.setFlagC((cpu.r.de.e & 0x01) == 0x01)
 	cpu.r.de.e = (cpu.r.de.e >> 1) | msb // restores MSB
 	cpu.r.setFlagZ(cpu.r.de.e == 0)
@@ -3884,7 +3884,7 @@ func sraE(cpu *cpu) cycleCount {
 func sraH(cpu *cpu) cycleCount {
 	// Shift H right into carry
 	// H[7] doesn't change
-	var msb = cpu.r.hl.h & 0x80
+	msb := cpu.r.hl.h & 0x80
 	cpu.r.setFlagC((cpu.r.hl.h & 0x01) == 0x01)
 	cpu.r.hl.h = (cpu.r.hl.h >> 1) | msb // restores MSB
 	cpu.r.setFlagZ(cpu.r.hl.h == 0)
@@ -3896,7 +3896,7 @@ func sraH(cpu *cpu) cycleCount {
 func sraL(cpu *cpu) cycleCount {
 	// Shift L right into carry
 	// L[7] doesn't change
-	var msb = cpu.r.hl.l & 0x80
+	msb := cpu.r.hl.l & 0x80
 	cpu.r.setFlagC((cpu.r.hl.l & 0x01) == 0x01)
 	cpu.r.hl.l = (cpu.r.hl.l >> 1) | msb // restores MSB
 	cpu.r.setFlagZ(cpu.r.hl.l == 0)

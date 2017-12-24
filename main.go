@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
-	"github.com/lbarrios/yesSGMB/cartridge"
-	"github.com/lbarrios/yesSGMB/cpu"
 	"log"
+	"github.com/lbarrios/yesSGMB/cartridge"
+	"github.com/lbarrios/yesSGMB/mmu"
+	"github.com/lbarrios/yesSGMB/cpu"
 )
 
 var (
@@ -20,6 +21,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s", err)
 	}
-
-	cpu.NewCPU()
+	var mmu = mmu.NewMMU()
+	cpu.NewCPU(mmu)
 }

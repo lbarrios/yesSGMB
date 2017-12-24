@@ -4,14 +4,18 @@ package cpu
 
 import (
 	"log"
+	"github.com/lbarrios/yesSGMB/mmu"
 )
 
 type cpu struct {
-	r Registers
+	r                 Registers
+	mmu               mmu.MMU
+	InterruptsEnabled bool
 }
 
-func NewCPU() *cpu {
+func NewCPU(mmu mmu.MMU) *cpu {
 	cpu := new(cpu)
+	cpu.mmu = mmu
 	cpu.Reset()
 	return cpu
 }

@@ -55,9 +55,7 @@ func (r Registers) hlAsWord() word {
 }
 
 func (r Registers) hlAsAddress() mmu.Address {
-	var addr mmu.Address
-	addr.High = r.hl.h
-	addr.Low = r.hl.l
+	addr := mmu.Address{High: r.hl.h, Low: r.hl.l}
 	return addr
 }
 
@@ -66,6 +64,14 @@ func (r Registers) spLow() byte {
 }
 
 func (r Registers) spHigh() byte {
+	return byte(r.sp >> 8)
+}
+
+func (r Registers) pcLow() byte {
+	return byte(r.sp & 0x0f)
+}
+
+func (r Registers) pcHigh() byte {
 	return byte(r.sp >> 8)
 }
 

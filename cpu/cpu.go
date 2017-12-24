@@ -10,6 +10,7 @@ import (
 type cpu struct {
 	r                 Registers
 	mmu               mmu.MMU
+	cycle             cycleCount
 	InterruptsEnabled bool
 }
 
@@ -32,4 +33,28 @@ func (cpu *cpu) Reset() {
 	cpu.r.de.e = 0
 	cpu.r.hl.h = 0
 	cpu.r.hl.l = 0
+}
+
+func (cpu *cpu) Step() {
+	op := cpu.fetch()
+	instr := cpu.decode(op)
+	cycles := cpu.execute(instr)
+	cpu.cycle += cycles
+}
+
+func (cpu *cpu) fetch() byte {
+	address := mmu.Address{High: cpu.r.pcHigh(), Low: cpu.r.pcLow()}
+	op := cpu.mmu.ReadByte(address)
+	cpu.r.pc++
+	return op
+}
+
+func (cpu *cpu) decode(op byte) instruction {
+	instr := operations[op]
+	return instr
+}
+
+func (cpu *cpu) execute(instr instruction) cycleCount {
+	cycles := instr(cpu)
+	return cycles
 }

@@ -1,7 +1,7 @@
 package cpu
 
 type cycleCount int
-type instructions func(*cpu) cycleCount
+type instruction func(*cpu) cycleCount
 
 const (
 	nopCycles       = 4  // 0x00
@@ -262,7 +262,7 @@ const (
 	rst38HCycles    = 32 // 0xFF
 )
 
-var op = [0x100] instructions{
+var operations = [0x100] instruction{
 	nop,            //0x00
 	ldBcNn,         //0x01
 	ldMemBcA,       //0x02
@@ -2528,7 +2528,7 @@ func decSp(cpu *cpu) cycleCount {
 // 		SWAP 			L 				CB 35 			8
 // 		SWAP 			(HL) 			CB 6 			16
 
-var swapInstructions = map[byte]instructions{
+var swapInstructions = map[byte]instruction{
 	0x37: swapA,
 	0x30: swapB,
 	0x31: swapC,
@@ -2891,7 +2891,7 @@ func rrA(cpu *cpu) cycleCount {
 // 		RLC 			L 				CB 05 		8
 // 		RLC 			(HL) 			CB 06 		16
 
-var rxNInstructions = map[byte]instructions{
+var rxNInstructions = map[byte]instruction{
 	// RLC
 	0x07: rlcA,
 	0x00: rlcB,

@@ -1,5 +1,4 @@
 // package cpu implements the CPU and Registers type
-// the comments are based on http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
 package cpu
 
 import (
@@ -44,9 +43,9 @@ func (cpu *cpu) Step() {
 
 func (cpu *cpu) fetch() byte {
 	address := mmu.Address{High: cpu.r.pcHigh(), Low: cpu.r.pcLow()}
-	op := cpu.mmu.ReadByte(address)
+	opcode := cpu.mmu.ReadByte(address)
 	cpu.r.pc++
-	return op
+	return opcode
 }
 
 func (cpu *cpu) decode(op byte) instruction {

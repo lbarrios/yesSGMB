@@ -1,5 +1,12 @@
 package cpu
 
+import (
+	"github.com/lbarrios/yesSGMB/mmu"
+)
+
+// the comments are based on http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
+// and http://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html
+
 type cycleCount int
 type instruction func(*cpu) cycleCount
 
@@ -106,7 +113,7 @@ const (
 	ldHECycles      = 4  // 0x63
 	ldHHCycles      = 4  // 0x64
 	ldHLCycles      = 4  // 0x65
-	ldHHlCycles     = 8  // 0x66
+	ldHMemHlCycles  = 8  // 0x66
 	ldHACycles      = 4  // 0x67
 	ldLBCycles      = 4  // 0x68
 	ldLCCycles      = 4  // 0x69
@@ -365,7 +372,7 @@ var operations = [0x100] instruction{
 	ldHE,           //0x63
 	ldHH,           //0x64
 	ldHL,           //0x65
-	ldHHl,          //0x66
+	ldHMemHl,       //0x66
 	ldHA,           //0x67
 	ldLB,           //0x68
 	ldLC,           //0x69
@@ -531,7 +538,11 @@ func nonImplemented(cpu *cpu) cycleCount {
 	// if the execution of the rom reaches this point
 	// then whe have a problem..!!
 	// TODO: Throw exception?
-	return 0
+	var cycles cycleCount
+	cycles = 0xDEAD // lol
+	// ret is the sum of all the unused cycles-constants... just to use them and prevent the compiler to detect it as a warning
+	cycles += xDThreeCycles + xDBCycles + xDDCycles + xEThreeCycles + xEFourCycles + xEBCycles + xECCycles + xEDCycles + xFFourCycles + xFCCycles + xFDCycles
+	return cycles
 }
 
 // 3.3. Instructions
@@ -551,37 +562,43 @@ func nonImplemented(cpu *cpu) cycleCount {
 
 func ldBN(cpu *cpu) cycleCount {
 	// Put value of the immediate value n into register B
-	// TODO: to implement
+	n := cpu.fetch()
+	cpu.r.bc.b = n
 	return ldBNCycles
 }
 
 func ldCN(cpu *cpu) cycleCount {
 	// Put value of the immediate value n into register C
-	// TODO: to implement
+	n := cpu.fetch()
+	cpu.r.bc.c = n
 	return ldCNCycles
 }
 
 func ldDN(cpu *cpu) cycleCount {
 	// Put value of the immediate value n into register D
-	// TODO: to implement
+	n := cpu.fetch()
+	cpu.r.de.d = n
 	return ldDNCycles
 }
 
 func ldEN(cpu *cpu) cycleCount {
 	// Put value of the immediate value n into register E
-	// TODO: to implement
+	n := cpu.fetch()
+	cpu.r.de.e = n
 	return ldENCycles
 }
 
 func ldHN(cpu *cpu) cycleCount {
 	// Put value of the immediate value n into register H
-	// TODO: to implement
+	n := cpu.fetch()
+	cpu.r.hl.h = n
 	return ldHNCycles
 }
 
 func ldLN(cpu *cpu) cycleCount {
 	// Put value of the immediate value n into register L
-	// TODO: to implement
+	n := cpu.fetch()
+	cpu.r.hl.l = n
 	return ldLNCycles
 }
 
@@ -591,6 +608,65 @@ func ldLN(cpu *cpu) cycleCount {
 // Use with:
 // 		r1 = A,B,C,D,E,H,L,(HL)
 //		r2 = A,B,C,D,E,H,L,(HL)
+// Opcodes:
+// 		Instruction 	Parameters 		Opcode 		Cycles
+// 		LD 				A,A 			7F 			4
+// 		LD 				A,B 			78 			4
+// 		LD 				A,C 			79 			4
+// 		LD 				A,D 			7A 			4
+// 		LD 				A,E 			7B 			4
+// 		LD 				A,H 			7C 			4
+// 		LD 				A,L 			7D 			4
+// 		LD 				A,(HL) 			7E 			8
+// 		LD 				B,B 			40 			4
+// 		LD 				B,C 			41 			4
+// 		LD 				B,D 			42 			4
+// 		LD 				B,E 			43 			4
+// 		LD 				B,H 			44 			4
+// 		LD 				B,L 			45 			4
+// 		LD 				B,(HL) 			46 			8
+// 		LD 				C,B 			48 			4
+// 		LD 				C,C 			49 			4
+// 		LD 				C,D 			4A 			4
+// 		LD 				C,E 			4B 			4
+// 		LD 				C,H 			4C 			4
+// 		LD 				C,L 			4D 			4
+// 		LD 				C,(HL) 			4E 			8
+// 		LD 				D,B 			50 			4
+// 		LD 				D,C 			51 			4
+// 		LD 				D,D 			52 			4
+// 		LD 				D,E 			53 			4
+// 		LD 				D,H 			54 			4
+// 		LD 				D,L 			55 			4
+// 		LD 				D,(HL) 			56 			8
+// 		LD 				E,B 			58 			4
+// 		LD 				E,C 			59 			4
+// 		LD 				E,D 			5A 			4
+// 		LD 				E,E 			5B 			4
+// 		LD 				E,H 			5C 			4
+// 		LD 				E,L 			5D 			4
+// 		LD 				E,(HL) 			5E 			8
+// 		LD 				H,B 			60 			4
+// 		LD 				H,C 			61 			4
+// 		LD 				H,D 			62 			4
+// 		LD 				H,E 			63 			4
+// 		LD 				H,H 			64 			4
+// 		LD 				H,L 			65 			4
+// 		LD 				H,(HL) 			66 			8
+// 		LD 				L,B 			68 			4
+// 		LD 				L,C 			69 			4
+// 		LD 				L,D 			6A 			4
+// 		LD 				L,E 			6B 			4
+// 		LD 				L,H 			6C 			4
+// 		LD 				L,L 			6D 			4
+// 		LD 				L,(HL) 			6E 			8
+// 		LD 				(HL),B 			70 			8
+// 		LD 				(HL),C 			71 			8
+// 		LD 				(HL),D 			72 			8
+// 		LD 				(HL),E 			73 			8
+// 		LD 				(HL),H 			74 			8
+// 		LD 				(HL),L 			75 			8
+// 		LD 				(HL),n 			36 			12
 
 func ldAA(cpu *cpu) cycleCount {
 	// Put value of register A into register A
@@ -634,10 +710,9 @@ func ldAL(cpu *cpu) cycleCount {
 	return ldALCycles
 }
 
-func ldAHl(cpu *cpu) cycleCount {
+func ldAMemHl(cpu *cpu) cycleCount {
 	// Put value of the position of memory indicated by register HL into register A
-	// TODO: how to implement this?
-	//cpu.r.af.a = cpu.r.hl
+	cpu.r.af.a = cpu.mmu.ReadByte(cpu.r.hlAsAddress())
 	return ldAMemHlCycles
 }
 
@@ -679,7 +754,7 @@ func ldBL(cpu *cpu) cycleCount {
 
 func ldBHl(cpu *cpu) cycleCount {
 	// Put value of the position of memory indicated by register HL into register B
-	// TODO: how to implement this?
+	cpu.r.bc.b = cpu.mmu.ReadByte(cpu.r.hlAsAddress())
 	return ldBHlCycles
 }
 
@@ -715,7 +790,7 @@ func ldCL(cpu *cpu) cycleCount {
 }
 func ldCHl(cpu *cpu) cycleCount {
 	// Put value of the position of memory indicated by register HL into register C
-	// TODO: how to implement this?
+	cpu.r.bc.c = cpu.mmu.ReadByte(cpu.r.hlAsAddress())
 	return ldCHlCycles
 }
 func ldDB(cpu *cpu) cycleCount {
@@ -750,7 +825,7 @@ func ldDL(cpu *cpu) cycleCount {
 }
 func ldDHl(cpu *cpu) cycleCount {
 	// Put value of the position of memory indicated by register HL into register D
-	// TODO: how to implement this?
+	cpu.r.de.d = cpu.mmu.ReadByte(cpu.r.hlAsAddress())
 	return ldDHlCycles
 }
 func ldEB(cpu *cpu) cycleCount {
@@ -785,7 +860,7 @@ func ldEL(cpu *cpu) cycleCount {
 }
 func ldEHl(cpu *cpu) cycleCount {
 	// Put value of the position of memory indicated by register HL into register E
-	// TODO: to implement
+	cpu.r.de.e = cpu.mmu.ReadByte(cpu.r.hlAsAddress())
 	return ldEHlCycles
 }
 func ldHB(cpu *cpu) cycleCount {
@@ -818,10 +893,10 @@ func ldHL(cpu *cpu) cycleCount {
 	cpu.r.hl.h = cpu.r.hl.l
 	return ldHLCycles
 }
-func ldHHl(cpu *cpu) cycleCount {
+func ldHMemHl(cpu *cpu) cycleCount {
 	// Put value of the position of memory indicated by register HL into register H
-	// TODO: to implement
-	return ldHHlCycles
+	cpu.r.hl.h = cpu.mmu.ReadByte(cpu.r.hlAsAddress())
+	return ldHMemHlCycles
 }
 func ldLB(cpu *cpu) cycleCount {
 	// Put value of register B into register L
@@ -855,43 +930,44 @@ func ldLL(cpu *cpu) cycleCount {
 }
 func ldLHl(cpu *cpu) cycleCount {
 	// Put value of the position of memory indicated by register HL into register L
-	// TODO: to implement
+	cpu.r.hl.l = cpu.mmu.ReadByte(cpu.r.hlAsAddress())
 	return ldLHlCycles
 }
 func ldMemHlB(cpu *cpu) cycleCount {
 	// Put value of register B into the position of memory indicated by register HL
-	// TODO: to implement
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), cpu.r.bc.b)
 	return ldMemHlBCycles
 }
 func ldMemHlC(cpu *cpu) cycleCount {
 	// Put value of register C into the position of memory indicated by register HL
-	// TODO: to implement
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), cpu.r.bc.c)
 	return ldMemHlCCycles
 }
 func ldMemHlD(cpu *cpu) cycleCount {
 	// Put value of register D into the position of memory indicated by register HL
-	// TODO: to implement
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), cpu.r.de.d)
 	return ldMemHlDCycles
 }
 func ldMemHlE(cpu *cpu) cycleCount {
 	// Put value of register E into the position of memory indicated by register HL
-	// TODO: to implement
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), cpu.r.de.e)
 	return ldMemHlECycles
-}
-func ldMemHlL(cpu *cpu) cycleCount {
-	// Put value of register L into the position of memory indicated by register HL
-	// TODO: to implement
-	return ldMemHlLCycles
 }
 func ldMemHlH(cpu *cpu) cycleCount {
 	// Put value of register H into the position of memory indicated by register HL
-	// TODO: to implement
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), cpu.r.hl.h)
 	return ldMemHlHCycles
+}
+func ldMemHlL(cpu *cpu) cycleCount {
+	// Put value of register L into the position of memory indicated by register HL
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), cpu.r.hl.l)
+	return ldMemHlLCycles
 }
 
 func ldMemHlN(cpu *cpu) cycleCount {
 	// Put the immediate value n into the position of memory indicated by register HL
-	// TODO: to implement
+	n := cpu.fetch()
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), n)
 	return ldMemHlNCycles
 }
 
@@ -904,31 +980,31 @@ func ldMemHlN(cpu *cpu) cycleCount {
 
 func ldAMemBc(cpu *cpu) cycleCount {
 	// Put the value into the position of memory indicated by register BC into register A
-	// TODO: to implement
+	cpu.r.af.a = cpu.mmu.ReadByte(cpu.r.bcAsAddress())
 	return ldAMemBcCycles
 }
 
 func ldAMemDe(cpu *cpu) cycleCount {
-	// Put the value into the position of memory indicated by register BC into register A
-	// TODO: to implement
+	// Put the value into the position of memory indicated by register DE into register A
+	cpu.r.af.a = cpu.mmu.ReadByte(cpu.r.deAsAddress())
 	return ldAMemDeCycles
 }
 
-func ldAMemHl(cpu *cpu) cycleCount {
-	// Put the value into the position of memory indicated by register BC into register A
-	// TODO: to implement
-	return ldAMemHlCycles
-}
+// func ldAMemHl(cpu *cpu) cycleCount
+// already defined
 
 func ldAMemNn(cpu *cpu) cycleCount {
 	// Put the value into the position of memory indicated by immediate value NN into register A
-	// TODO: to implement
+	// (LS byte comes first!)
+	low := cpu.fetch()
+	high := cpu.fetch()
+	cpu.r.af.a = cpu.mmu.ReadByte(mmu.Address{High: high, Low: low})
 	return ldAMemNnCycles
 }
 
 func ldAN(cpu *cpu) cycleCount {
 	// Put the immediate value N into register A
-	// TODO: to implement
+	cpu.r.af.a = cpu.fetch()
 	return ldANCycles
 }
 
@@ -971,22 +1047,25 @@ func ldLA(cpu *cpu) cycleCount {
 }
 func ldMemBcA(cpu *cpu) cycleCount {
 	// Put the value of register A into the position of memory pointed by register BC
-	// TODO: To implement
+	cpu.mmu.WriteByte(cpu.r.bcAsAddress(), cpu.r.af.a)
 	return ldMemBcACycles
 }
 func ldMemDeA(cpu *cpu) cycleCount {
 	// Put the value of register A into the position of memory pointed by register DE
-	// TODO: To implement
+	cpu.mmu.WriteByte(cpu.r.deAsAddress(), cpu.r.af.a)
 	return ldMemDeACycles
 }
 func ldMemHlA(cpu *cpu) cycleCount {
 	// Put the value of register A into the position of memory pointed by register HL
-	// TODO: To implement
+	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), cpu.r.af.a)
 	return ldMemHlACycles
 }
 func ldMemNnA(cpu *cpu) cycleCount {
 	// Put the value of register A into the position of memory pointed by an immediate value
-	// TODO: To implement
+	// (LS byte comes first!)
+	low := cpu.fetch()
+	high := cpu.fetch()
+	cpu.mmu.WriteByte(mmu.Address{High: high, Low: low}, cpu.r.af.a)
 	return ldMemNnACycles
 }
 
@@ -996,8 +1075,8 @@ func ldMemNnA(cpu *cpu) cycleCount {
 // Same as: LD A,($FF00+C)
 
 func ldAStackC(cpu *cpu) cycleCount {
-	// Put the value from the position of memory (0xFF00+BC) into register A
-	// TODO: to implement
+	// Put the value from the position of memory (0xFF00+C) into register A
+	cpu.r.af.a = cpu.mmu.ReadByte(mmu.Address{High: 0xFF, Low: cpu.r.bc.c})
 	return ldAStackCCycles
 }
 
@@ -1006,8 +1085,8 @@ func ldAStackC(cpu *cpu) cycleCount {
 //		Put A into address $FF00 + register C.
 
 func ldStackCA(cpu *cpu) cycleCount {
-	// Put the value from the register A into the position of memory (0xFF00+BC)
-	// TODO: to implement
+	// Put the value from the register A into the position of memory (0xFF00+C)
+	cpu.mmu.WriteByte(mmu.Address{High: 0xFF, Low: cpu.r.bc.c}, cpu.r.af.a)
 	return ldStackCACycles
 }
 
@@ -2526,30 +2605,7 @@ func decSp(cpu *cpu) cycleCount {
 // 		SWAP 			E 				CB 33 			8
 // 		SWAP 			H 				CB 34 			8
 // 		SWAP 			L 				CB 35 			8
-// 		SWAP 			(HL) 			CB 6 			16
-
-var swapInstructions = map[byte]instruction{
-	0x37: swapA,
-	0x30: swapB,
-	0x31: swapC,
-	0x32: swapD,
-	0x33: swapE,
-	0x34: swapH,
-	0x35: swapL,
-	0x06: swapMemHl,
-}
-
-func swap(cpu *cpu) cycleCount {
-	// Swap upper & lower nibles
-	// This function gets the next opcode from memory,
-	// and calls to the corresponding function
-	nextOpcode := byte(0)
-	// TODO: Read the next opcode from memory
-	cpu.r.setFlagN(false)
-	cpu.r.setFlagH(false)
-	cpu.r.setFlagC(false)
-	return swapInstructions[nextOpcode](cpu)
-}
+// 		SWAP 			(HL) 			CB 36 			16
 
 func swapA(cpu *cpu) cycleCount {
 	// Swap upper & lower nibles of register A
@@ -3171,6 +3227,15 @@ var rxNInstructions = map[byte]instruction{
 	0xFC: set7H,
 	0xFD: set7L,
 	0xFE: set7MemHl,
+	// SWAP
+	0x37: swapA,
+	0x30: swapB,
+	0x31: swapC,
+	0x32: swapD,
+	0x33: swapE,
+	0x34: swapH,
+	0x35: swapL,
+	0x36: swapMemHl,
 }
 
 const (
@@ -3185,9 +3250,8 @@ const (
 
 func rxN(cpu *cpu) cycleCount {
 	// Reads one opcode from memory,
-	// and decides which RL/RLC/RR/RRC function to call
-	nextOpcode := byte(0)
-	// TODO: Read the next opcode from memory
+	// and decides which RL/RLC/RR/RRC/SWAP/SET/RES function to call
+	nextOpcode := cpu.fetch()
 	cycles := rxNInstructions[nextOpcode](cpu)
 	if cycles < rxNCycles {
 		return rxNCycles

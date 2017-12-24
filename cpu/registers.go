@@ -36,6 +36,9 @@ type Registers struct {
 	pc word // program counter
 }
 
+/**
+	Registers as Word
+ */
 func (r Registers) bcAsWord() word {
 	res := word(r.bc.b) << 8
 	res += word(r.bc.c)
@@ -54,11 +57,25 @@ func (r Registers) hlAsWord() word {
 	return res
 }
 
+/**
+	Registers as Address
+ */
+func (r Registers) bcAsAddress() mmu.Address {
+	addr := mmu.Address{High: r.bc.b, Low: r.bc.c}
+	return addr
+}
+func (r Registers) deAsAddress() mmu.Address {
+	addr := mmu.Address{High: r.de.d, Low: r.de.e}
+	return addr
+}
 func (r Registers) hlAsAddress() mmu.Address {
 	addr := mmu.Address{High: r.hl.h, Low: r.hl.l}
 	return addr
 }
 
+/**
+	Registers as Low or High nibbles
+ */
 func (r Registers) spLow() byte {
 	return byte(r.sp & 0x0f)
 }
@@ -75,6 +92,9 @@ func (r Registers) pcHigh() byte {
 	return byte(r.sp >> 8)
 }
 
+/*
+	Set Flags
+ */
 func (r *Registers) setFlagZ(condition bool) {
 	// Put true on FLAG Z if condition is true, else false
 	r.af.f.z = condition
@@ -95,6 +115,9 @@ func (r *Registers) setFlagC(condition bool) {
 	r.af.f.c = condition
 }
 
+/*
+	Get Flags
+ */
 func (r Registers) flagAsByte(flag bool) byte {
 	if flag {
 		return 1

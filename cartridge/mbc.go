@@ -44,20 +44,20 @@ type MemoryBankController interface {
 
 type MBCRomOnly struct {
 	romBank []byte
+	log     logger.Logger
 }
 
 func (mbc *MBCRomOnly) Init(data []byte) {
-	log = logger.Logger("MBC: ")
 	mbc.romBank = data[0x0000:0x8000]
 }
 
 func (mbc *MBCRomOnly) Write(address types.Address, value byte) {
 	if address.High >= 0x80 {
-		log.Fatalf("Cannot write to address: %.4x!", address.AsWord())
+		mbc.log.Fatalf("Cannot write to address: %.4x!", address.AsWord())
 		return
 	}
 	// TODO: Check this
-	log.Printf("Cannot write to address: %.4x!", address.AsWord())
+	mbc.log.Printf("Cannot write to address: %.4x!", address.AsWord())
 }
 
 func (mbc *MBCRomOnly) Read(address types.Address) byte {

@@ -5,9 +5,8 @@ import (
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/types"
 	"github.com/lbarrios/yesSGMB/logger"
+	"sync"
 )
-
-var log = logger.Logger("CPU: ")
 
 type cpu struct {
 	r                 Registers
@@ -15,17 +14,20 @@ type cpu struct {
 	cycle             cycleCount
 	interruptsEnabled bool
 	halted            bool
+	log               *logger.Logger
 }
 
-func NewCPU(mmu mmu.MMU) *cpu {
+func NewCPU(mmu mmu.MMU, l *logger.Logger) *cpu {
 	cpu := new(cpu)
 	cpu.mmu = mmu
+	cpu.log = l
+	cpu.log.SetPrefix("\033[0;34mCPU: ")
 	cpu.Reset()
 	return cpu
 }
 
 func (cpu *cpu) Reset() {
-	log.Println("CPU reset triggered.")
+	cpu.log.Println("CPU reset triggered.")
 	cpu.r.pc = 0x0100 // On power up, the GameBoy Program Counter is initialized to 0x0100
 	cpu.r.sp = 0xFFFE // On power up, the GameBoy Stack Pointer is initialized to 0xFFFE
 
@@ -88,7 +90,7 @@ func (cpu *cpu) Step() {
 func (cpu *cpu) fetch() byte {
 	address := types.Address{High: cpu.r.pc.high(), Low: cpu.r.pc.low()}
 	opcode := cpu.mmu.ReadByte(address)
-	log.Printf("fetch[0x%.2x%.2x] = 0x%.4x (%s).", cpu.r.pc.high(), cpu.r.pc.low(), opcode, instructions_debug[opcode])
+	cpu.log.Printf("fetch[0x%.2x%.2x] = 0x%.4x (%s).", cpu.r.pc.high(), cpu.r.pc.low(), opcode, instructions_debug[opcode])
 	cpu.r.pc++
 	return opcode
 }
@@ -103,21 +105,22 @@ func (cpu *cpu) execute(instr instruction) cycleCount {
 	return cycles
 }
 
-func (cpu *cpu) Run() {
-	log.Println("CPU started.")
+func (cpu *cpu) Run(wg *sync.WaitGroup) {
+	cpu.log.Println("CPU started.")
 	for {
-		log.Println(cpu.r)
+		cpu.log.Println(cpu.r)
 		cpu.Step()
 		if cpu.r.pc == 0x02b2 {
-			log.Println("Breakpoint at 0x02b3.")
-			log.Println(cpu.r)
+			cpu.log.Println("Breakpoint at 0x02b3.")
+			cpu.log.Println(cpu.r)
 			cpu.Step()
-			log.Println(cpu.r)
+			cpu.log.Println(cpu.r)
 			break
 		}
 		if cpu.cycle > 0x20000 {
-			log.Println("max cycles.")
+			cpu.log.Println("max cycles.")
 			break
 		}
 	}
+	wg.Done()
 }

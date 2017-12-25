@@ -532,7 +532,7 @@ func nonImplemented(cpu *cpu) cycleCount {
 	// This function is not intended to be implemented
 	// if the execution of the rom reaches this point
 	// then whe have a problem..!!
-	log.Println("Non implemented function executed.")
+	cpu.log.Println("Non implemented function executed.")
 	var cycles cycleCount
 	cycles = 0xDEAD // lol
 	// ret is the sum of all the unused cycles-constants... just to use them and prevent the compiler to detect it as a warning
@@ -2876,7 +2876,7 @@ func scf(cpu *cpu) cycleCount {
 // 		NOP 			-/- 			00 			4
 func nop(cpu *cpu) cycleCount {
 	// Does nothing
-	log.Printf("CPU: nop at... %d", cpu.cycle)
+	cpu.log.Printf("CPU: nop at... %d", cpu.cycle)
 	return nopCycles
 }
 
@@ -2902,7 +2902,7 @@ func halt(cpu *cpu) cycleCount {
 func stop(cpu *cpu) cycleCount {
 	// Stops the CPU until an interrupt occurs
 	cpu.fetch()
-	log.Println("CPU: Stopping...")
+	cpu.log.Println("CPU: Stopping...")
 	return stopCycles
 }
 

@@ -12,8 +12,6 @@ import (
 	"bytes"
 )
 
-var log = logger.Logger("CART: ")
-
 type Cartridge struct {
 	Filename            string
 	data                []byte
@@ -35,6 +33,7 @@ type Cartridge struct {
 	headerChecksum      byte
 	globalChecksum      []byte
 	MBC                 MemoryBankController
+	log                 logger.Logger
 }
 
 const (
@@ -63,8 +62,10 @@ const (
 	globalChecksumEnd          = 0x014F + 1
 )
 
-func NewCartridge(filename string) (*Cartridge, error) {
+func NewCartridge(filename string, l *logger.Logger) (*Cartridge, error) {
 	c := new(Cartridge)
+	c.log = *l
+	c.log.SetPrefix("\033[0;33mCART: ")
 
 	if err := c.LoadROMFile(filename); err != nil {
 		return nil, err
@@ -90,14 +91,14 @@ func (c *Cartridge) ParseHeader() (error) {
 	// A CGB verifies only the first 18h bytes of the bitmap, but others (for example a Pocket GameBoy) verify all 30h bytes.
 	c.nintendoLogo = c.data[nintendoLogoStart:nintendoLogoEnd]
 	if ! bytes.Equal(c.nintendoLogo, originalNintendoLogo) {
-		log.Println(c.nintendoLogo)
-		log.Println(originalNintendoLogo)
+		c.log.Println(c.nintendoLogo)
+		c.log.Println(originalNintendoLogo)
 		return errors.New("The cartridge is not original! It's a pirate copy, Nintendo is losing money!")
 	}
 
 	// Title - The empty chars are filled with 0's
 	c.Title = strings.Trim(string(c.data[titleStart:titleEnd]), "\0000")
-	log.Printf("The game title is: %s", c.Title)
+	c.log.Printf("The game title is: %s", c.Title)
 
 	// GBC - Manufacturer Code
 	c.manufacturerCode = string(c.data[manufacturerCodeStart:manufacturerCodeEnd])
@@ -119,7 +120,7 @@ func (c *Cartridge) ParseHeader() (error) {
 		c.licensee = c.data[newLicenseeCodeStart:newLicenseeCodeEnd]
 	}
 	c.licenseeDescription = licenseeMap[fmt.Sprintf("%x", c.licensee)]
-	log.Printf("The game vendor is: %s=%s", fmt.Sprintf("%x", c.licensee), c.licenseeDescription)
+	c.log.Printf("The game vendor is: %s=%s", fmt.Sprintf("%x", c.licensee), c.licenseeDescription)
 
 	// SGB - Super GameBoy Flag
 	// 		00h = No SGB functions (Normal Gameboy or CGB only game)
@@ -135,21 +136,21 @@ func (c *Cartridge) ParseHeader() (error) {
 	}
 	switch c.Type {
 	case MBC_ROMONLY:
-		c.MBC = &MBCRomOnly{}
+		c.MBC = &MBCRomOnly{log: c.log}
 	default:
 		return errors.New(fmt.Sprintf("Unknown cartridge type for MBC: %X", c.Type))
 	}
 	c.MBC.Init(c.data)
-	log.Printf("The cartridge type is: %s", c.TypeDescription)
+	c.log.Printf("The cartridge type is: %s", c.TypeDescription)
 
 	// ROM Banks and Size
 	c.romBanks = romBanksMap[c.data[romBanksPosition]]
 	c.romSize = romSizeForBanks(c.romBanks)
-	log.Printf("ROM size is %d KB", c.romSize/1024)
+	c.log.Printf("ROM size is %d KB", c.romSize/1024)
 
 	// RAM Size
 	c.ramSize = ramSizeMap[c.data[ramSizePosition]]
-	log.Printf("RAM size is %d KB", c.ramSize/1024)
+	c.log.Printf("RAM size is %d KB", c.ramSize/1024)
 
 	// Destination Code (ie Japanese or not)
 	c.destinationCode = c.data[destinationCodePosition]
@@ -173,7 +174,7 @@ func (c *Cartridge) ParseHeader() (error) {
 }
 
 func (c *Cartridge) LoadROMFile(filename string) error {
-	log.Printf("Loading file %s...", filename)
+	c.log.Printf("Loading file %s...", filename)
 	c.Filename = filename
 
 	if fileContent, err := ioutil.ReadFile(filename); err != nil {
@@ -182,7 +183,7 @@ func (c *Cartridge) LoadROMFile(filename string) error {
 		c.data = fileContent
 	}
 
-	log.Printf("File %s loaded.", filename)
+	c.log.Printf("File %s loaded.", filename)
 	return nil
 }
 

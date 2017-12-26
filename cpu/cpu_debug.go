@@ -14,9 +14,9 @@ func (cpu *cpu) StepDebug() {
 }
 
 func (cpu *cpu) fetchDebug() byte {
-	address := types.Address{High: cpu.r.pc.high(), Low: cpu.r.pc.low()}
+	address := types.Address{High: cpu.r.pc.High(), Low: cpu.r.pc.Low()}
 	opcode := cpu.mmu.ReadByte(address)
-	cpu.log.Printf("fetch(0x%.2x%.2x) = 0x%.4x.", cpu.r.pc.high(), cpu.r.pc.low(), opcode)
+	cpu.log.Printf("fetch(0x%.2x%.2x) = 0x%.4x.", cpu.r.pc.High(), cpu.r.pc.Low(), opcode)
 	cpu.r.pc++
 	return opcode
 }

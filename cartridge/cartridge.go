@@ -4,12 +4,12 @@
 package cartridge
 
 import (
-	"fmt"
-	"io/ioutil"
-	"github.com/lbarrios/yesSGMB/logger"
-	"strings"
-	"errors"
 	"bytes"
+	"errors"
+	"fmt"
+	"github.com/lbarrios/yesSGMB/logger"
+	"io/ioutil"
+	"strings"
 )
 
 type Cartridge struct {
@@ -65,7 +65,7 @@ const (
 func NewCartridge(filename string, l *logger.Logger) (*Cartridge, error) {
 	c := new(Cartridge)
 	c.log = *l
-	c.log.SetPrefix("\033[0;33mCART: ")
+	c.log.SetPrefix("\033[0;30mCART: ")
 
 	if err := c.LoadROMFile(filename); err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func NewCartridge(filename string, l *logger.Logger) (*Cartridge, error) {
 	return c, nil
 }
 
-func (c *Cartridge) ParseHeader() (error) {
+func (c *Cartridge) ParseHeader() error {
 	// As the documentation states, the minimum cartridge ROM size is when the cartridge has zero rom banks
 	minimumRomSize := romSizeForBanks(0)
 	if len(c.data) < minimumRomSize {
@@ -90,7 +90,7 @@ func (c *Cartridge) ParseHeader() (error) {
 	// The GameBoy boot procedure verifies the content of this bitmap (after it has displayed it), and LOCKS ITSELF UP if these bytes are incorrect.
 	// A CGB verifies only the first 18h bytes of the bitmap, but others (for example a Pocket GameBoy) verify all 30h bytes.
 	c.nintendoLogo = c.data[nintendoLogoStart:nintendoLogoEnd]
-	if ! bytes.Equal(c.nintendoLogo, originalNintendoLogo) {
+	if !bytes.Equal(c.nintendoLogo, originalNintendoLogo) {
 		c.log.Println(c.nintendoLogo)
 		c.log.Println(originalNintendoLogo)
 		return errors.New("The cartridge is not original! It's a pirate copy, Nintendo is losing money!")

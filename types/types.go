@@ -14,12 +14,32 @@ func (address Address) NextAddress() Address {
 	return addr
 }
 
-func (address Address) AsWord() uint16 {
-	var ret uint16
-	ret = uint16(address.High)<<8 + uint16(address.Low)
+func (address Address) AsWord() Word {
+	var ret Word
+	ret = Word(address.High)<<8 + Word(address.Low)
 	return ret
 }
 
 func (address Address) String() string {
 	return string(address.AsWord())
+}
+
+type Word uint16
+
+/**
+Return the Low byte of a Word
+*/
+func (w Word) Low() byte {
+	return byte(w & 0xFF)
+}
+
+/**
+Return the Low byte of a Word
+*/
+func (w Word) High() byte {
+	return byte(w >> 8)
+}
+
+func (w Word) AsAddress() Address {
+	return Address{High: w.High(), Low: w.Low()}
 }

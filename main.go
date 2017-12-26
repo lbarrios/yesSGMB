@@ -2,13 +2,13 @@ package main
 
 import (
 	"flag"
-	"sync"
-	"github.com/lbarrios/yesSGMB/logger"
 	"github.com/lbarrios/yesSGMB/cartridge"
-	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/cpu"
 	"github.com/lbarrios/yesSGMB/gpu"
-	"github.com/lbarrios/yesSGMB/types"
+	"github.com/lbarrios/yesSGMB/logger"
+	"github.com/lbarrios/yesSGMB/mmu"
+	"github.com/lbarrios/yesSGMB/timer"
+	"sync"
 )
 
 var (
@@ -30,17 +30,39 @@ func main() {
 		log.Fatalf("ERROR: %s", err)
 	}
 
+	// Initialize the Memory Management Unit
 	MMU := mmu.NewMMU(log)
 	MMU.LoadCartridge(cart)
 
+	// Initialize the Central Processing Unit
 	CPU := cpu.NewCPU(MMU, log)
-	wg.Add(1)
-	go CPU.Run(&wg)
 
+	// Initialize the Graphics Processing Unit
 	GPU := gpu.NewGpu(MMU, log)
-	wg.Add(1)
-	MMU.MapMemoryAdress(GPU, types.Address{0xff, 0x40})
-	go GPU.Run(&wg)
+	MMU.MapMemoryRegion(GPU, gpu.VIDEO_RAM_START.AsAddress(), gpu.VIDEO_RAM_END.AsAddress())
+	MMU.MapMemoryRegion(GPU, gpu.OAM_START.AsAddress(), gpu.OAM_END.AsAddress())
+	MMU.MapMemoryAdress(GPU, gpu.LCDC_ADDRESS.AsAddress())
+	MMU.MapMemoryAdress(GPU, gpu.STAT_ADDRESS.AsAddress())
+	MMU.MapMemoryAdress(GPU, gpu.SCY_ADDRESS.AsAddress())
+	MMU.MapMemoryAdress(GPU, gpu.SCX_ADDRESS.AsAddress())
+	MMU.MapMemoryAdress(GPU, gpu.LY_ADDRESS.AsAddress())
+	MMU.MapMemoryAdress(GPU, gpu.LYC_ADDRESS.AsAddress())
+	GPU.Reset()
 
+	// Initialize the Timer
+	Timer := timer.NewTimer(log)
+	MMU.MapMemoryAdress(Timer, timer.DIV_ADDRESS.AsAddress())
+	MMU.MapMemoryAdress(Timer, timer.TIMA_ADDRESS.AsAddress())
+	MMU.MapMemoryAdress(Timer, timer.TMA_ADDRESS.AsAddress())
+	MMU.MapMemoryAdress(Timer, timer.TAC_ADDRESS.AsAddress())
+	Timer.Reset()
+
+	// Run all the components
+	wg.Add(3)
+	go CPU.Run(&wg)
+	go GPU.Run(&wg)
+	go Timer.Run(&wg)
+
+	// Wait to exit the program
 	wg.Wait()
 }

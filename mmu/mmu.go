@@ -3,15 +3,20 @@ package mmu
 
 import (
 	"github.com/lbarrios/yesSGMB/cartridge"
-	"github.com/lbarrios/yesSGMB/types"
 	"github.com/lbarrios/yesSGMB/logger"
+	"github.com/lbarrios/yesSGMB/types"
 	"sync"
+)
+
+const (
+	MIN_ADDRESS = 0x0000
+	MAX_ADDRESS = 0xFFFF
 )
 
 type mmu struct {
 	bios       [0x100]byte
 	cartridge  *cartridge.Cartridge
-	memory     [0x10000]byte
+	memory     [MAX_ADDRESS + 1]byte
 	memoryLock sync.Mutex
 	log        logger.Logger
 }
@@ -24,7 +29,7 @@ type MMU interface {
 func NewMMU(l *logger.Logger) *mmu {
 	mmu := new(mmu)
 	mmu.log = *l
-	mmu.log.SetPrefix("\033[0;31mMMU: ")
+	mmu.log.SetPrefix("\033[0;33mMMU: ")
 	return mmu
 }
 
@@ -86,9 +91,7 @@ func (mmu *mmu) ReadByte(address types.Address) byte {
 		mmu.log.Fatalf("Attemping to read from unimplemented address %x (EMPTY_BUT_UNUSABLE_FOR_IO_1)", address.AsWord())
 
 	case address.AsWord() >= IO_PORTS && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_2:
-		// IO_PORTS
-		// TODO: Check this
-		mmu.log.Printf("Attemping to read from dubiously-implemented address %x (IO_PORTS)", address.AsWord())
+		// IO_PORTS, this case write to memory that is mapped to peripherals
 		ret = mmu.memory[address.AsWord()]
 
 	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_2 && address.AsWord() < HIGH_RAM:
@@ -150,10 +153,8 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 		mmu.log.Fatalf("Attemping to write to unimplemented address %x (EMPTY_BUT_UNUSABLE_FOR_IO_1)", address.AsWord())
 
 	case address.AsWord() >= IO_PORTS && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_2:
-		// IO_PORTS
+		// IO_PORTS, this case write to memory that is mapped to peripherals
 		mmu.memory[address.AsWord()] = value
-		mmu.log.Printf("Attemping to write to dubiously-implemented address %x (IO_PORTS)", address.AsWord())
-		// TODO: Check this
 
 	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_2 && address.AsWord() < HIGH_RAM:
 		// EMPTY_BUT_UNUSABLE_FOR_IO_2
@@ -166,7 +167,7 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 	case address.AsWord() >= INTERRUPT_ENABLE_REGISTER:
 		// INTERRUPT_ENABLE_REGISTER
 		mmu.memory[address.AsWord()] = value
-		mmu.log.Printf("Writing value %.4x to INTERRUPT_ENABLE_REGISTER", value)
+		mmu.log.Printf("Writing value %.2x to INTERRUPT_ENABLE_REGISTER", value)
 	default:
 		mmu.log.Printf("Attemping to read from invalid address %x", address.AsWord())
 		mmu.memory[address.AsWord()] = value
@@ -181,7 +182,19 @@ func (mmu *mmu) RequestInterrupt(interrupt byte) {
 	mmu.memoryLock.Unlock()
 }
 
-func (mmu *mmu) MapMemoryAdress(p Peripheral, address types.Address){
+func (mmu *mmu) MapMemoryRegion(p Peripheral, begin types.Address, end types.Address) {
+	if end.AsWord() < begin.AsWord() {
+		mmu.log.Fatalf("MapMemoryRegion expects a non-negative lenght interval")
+	}
+	if begin.AsWord() < MIN_ADDRESS || end.AsWord() > MAX_ADDRESS {
+		mmu.log.Fatalf("MapMemoryRegion parameters are out-o-range")
+	}
+	for i := begin.AsWord(); i < end.AsWord(); i++ {
+		mmu.MapMemoryAdress(p, i.AsAddress())
+	}
+}
+
+func (mmu *mmu) MapMemoryAdress(p Peripheral, address types.Address) {
 	mmu.memoryLock.Lock()
 	p.MapByte(address, &mmu.memory[address.AsWord()])
 	mmu.memoryLock.Unlock()

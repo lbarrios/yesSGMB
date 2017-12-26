@@ -1,11 +1,9 @@
 package cpu
 
 import (
-	"github.com/lbarrios/yesSGMB/types"
 	"fmt"
+	"github.com/lbarrios/yesSGMB/types"
 )
-
-type word uint16
 
 type Flags struct {
 	z bool // zero flag
@@ -72,8 +70,8 @@ type Registers struct {
 		h byte // high
 		l byte // low
 	}
-	sp word // stack pointer
-	pc word // program counter
+	sp types.Word // stack pointer
+	pc types.Word // program counter
 }
 
 // String prints registers as string
@@ -91,29 +89,29 @@ func (r Registers) String() string {
 }
 
 /**
-	Registers as Word
- */
-func (r Registers) bcAsWord() word {
-	res := word(r.bc.b) << 8
-	res += word(r.bc.c)
+Registers as Word
+*/
+func (r Registers) bcAsWord() types.Word {
+	res := types.Word(r.bc.b) << 8
+	res += types.Word(r.bc.c)
 	return res
 }
 
-func (r Registers) deAsWord() word {
-	res := word(r.de.d) << 8
-	res += word(r.de.e)
+func (r Registers) deAsWord() types.Word {
+	res := types.Word(r.de.d) << 8
+	res += types.Word(r.de.e)
 	return res
 }
 
-func (r Registers) hlAsWord() word {
-	res := word(r.hl.h) << 8
-	res += word(r.hl.l)
+func (r Registers) hlAsWord() types.Word {
+	res := types.Word(r.hl.h) << 8
+	res += types.Word(r.hl.l)
 	return res
 }
 
 /**
-	Registers as Address
- */
+Registers as Address
+*/
 func (r Registers) bcAsAddress() types.Address {
 	addr := types.Address{High: r.bc.b, Low: r.bc.c}
 	return addr
@@ -127,14 +125,14 @@ func (r Registers) hlAsAddress() types.Address {
 	return addr
 }
 func (r Registers) spAsAddress() types.Address {
-	addr := types.Address{High: r.sp.high(), Low: r.sp.low()}
+	addr := types.Address{High: r.sp.High(), Low: r.sp.Low()}
 	return addr
 }
 
 /**
-	Registers as Low or High nibbles
-	(get low or high nibbles of a Byte)
- */
+Registers as Low or High nibbles
+(get low or high nibbles of a Byte)
+*/
 func lowNibble(b byte) byte {
 	return byte(b & 0x0F)
 }
@@ -143,20 +141,9 @@ func highNibble(b byte) byte {
 	return byte((b & 0xF0) >> 4)
 }
 
-/**
-	Registers as Low or High bytes
-	(get low or high parts of a Word)
- */
-func (w word) low() byte {
-	return byte(w & 0xFF)
-}
-func (w word) high() byte {
-	return byte(w >> 8)
-}
-
 /*
 	Set Flags
- */
+*/
 func (r *Registers) setFlagZ(condition bool) {
 	// Put true on FLAG Z if condition is true, else false
 	r.af.f.z = condition
@@ -179,7 +166,7 @@ func (r *Registers) setFlagC(condition bool) {
 
 /*
 	Get Flags
- */
+*/
 func (r Registers) flagAsByte(flag bool) byte {
 	if flag {
 		return 1

@@ -2,9 +2,9 @@
 package cpu
 
 import (
+	"github.com/lbarrios/yesSGMB/logger"
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/types"
-	"github.com/lbarrios/yesSGMB/logger"
 	"sync"
 )
 
@@ -88,7 +88,7 @@ func (cpu *cpu) Step() {
 }
 
 func (cpu *cpu) fetch() byte {
-	address := types.Address{High: cpu.r.pc.high(), Low: cpu.r.pc.low()}
+	address := types.Address{High: cpu.r.pc.High(), Low: cpu.r.pc.Low()}
 	opcode := cpu.mmu.ReadByte(address)
 	cpu.r.pc++
 	return opcode
@@ -109,11 +109,11 @@ func (cpu *cpu) Run(wg *sync.WaitGroup) {
 	for {
 		cpu.Step()
 		if cpu.r.pc == 0x02b2 {
-			cpu.log.Println("\033[0;31mBreakpoint at 0x02b2.")
+			cpu.log.Println("\033[1;31mBreakpoint at 0x02b2.")
 			cpu.StepDebug()
 			cpu.StepDebug()
 			cpu.log.Println("writing 0xff to 0xff40 (this will stop the GPU)")
-			cpu.mmu.WriteByte(types.Address{0xff,0x40}, 0xff)
+			cpu.mmu.WriteByte(types.Address{0xff, 0x40}, 0xff)
 			break
 		}
 		if cpu.cycle > 0x20000 {
@@ -123,4 +123,3 @@ func (cpu *cpu) Run(wg *sync.WaitGroup) {
 	}
 	wg.Done()
 }
-

@@ -147,11 +147,11 @@ func highNibble(b byte) byte {
 	Registers as Low or High bytes
 	(get low or high parts of a Word)
  */
-func (w *word) low() byte {
-	return byte(*w & 0xFF)
+func (w word) low() byte {
+	return byte(w & 0xFF)
 }
-func (w *word) high() byte {
-	return byte(*w >> 8)
+func (w word) high() byte {
+	return byte(w >> 8)
 }
 
 /*

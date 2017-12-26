@@ -1,4 +1,4 @@
-// package mmu implements the Memory Management Unit of the Gameboy
+// Package mmu implements the Memory Management Unit of the Gameboy
 package mmu
 
 import (
@@ -22,10 +22,10 @@ type MMU interface {
 }
 
 func NewMMU(l *logger.Logger) *mmu {
-	MMU := new(mmu)
-	MMU.log = *l
-	MMU.log.SetPrefix("\033[0;31mMMU: ")
-	return MMU
+	mmu := new(mmu)
+	mmu.log = *l
+	mmu.log.SetPrefix("\033[0;31mMMU: ")
+	return mmu
 }
 
 func (mmu *mmu) LoadCartridge(cart *cartridge.Cartridge) {
@@ -43,7 +43,7 @@ const (
 	EMPTY_BUT_UNUSABLE_FOR_IO_1 = 0xFEA0
 	IO_PORTS                    = 0xFF00
 	EMPTY_BUT_UNUSABLE_FOR_IO_2 = 0xFF4C
-	INTERNAL_RAM                = 0xFF80
+	HIGH_RAM                    = 0xFF80
 	INTERRUPT_ENABLE_REGISTER   = 0xFFFF
 )
 
@@ -70,11 +70,12 @@ func (mmu *mmu) ReadByte(address types.Address) byte {
 
 	case address.AsWord() >= INTERNAL_RAM_8KB && address.AsWord() < ECHO_8KB_INTERNAL_RAM:
 		// INTERNAL_RAM_8KB
-		mmu.log.Printf("Attemping to read from unimplemented address %x (INTERNAL_RAM_8KB)", address.AsWord())
+		ret = mmu.memory[address.AsWord()]
 
 	case address.AsWord() >= ECHO_8KB_INTERNAL_RAM && address.AsWord() < SPRITE_ATTRIB_MEMORY_OAM:
 		// ECHO_8KB_INTERNAL_RAM
-		mmu.log.Printf("Attemping to read from unimplemented address %x (ECHO_8KB_INTERNAL_RAM)", address.AsWord())
+		// The addresses from E000 to FE00 appear to access the internal RAM the same as C000-DE00.
+		ret = mmu.memory[address.AsWord()-(ECHO_8KB_INTERNAL_RAM-INTERNAL_RAM_8KB)]
 
 	case address.AsWord() >= SPRITE_ATTRIB_MEMORY_OAM && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_1:
 		// SPRITE_ATTRIB_MEMORY_OAM
@@ -90,13 +91,13 @@ func (mmu *mmu) ReadByte(address types.Address) byte {
 		mmu.log.Printf("Attemping to read from dubiously-implemented address %x (IO_PORTS)", address.AsWord())
 		ret = mmu.memory[address.AsWord()]
 
-	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_2 && address.AsWord() < INTERNAL_RAM:
+	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_2 && address.AsWord() < HIGH_RAM:
 		// EMPTY_BUT_UNUSABLE_FOR_IO_2
 		mmu.log.Fatalf("Attemping to read from unimplemented address %x (EMPTY_BUT_UNUSABLE_FOR_IO_2)", address.AsWord())
 
-	case address.AsWord() >= INTERNAL_RAM && address.AsWord() < INTERRUPT_ENABLE_REGISTER:
-		// INTERNAL_RAM
-		mmu.log.Printf("Attemping to read from unimplemented address %x (INTERNAL_RAM)", address.AsWord())
+	case address.AsWord() >= HIGH_RAM && address.AsWord() < INTERRUPT_ENABLE_REGISTER:
+		// HIGH_RAM
+		ret = mmu.memory[address.AsWord()]
 
 	case address.AsWord() >= INTERRUPT_ENABLE_REGISTER:
 		// INTERRUPT_ENABLE_REGISTER
@@ -133,11 +134,12 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 
 	case address.AsWord() >= INTERNAL_RAM_8KB && address.AsWord() < ECHO_8KB_INTERNAL_RAM:
 		// INTERNAL_RAM_8KB
-		mmu.log.Printf("Attemping to write to unimplemented address %x (INTERNAL_RAM_8KB)", address.AsWord())
+		mmu.memory[address.AsWord()] = value
 
 	case address.AsWord() >= ECHO_8KB_INTERNAL_RAM && address.AsWord() < SPRITE_ATTRIB_MEMORY_OAM:
 		// ECHO_8KB_INTERNAL_RAM
-		mmu.log.Printf("Attemping to write to unimplemented address %x (ECHO_8KB_INTERNAL_RAM)", address.AsWord())
+		// The addresses from E000 to FE00 appear to access the internal RAM the same as C000-DE00.
+		mmu.memory[address.AsWord()-(ECHO_8KB_INTERNAL_RAM-INTERNAL_RAM_8KB)] = value
 
 	case address.AsWord() >= SPRITE_ATTRIB_MEMORY_OAM && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_1:
 		// SPRITE_ATTRIB_MEMORY_OAM
@@ -150,20 +152,21 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 	case address.AsWord() >= IO_PORTS && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_2:
 		// IO_PORTS
 		mmu.memory[address.AsWord()] = value
+		mmu.log.Printf("Attemping to write to dubiously-implemented address %x (IO_PORTS)", address.AsWord())
 		// TODO: Check this
-		// mmu.log.Fatalf("Attemping to write to unimplemented address %x (IO_PORTS)", address.AsWord())
 
-	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_2 && address.AsWord() < INTERNAL_RAM:
+	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_2 && address.AsWord() < HIGH_RAM:
 		// EMPTY_BUT_UNUSABLE_FOR_IO_2
 		mmu.log.Fatalf("Attemping to write to unimplemented address %x (EMPTY_BUT_UNUSABLE_FOR_IO_2)", address.AsWord())
 
-	case address.AsWord() >= INTERNAL_RAM && address.AsWord() < INTERRUPT_ENABLE_REGISTER:
+	case address.AsWord() >= HIGH_RAM && address.AsWord() < INTERRUPT_ENABLE_REGISTER:
 		// INTERNAL_RAM
-		mmu.log.Printf("Attemping to write to unimplemented address %x (INTERNAL_RAM)", address.AsWord())
+		mmu.memory[address.AsWord()] = value
 
 	case address.AsWord() >= INTERRUPT_ENABLE_REGISTER:
 		// INTERRUPT_ENABLE_REGISTER
-		mmu.log.Printf("Attemping to write to unimplemented address %x (INTERRUPT_ENABLE_REGISTER)", address.AsWord())
+		mmu.memory[address.AsWord()] = value
+		mmu.log.Printf("Writing value %.4x to INTERRUPT_ENABLE_REGISTER", value)
 	default:
 		mmu.log.Printf("Attemping to read from invalid address %x", address.AsWord())
 		mmu.memory[address.AsWord()] = value
@@ -175,5 +178,11 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 func (mmu *mmu) RequestInterrupt(interrupt byte) {
 	mmu.memoryLock.Lock()
 	mmu.log.Printf("Interruption %x", interrupt)
+	mmu.memoryLock.Unlock()
+}
+
+func (mmu *mmu) MapMemoryAdress(p Peripheral, address types.Address){
+	mmu.memoryLock.Lock()
+	p.MapByte(address, &mmu.memory[address.AsWord()])
 	mmu.memoryLock.Unlock()
 }

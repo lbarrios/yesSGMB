@@ -1,4 +1,4 @@
-// package cartridge implements the Cartridge type, that abstracts the GameBoy cartridge
+// Package cartridge implements the Cartridge type, that abstracts the GameBoy cartridge
 // it basically reads a rom from a file, and loads it in memory
 // the format of the header can be found here: http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
 package cartridge

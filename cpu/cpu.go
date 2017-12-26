@@ -1,4 +1,4 @@
-// package cpu implements the CPU and Registers type
+// Package cpu implements the CPU and Registers type
 package cpu
 
 import (
@@ -90,7 +90,6 @@ func (cpu *cpu) Step() {
 func (cpu *cpu) fetch() byte {
 	address := types.Address{High: cpu.r.pc.high(), Low: cpu.r.pc.low()}
 	opcode := cpu.mmu.ReadByte(address)
-	cpu.log.Printf("fetch[0x%.2x%.2x] = 0x%.4x (%s).", cpu.r.pc.high(), cpu.r.pc.low(), opcode, instructions_debug[opcode])
 	cpu.r.pc++
 	return opcode
 }
@@ -108,13 +107,13 @@ func (cpu *cpu) execute(instr instruction) cycleCount {
 func (cpu *cpu) Run(wg *sync.WaitGroup) {
 	cpu.log.Println("CPU started.")
 	for {
-		cpu.log.Println(cpu.r)
 		cpu.Step()
 		if cpu.r.pc == 0x02b2 {
-			cpu.log.Println("Breakpoint at 0x02b3.")
-			cpu.log.Println(cpu.r)
-			cpu.Step()
-			cpu.log.Println(cpu.r)
+			cpu.log.Println("\033[0;31mBreakpoint at 0x02b2.")
+			cpu.StepDebug()
+			cpu.StepDebug()
+			cpu.log.Println("writing 0xff to 0xff40 (this will stop the GPU)")
+			cpu.mmu.WriteByte(types.Address{0xff,0x40}, 0xff)
 			break
 		}
 		if cpu.cycle > 0x20000 {
@@ -124,3 +123,4 @@ func (cpu *cpu) Run(wg *sync.WaitGroup) {
 	}
 	wg.Done()
 }
+

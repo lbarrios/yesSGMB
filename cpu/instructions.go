@@ -206,13 +206,13 @@ const (
 	retNZCycles     = 8  // 0xC0
 	popBcCycles     = 12 // 0xC1
 	jpNZCycles      = 12 // 0xC2
-	jpCycles        = 16  // 0xC3
+	jpCycles        = 16 // 0xC3
 	callNZCycles    = 12 // 0xC4
 	pushBcCycles    = 16 // 0xC5
 	addANnCycles    = 8  // 0xC6
 	rst00HCycles    = 32 // 0xC7
 	retZCycles      = 8  // 0xC8
-	retCycles       = 16  // 0xC9
+	retCycles       = 16 // 0xC9
 	jpZCycles       = 12 // 0xCA
 	rxNCycles       = 8  // 0xCB
 	callZCycles     = 12 // 0xCC
@@ -228,7 +228,7 @@ const (
 	subANnCycles    = 8  // 0xD6
 	rst10HCycles    = 32 // 0xD7
 	retCCycles      = 8  // 0xD8
-	retiCycles      = 16  // 0xD9
+	retiCycles      = 16 // 0xD9
 	jpCCycles       = 12 // 0xDA
 	xDBCycles       = 0  // 0xDB
 	callCCycles     = 12 // 0xDC
@@ -1109,8 +1109,8 @@ func lddAMemHl(cpu *cpu) cycleCount {
 	// Then, decrement HL.
 	cpu.r.af.a = cpu.mmu.ReadByte(cpu.r.hlAsAddress())
 	hl := cpu.r.hlAsWord() - 0x0001
-	cpu.r.hl.h = byte(hl >> 4)
-	cpu.r.hl.l = byte(hl & 0x0F)
+	cpu.r.hl.h = hl.high()
+	cpu.r.hl.l = hl.low()
 	return lddAMemHlCycles
 }
 
@@ -1130,8 +1130,8 @@ func lddMemHlA(cpu *cpu) cycleCount {
 	// Then, decrement HL.
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), cpu.r.af.a)
 	hl := cpu.r.hlAsWord() - 0x0001
-	cpu.r.hl.h = byte(hl >> 4)
-	cpu.r.hl.l = byte(hl & 0x0F)
+	cpu.r.hl.h = hl.high()
+	cpu.r.hl.l = hl.low()
 	return lddMemHlACycles
 }
 
@@ -5718,7 +5718,7 @@ func call(cpu *cpu) cycleCount {
 	// (nn: parameter from immediate value)
 	low := cpu.fetch()
 	high := cpu.fetch()
-	nextInstruction := cpu.r.pc+1
+	nextInstruction := cpu.r.pc + 1
 	cpu.r.sp--
 	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
 	cpu.r.sp--
@@ -5751,7 +5751,7 @@ func callNZ(cpu *cpu) cycleCount {
 	low := cpu.fetch()
 	high := cpu.fetch()
 	if !cpu.r.af.f.z {
-		nextInstruction := cpu.r.pc+1
+		nextInstruction := cpu.r.pc + 1
 		cpu.r.sp--
 		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
 		cpu.r.sp--
@@ -5769,7 +5769,7 @@ func callZ(cpu *cpu) cycleCount {
 	low := cpu.fetch()
 	high := cpu.fetch()
 	if cpu.r.af.f.z {
-		nextInstruction := cpu.r.pc+1
+		nextInstruction := cpu.r.pc + 1
 		cpu.r.sp--
 		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
 		cpu.r.sp--
@@ -5787,7 +5787,7 @@ func callNC(cpu *cpu) cycleCount {
 	low := cpu.fetch()
 	high := cpu.fetch()
 	if !cpu.r.af.f.c {
-		nextInstruction := cpu.r.pc+1
+		nextInstruction := cpu.r.pc + 1
 		cpu.r.sp--
 		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
 		cpu.r.sp--
@@ -5805,7 +5805,7 @@ func callC(cpu *cpu) cycleCount {
 	low := cpu.fetch()
 	high := cpu.fetch()
 	if cpu.r.af.f.c {
-		nextInstruction := cpu.r.pc+1
+		nextInstruction := cpu.r.pc + 1
 		cpu.r.sp--
 		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.high())
 		cpu.r.sp--
@@ -5956,7 +5956,7 @@ func retNZ(cpu *cpu) cycleCount {
 	// If Z flag is reset, then
 	// pop two bytes from stack,
 	// and jump to that address.
-	if !cpu.r.af.f.z{
+	if !cpu.r.af.f.z {
 		low := cpu.mmu.ReadByte(cpu.r.spAsAddress())
 		cpu.r.sp++
 		high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
@@ -5971,7 +5971,7 @@ func retZ(cpu *cpu) cycleCount {
 	// If Z flag is set, then
 	// pop two bytes from stack,
 	// and jump to that address.
-	if cpu.r.af.f.z{
+	if cpu.r.af.f.z {
 		low := cpu.mmu.ReadByte(cpu.r.spAsAddress())
 		cpu.r.sp++
 		high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
@@ -5986,7 +5986,7 @@ func retNC(cpu *cpu) cycleCount {
 	// If C flag is reset, then
 	// pop two bytes from stack,
 	// and jump to that address.
-	if !cpu.r.af.f.c{
+	if !cpu.r.af.f.c {
 		low := cpu.mmu.ReadByte(cpu.r.spAsAddress())
 		cpu.r.sp++
 		high := cpu.mmu.ReadByte(cpu.r.spAsAddress())
@@ -6001,7 +6001,7 @@ func retC(cpu *cpu) cycleCount {
 	// If C flag is set, then
 	// pop two bytes from stack,
 	// and jump to that address.
-	if !cpu.r.af.f.c{
+	if !cpu.r.af.f.c {
 		low := cpu.mmu.ReadByte(cpu.r.spAsAddress())
 		cpu.r.sp++
 		high := cpu.mmu.ReadByte(cpu.r.spAsAddress())

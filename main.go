@@ -8,6 +8,7 @@ import (
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/cpu"
 	"github.com/lbarrios/yesSGMB/gpu"
+	"github.com/lbarrios/yesSGMB/types"
 )
 
 var (
@@ -38,6 +39,7 @@ func main() {
 
 	GPU := gpu.NewGpu(MMU, log)
 	wg.Add(1)
+	MMU.MapMemoryAdress(GPU, types.Address{0xff, 0x40})
 	go GPU.Run(&wg)
 
 	wg.Wait()

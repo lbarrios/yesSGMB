@@ -2876,7 +2876,7 @@ func scf(cpu *cpu) cycleCount {
 // 		NOP 			-/- 			00 			4
 func nop(cpu *cpu) cycleCount {
 	// Does nothing
-	cpu.log.Printf("CPU: nop at... %d", cpu.cycle)
+	cpu.log.Printf("CPU: nop at... %d", cpu.cycles)
 	return nopCycles
 }
 

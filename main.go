@@ -57,11 +57,16 @@ func main() {
 	MMU.MapMemoryAdress(Timer, timer.TAC_ADDRESS.AsAddress())
 	Timer.Reset()
 
+	// Initialize the Clock
+	Clock := timer.Clock{Log: log}
+	Clock.ConnectPeripheral(CPU)
+
 	// Run all the components
 	wg.Add(3)
 	go CPU.Run(&wg)
 	go GPU.Run(&wg)
 	go Timer.Run(&wg)
+	go Clock.Run(&wg)
 
 	// Wait to exit the program
 	wg.Wait()

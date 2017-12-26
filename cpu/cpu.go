@@ -11,10 +11,13 @@ import (
 type cpu struct {
 	r                 Registers
 	mmu               mmu.MMU
-	cycle             cycleCount
 	interruptsEnabled bool
 	halted            bool
 	log               *logger.Logger
+	clockWg           *sync.WaitGroup // Clock WaitGroup
+	clockChan         chan uint64
+	cycles            uint64
+	clock             uint64
 }
 
 func NewCPU(mmu mmu.MMU, l *logger.Logger) *cpu {
@@ -24,6 +27,12 @@ func NewCPU(mmu mmu.MMU, l *logger.Logger) *cpu {
 	cpu.log.SetPrefix("\033[0;34mCPU: ")
 	cpu.Reset()
 	return cpu
+}
+
+func (cpu *cpu) ConnectClock(clockWg *sync.WaitGroup) chan uint64 {
+	cpu.clockWg = clockWg
+	cpu.clockChan = make(chan uint64)
+	return cpu.clockChan
 }
 
 func (cpu *cpu) Reset() {
@@ -84,7 +93,7 @@ func (cpu *cpu) Step() {
 	op := cpu.fetch()
 	instr := cpu.decode(op)
 	cycles := cpu.execute(instr)
-	cpu.cycle += cycles
+	cpu.cycles += uint64(cycles)
 }
 
 func (cpu *cpu) fetch() byte {
@@ -107,19 +116,20 @@ func (cpu *cpu) execute(instr instruction) cycleCount {
 func (cpu *cpu) Run(wg *sync.WaitGroup) {
 	cpu.log.Println("CPU started.")
 	for {
-		cpu.Step()
-		if cpu.r.pc == 0x02b2 {
-			cpu.log.Println("\033[1;31mBreakpoint at 0x02b2.")
+		for currentClock := <-cpu.clockChan; cpu.cycles <= currentClock; {
 			cpu.StepDebug()
-			cpu.StepDebug()
-			cpu.log.Println("writing 0xff to 0xff40 (this will stop the GPU)")
-			cpu.mmu.WriteByte(types.Address{0xff, 0x40}, 0xff)
-			break
+			if cpu.r.pc == 0x02b2 {
+				cpu.log.Println("\033[1;31mBreakpoint at 0x02b2.")
+				cpu.StepDebug()
+				cpu.StepDebug()
+				cpu.log.Println("writing 0xff to 0xff40 (this will stop the GPU)")
+				cpu.mmu.WriteByte(types.Address{0xff, 0x40}, 0xff)
+				cpu.clockWg.Done()
+				wg.Done()
+				return
+			}
 		}
-		if cpu.cycle > 0x20000 {
-			cpu.log.Println("max cycles.")
-			break
-		}
+		cpu.clockWg.Done()
 	}
 	wg.Done()
 }

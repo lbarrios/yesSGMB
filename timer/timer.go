@@ -16,12 +16,19 @@ const (
 	TAC_ADDRESS  = types.Word(0xFF07)
 )
 
+const (
+	FREQ_4096   = 4096
+	FREQ_16384  = 16384
+	FREQ_65536  = 65536
+	FREQ_262144 = 262144
+)
+
 type timer struct {
-	log  logger.Logger
-	div  *byte
-	tima *byte
-	tma  *byte
-	tac  *byte
+	log         logger.Logger
+	div         *byte
+	tima        *byte
+	tma         *byte
+	tac         *byte
 }
 
 func NewTimer(l *logger.Logger) *timer {
@@ -48,6 +55,15 @@ func (t *timer) MapByte(logical_address types.Address, physical_address *byte) {
 		t.tac = physical_address
 	default:
 		t.log.Fatalf("Trying to map unexpected address: 0x%.4x", addr)
+	}
+}
+
+func (t *timer) step() {
+	*t.tima -= *t.tma
+	// t clock main = 0;
+	if (*t.tima == 0) {
+		*t.tima = *t.tma;
+		// interrupt flag |= 4;
 	}
 }
 

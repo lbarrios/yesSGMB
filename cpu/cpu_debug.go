@@ -8,7 +8,7 @@ func (cpu *cpu) StepDebug() {
 	op := cpu.fetchDebug()
 	instr := cpu.decodeDebug(op)
 	cycles := cpu.executeDebug(instr)
-	cpu.cycle += cycles
+	cpu.cycles += uint64(cycles)
 	cpu.log.Println(cpu.r)
 	cpu.log.Println("")
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/types"
 	"sync"
+	"github.com/lbarrios/yesSGMB/timer"
 )
 
 type cpu struct {
@@ -13,26 +14,26 @@ type cpu struct {
 	mmu               mmu.MMU
 	interruptsEnabled bool
 	halted            bool
-	log               *logger.Logger
-	clockWg           *sync.WaitGroup // Clock WaitGroup
-	clockChan         chan uint64
-	cycles            uint64
-	clock             uint64
+	log               logger.Logger
+	clock             timer.ClockCounter
 }
 
 func NewCPU(mmu mmu.MMU, l *logger.Logger) *cpu {
 	cpu := new(cpu)
 	cpu.mmu = mmu
-	cpu.log = l
+	cpu.log = *l
 	cpu.log.SetPrefix("\033[0;34mCPU: ")
 	cpu.Reset()
 	return cpu
 }
 
-func (cpu *cpu) ConnectClock(clockWg *sync.WaitGroup) chan uint64 {
-	cpu.clockWg = clockWg
-	cpu.clockChan = make(chan uint64)
-	return cpu.clockChan
+func (cpu *cpu) ConnectClock(clockWg *sync.WaitGroup, clock timer.Clock) chan uint64 {
+	cpu.clock.Init(clockWg, make(chan uint64), clock)
+	return cpu.clock.Channel
+}
+
+func (cpu *cpu) GetName() string {
+	return "cpu"
 }
 
 func (cpu *cpu) Reset() {
@@ -93,7 +94,7 @@ func (cpu *cpu) Step() {
 	op := cpu.fetch()
 	instr := cpu.decode(op)
 	cycles := cpu.execute(instr)
-	cpu.cycles += uint64(cycles)
+	cpu.clock.Cycles += uint64(cycles)
 }
 
 func (cpu *cpu) fetch() byte {
@@ -116,20 +117,20 @@ func (cpu *cpu) execute(instr instruction) cycleCount {
 func (cpu *cpu) Run(wg *sync.WaitGroup) {
 	cpu.log.Println("CPU started.")
 	for {
-		for currentClock := <-cpu.clockChan; cpu.cycles <= currentClock; {
+		cpu.clock.WaitNextCycle()
+
+		cpu.StepDebug()
+		if cpu.r.pc == 0x02b2 {
+			cpu.log.Println("\033[1;31mBreakpoint at 0x02b2.")
 			cpu.StepDebug()
-			if cpu.r.pc == 0x02b2 {
-				cpu.log.Println("\033[1;31mBreakpoint at 0x02b2.")
-				cpu.StepDebug()
-				cpu.StepDebug()
-				cpu.log.Println("writing 0xff to 0xff40 (this will stop the GPU)")
-				cpu.mmu.WriteByte(types.Address{0xff, 0x40}, 0xff)
-				cpu.clockWg.Done()
-				wg.Done()
-				return
-			}
+			cpu.StepDebug()
+			cpu.log.Println("writing 0xff to 0xff40 (this will stop the GPU)")
+			cpu.mmu.WriteByte(types.Address{0xff, 0x40}, 0xff)
+			cpu.log.Println("writing 0xff to 0xff07 (this will stop the timer)")
+			cpu.mmu.WriteByte(types.Address{0xff, 0x07}, 0xff)
+			cpu.clock.Disconnect(cpu)
+			break
 		}
-		cpu.clockWg.Done()
 	}
 	wg.Done()
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/types"
 	"sync"
-	"time"
+	"github.com/lbarrios/yesSGMB/timer"
 )
 
 const (
@@ -28,6 +28,7 @@ const (
 )
 
 type gpu struct {
+	clock      timer.ClockCounter
 	irqHandler mmu.IRQHandler
 	log        logger.Logger
 	lcdc       *byte
@@ -48,21 +49,14 @@ func NewGpu(mmu mmu.IRQHandler, l *logger.Logger) *gpu {
 	return gpu
 }
 
-func (gpu *gpu) Reset() {
-	gpu.log.Println("GPU reset triggered.")
+
+func (gpu *gpu) ConnectClock(clockWg *sync.WaitGroup, clock timer.Clock) chan uint64 {
+	gpu.clock.Init(clockWg, make(chan uint64), clock)
+	return gpu.clock.Channel
 }
 
-func (gpu *gpu) Run(wg *sync.WaitGroup) {
-	gpu.log.Println("GPU started.")
-	for {
-		if *gpu.lcdc == 0xff {
-			gpu.log.Println("lcdc=0xff, stopping GPU.")
-			break
-		}
-		gpu.log.Printf("lcdc=0x%.2x; the GPU will stop when this reaches 0xff..", *gpu.lcdc)
-		time.Sleep(1 * time.Second)
-	}
-	wg.Done()
+func (gpu *gpu) GetName() string {
+	return "gpu"
 }
 
 func (gpu *gpu) MapByte(logical_address types.Address, physical_address *byte) {
@@ -87,4 +81,29 @@ func (gpu *gpu) MapByte(logical_address types.Address, physical_address *byte) {
 	default:
 		gpu.log.Fatalf("Trying to map unexpected address: 0x%.4x", addr)
 	}
+}
+
+func (gpu *gpu) Reset() {
+	gpu.log.Println("GPU reset triggered.")
+}
+
+func (gpu *gpu) step() {
+	gpu.clock.Cycles += 2048
+}
+
+func (gpu *gpu) Run(wg *sync.WaitGroup) {
+	gpu.log.Println("GPU started.")
+	for {
+		gpu.clock.WaitNextCycle()
+
+		if *gpu.lcdc == 0xff {
+			gpu.log.Println("lcdc=0xff, stopping GPU.")
+			gpu.clock.Disconnect(gpu)
+			break
+		}
+		gpu.log.Printf("lcdc=0x%.2x; the GPU will stop when this reaches 0xff..", *gpu.lcdc)
+		gpu.step()
+		//time.Sleep(1 * time.Second)
+	}
+	wg.Done()
 }

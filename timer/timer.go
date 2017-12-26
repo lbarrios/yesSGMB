@@ -6,7 +6,6 @@ import (
 	"github.com/lbarrios/yesSGMB/logger"
 	"github.com/lbarrios/yesSGMB/types"
 	"sync"
-	"time"
 )
 
 const (
@@ -17,18 +16,23 @@ const (
 )
 
 const (
-	FREQ_4096   = 4096
-	FREQ_16384  = 16384
-	FREQ_65536  = 65536
-	FREQ_262144 = 262144
+	FREQ_4096     = 4096
+	FREQ_16384    = 16384
+	FREQ_65536    = 65536
+	FREQ_262144   = 262144
+	CYCLES_4096   = 1024
+	CYCLES_16384  = 256
+	CYCLES_65536  = 64
+	CYCLES_262144 = 16
 )
 
 type timer struct {
-	log         logger.Logger
-	div         *byte
-	tima        *byte
-	tma         *byte
-	tac         *byte
+	log   logger.Logger
+	clock ClockCounter
+	div   *byte
+	tima  *byte
+	tma   *byte
+	tac   *byte
 }
 
 func NewTimer(l *logger.Logger) *timer {
@@ -36,6 +40,15 @@ func NewTimer(l *logger.Logger) *timer {
 	t.log = *l
 	t.log.SetPrefix("\033[0;32mTIMER: ")
 	return t
+}
+
+func (t *timer) ConnectClock(clockWg *sync.WaitGroup, clock Clock) chan uint64 {
+	t.clock.Init(clockWg, make(chan uint64), clock)
+	return t.clock.Channel
+}
+
+func (t *timer) GetName() string {
+	return "timer"
 }
 
 func (t *timer) Reset() {
@@ -70,13 +83,19 @@ func (t *timer) step() {
 func (t *timer) Run(wg *sync.WaitGroup) {
 	t.log.Println("Timer started.")
 	for {
-		*t.div += 32
-		t.log.Printf("tic, div=%d", *t.div)
-		if *t.div == 0x00 {
-			t.log.Println("div=0x00, stopping Timer.")
+		t.clock.WaitNextCycle()
+
+		if *t.tac == 0xff {
+			t.log.Println("tac=0xff, stopping timer.")
+			t.clock.Disconnect(t)
 			break
 		}
-		time.Sleep(1000 * time.Millisecond)
+
+		t.clock.Cycles += CYCLES_4096
+		*t.div += 1
+		if *t.div == 0x00 {
+			t.log.Println("tic, div=0x00.")
+		}
 	}
 	wg.Done()
 }

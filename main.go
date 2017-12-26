@@ -58,11 +58,13 @@ func main() {
 	Timer.Reset()
 
 	// Initialize the Clock
-	Clock := timer.Clock{Log: log}
+	Clock := timer.NewClock(log)
 	Clock.ConnectPeripheral(CPU)
+	Clock.ConnectPeripheral(Timer)
+	Clock.ConnectPeripheral(GPU)
 
 	// Run all the components
-	wg.Add(3)
+	wg.Add(4)
 	go CPU.Run(&wg)
 	go GPU.Run(&wg)
 	go Timer.Run(&wg)

@@ -3,5 +3,6 @@ package timer
 import "sync"
 
 type Peripheral interface {
-	ConnectClock(*sync.WaitGroup) chan uint64
+	ConnectClock(*sync.WaitGroup, Clock) chan uint64
+	GetName() string
 }

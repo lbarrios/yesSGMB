@@ -9,6 +9,7 @@ import (
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/timer"
 	"sync"
+	"github.com/lbarrios/yesSGMB/clock"
 )
 
 var (
@@ -58,7 +59,7 @@ func main() {
 	Timer.Reset()
 
 	// Initialize the Clock
-	Clock := timer.NewClock(log)
+	Clock := clock.NewClock(log)
 	Clock.ConnectPeripheral(CPU)
 	Clock.ConnectPeripheral(Timer)
 	Clock.ConnectPeripheral(GPU)

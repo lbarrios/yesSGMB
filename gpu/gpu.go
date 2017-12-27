@@ -6,7 +6,7 @@ import (
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/types"
 	"sync"
-	"github.com/lbarrios/yesSGMB/timer"
+	"github.com/lbarrios/yesSGMB/clock"
 )
 
 const (
@@ -21,24 +21,39 @@ const (
 	OAM_END         = types.Word(0xFE9F) // Sprite Attribute Table
 	LCDC_ADDRESS    = types.Word(0xFF40)
 	STAT_ADDRESS    = types.Word(0xFF41)
+	STAT_MODE_MASK  = 0x03
 	SCY_ADDRESS     = types.Word(0xFF42)
 	SCX_ADDRESS     = types.Word(0xFF43)
 	LY_ADDRESS      = types.Word(0xFF44)
 	LYC_ADDRESS     = types.Word(0xFF45)
 )
 
+const ( // Video modes
+	HBLANK_MODE = 0x00
+	VBLANK_MODE = 0x01
+	OAM_MODE    = 0x02
+	VRAM_MODE   = 0x03
+)
+
+const (
+	HBLANK_MODE_CYCLES = 204
+	VBLANK_MODE_CYCLES = 4560
+	OAM_MODE_CYCLES    = 80
+	VRAM_MODE_CYCLES   = 172
+)
+
 type gpu struct {
-	clock      timer.ClockCounter
-	irqHandler mmu.IRQHandler
-	log        logger.Logger
-	lcdc       *byte
-	stat       *byte
-	scy        *byte
-	scx        *byte
-	ly         *byte
-	lyc        *byte
-	video_ram  [1 + VIDEO_RAM_END - VIDEO_RAM_START]*byte
-	oam        [1 + OAM_END - OAM_START]*byte
+	clock        clock.ClockCounter
+	irqHandler   mmu.IRQHandler
+	log          logger.Logger
+	lcdc         *byte
+	stat         *byte
+	scy          *byte
+	scx          *byte
+	current_line *byte
+	lyc          *byte
+	video_ram    [1 + VIDEO_RAM_END - VIDEO_RAM_START]*byte
+	oam          [1 + OAM_END - OAM_START]*byte
 }
 
 func NewGpu(mmu mmu.IRQHandler, l *logger.Logger) *gpu {
@@ -49,8 +64,7 @@ func NewGpu(mmu mmu.IRQHandler, l *logger.Logger) *gpu {
 	return gpu
 }
 
-
-func (gpu *gpu) ConnectClock(clockWg *sync.WaitGroup, clock timer.Clock) chan uint64 {
+func (gpu *gpu) ConnectClock(clockWg *sync.WaitGroup, clock clock.Clock) chan uint64 {
 	gpu.clock.Init(clockWg, make(chan uint64), clock)
 	return gpu.clock.Channel
 }
@@ -71,7 +85,7 @@ func (gpu *gpu) MapByte(logical_address types.Address, physical_address *byte) {
 	case addr == SCX_ADDRESS:
 		gpu.scx = physical_address
 	case addr == LY_ADDRESS:
-		gpu.ly = physical_address
+		gpu.current_line = physical_address
 	case addr == LYC_ADDRESS:
 		gpu.lyc = physical_address
 	case addr >= VIDEO_RAM_START && addr <= VIDEO_RAM_END:
@@ -87,8 +101,54 @@ func (gpu *gpu) Reset() {
 	gpu.log.Println("GPU reset triggered.")
 }
 
+func (gpu *gpu) mode() byte {
+	mode := *gpu.stat
+	mode &= STAT_MODE_MASK
+	return mode
+}
+
+func (gpu *gpu) setMode(mode byte) {
+	*gpu.stat = ((*gpu.stat >> 2) << 2) | mode
+
+	switch mode {
+	case HBLANK_MODE:
+
+	case OAM_MODE:
+
+	case VBLANK_MODE:
+
+	case VRAM_MODE:
+
+	}
+}
+
 func (gpu *gpu) step() {
-	gpu.clock.Cycles += 2048
+	gpu.log.Printf("mode: %.2x", gpu.mode())
+	switch {
+	case gpu.mode() == HBLANK_MODE:
+		gpu.log.Println("HBLANK")
+		gpu.clock.Cycles += HBLANK_MODE_CYCLES
+		*gpu.current_line += 1
+		if *gpu.current_line < DISPLAY_HEIGHT {
+			gpu.setMode(OAM_MODE)
+		} else {
+			gpu.setMode(VBLANK_MODE)
+		}
+
+	case gpu.mode() == VBLANK_MODE:
+		gpu.log.Println("VBLANK")
+		gpu.clock.Cycles += VBLANK_MODE_CYCLES
+		*gpu.current_line = 0
+		gpu.setMode(OAM_MODE)
+
+	case gpu.mode() == OAM_MODE:
+		gpu.clock.Cycles += OAM_MODE_CYCLES
+		gpu.setMode(VRAM_MODE)
+
+	case gpu.mode() == VRAM_MODE:
+		gpu.clock.Cycles += VRAM_MODE_CYCLES
+		gpu.setMode(HBLANK_MODE)
+	}
 }
 
 func (gpu *gpu) Run(wg *sync.WaitGroup) {
@@ -101,7 +161,7 @@ func (gpu *gpu) Run(wg *sync.WaitGroup) {
 			gpu.clock.Disconnect(gpu)
 			break
 		}
-		gpu.log.Printf("lcdc=0x%.2x; the GPU will stop when this reaches 0xff..", *gpu.lcdc)
+
 		gpu.step()
 		//time.Sleep(1 * time.Second)
 	}

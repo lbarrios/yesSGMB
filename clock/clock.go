@@ -1,4 +1,8 @@
-package timer
+// Package clock provides the abstraction for the clock of the Gameboy.
+// In the original hardware it works at approximately 4 MHz.
+// In the emulation, it connects to some list of peripherals, and then generates periodical signals,
+// providing them of some fixed quantum. It works like a scheduler.
+package clock
 
 import (
 	"github.com/lbarrios/yesSGMB/logger"
@@ -25,7 +29,7 @@ func NewClock(l *logger.Logger) *clock {
 	c := new(clock)
 	c.log = *l
 	c.peripherals = make(map[string]chan uint64)
-	c.log.SetPrefix("\033[0;35mCPU: ")
+	c.log.SetPrefix("\033[0;35mClock: ")
 	return c
 }
 

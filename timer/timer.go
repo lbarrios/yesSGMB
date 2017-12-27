@@ -6,6 +6,7 @@ import (
 	"github.com/lbarrios/yesSGMB/logger"
 	"github.com/lbarrios/yesSGMB/types"
 	"sync"
+	"github.com/lbarrios/yesSGMB/clock"
 )
 
 const (
@@ -28,7 +29,7 @@ const (
 
 type timer struct {
 	log   logger.Logger
-	clock ClockCounter
+	clock clock.ClockCounter
 	div   *byte
 	tima  *byte
 	tma   *byte
@@ -42,7 +43,7 @@ func NewTimer(l *logger.Logger) *timer {
 	return t
 }
 
-func (t *timer) ConnectClock(clockWg *sync.WaitGroup, clock Clock) chan uint64 {
+func (t *timer) ConnectClock(clockWg *sync.WaitGroup, clock clock.Clock) chan uint64 {
 	t.clock.Init(clockWg, make(chan uint64), clock)
 	return t.clock.Channel
 }
@@ -74,8 +75,8 @@ func (t *timer) MapByte(logical_address types.Address, physical_address *byte) {
 func (t *timer) step() {
 	*t.tima -= *t.tma
 	// t clock main = 0;
-	if (*t.tima == 0) {
-		*t.tima = *t.tma;
+	if *t.tima == 0 {
+		*t.tima = *t.tma
 		// interrupt flag |= 4;
 	}
 }

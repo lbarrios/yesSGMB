@@ -6,7 +6,7 @@ import (
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/types"
 	"sync"
-	"github.com/lbarrios/yesSGMB/timer"
+	"github.com/lbarrios/yesSGMB/clock"
 )
 
 type cpu struct {
@@ -15,7 +15,7 @@ type cpu struct {
 	interruptsEnabled bool
 	halted            bool
 	log               logger.Logger
-	clock             timer.ClockCounter
+	clock             clock.ClockCounter
 }
 
 func NewCPU(mmu mmu.MMU, l *logger.Logger) *cpu {
@@ -27,7 +27,7 @@ func NewCPU(mmu mmu.MMU, l *logger.Logger) *cpu {
 	return cpu
 }
 
-func (cpu *cpu) ConnectClock(clockWg *sync.WaitGroup, clock timer.Clock) chan uint64 {
+func (cpu *cpu) ConnectClock(clockWg *sync.WaitGroup, clock clock.Clock) chan uint64 {
 	cpu.clock.Init(clockWg, make(chan uint64), clock)
 	return cpu.clock.Channel
 }

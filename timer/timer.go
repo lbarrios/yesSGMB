@@ -3,10 +3,10 @@
 package timer
 
 import (
+	"github.com/lbarrios/yesSGMB/clock"
 	"github.com/lbarrios/yesSGMB/logger"
 	"github.com/lbarrios/yesSGMB/types"
 	"sync"
-	"github.com/lbarrios/yesSGMB/clock"
 )
 
 const (

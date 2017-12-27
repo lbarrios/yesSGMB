@@ -1,9 +1,9 @@
 package logger
 
 import (
+	"fmt"
 	"log"
 	"os"
-	"fmt"
 	"sync"
 )
 

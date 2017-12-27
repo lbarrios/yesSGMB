@@ -2,11 +2,11 @@
 package cpu
 
 import (
+	"github.com/lbarrios/yesSGMB/clock"
 	"github.com/lbarrios/yesSGMB/logger"
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/types"
 	"sync"
-	"github.com/lbarrios/yesSGMB/clock"
 )
 
 type cpu struct {

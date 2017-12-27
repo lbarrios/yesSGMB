@@ -1,6 +1,6 @@
 package cpu
 
-var instructions_debug = [0x100] string{
+var instructions_debug = [0x100]string{
 	"nop",            // 0x00
 	"ldBcNn",         // 0x01
 	"ldMemBcA",       // 0x02

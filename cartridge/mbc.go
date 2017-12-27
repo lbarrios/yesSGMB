@@ -1,8 +1,8 @@
 package cartridge
 
 import (
-	"github.com/lbarrios/yesSGMB/types"
 	"github.com/lbarrios/yesSGMB/logger"
+	"github.com/lbarrios/yesSGMB/types"
 )
 
 const (

@@ -2,16 +2,12 @@
 package gpu
 
 import (
+	"github.com/lbarrios/yesSGMB/clock"
+	"github.com/lbarrios/yesSGMB/display"
 	"github.com/lbarrios/yesSGMB/logger"
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/types"
 	"sync"
-	"github.com/lbarrios/yesSGMB/clock"
-)
-
-const (
-	DISPLAY_WIDTH  = 160
-	DISPLAY_HEIGHT = 144
 )
 
 const (
@@ -35,16 +31,21 @@ const ( // Video modes
 	VRAM_MODE   = 0x03
 )
 
-const (
+const ( // Video modes cycles
 	HBLANK_MODE_CYCLES = 204
 	VBLANK_MODE_CYCLES = 4560
 	OAM_MODE_CYCLES    = 80
 	VRAM_MODE_CYCLES   = 172
 )
 
+const ( // Interruptions
+	VBLANK_IRQ = 0
+)
+
 type gpu struct {
 	clock        clock.ClockCounter
 	irqHandler   mmu.IRQHandler
+	display      *display.Display
 	log          logger.Logger
 	lcdc         *byte
 	stat         *byte
@@ -67,6 +68,10 @@ func NewGpu(mmu mmu.IRQHandler, l *logger.Logger) *gpu {
 func (gpu *gpu) ConnectClock(clockWg *sync.WaitGroup, clock clock.Clock) chan uint64 {
 	gpu.clock.Init(clockWg, make(chan uint64), clock)
 	return gpu.clock.Channel
+}
+
+func (gpu *gpu) ConnectDisplay(d *display.Display) {
+	gpu.display = d
 }
 
 func (gpu *gpu) GetName() string {
@@ -129,7 +134,7 @@ func (gpu *gpu) step() {
 		gpu.log.Println("HBLANK")
 		gpu.clock.Cycles += HBLANK_MODE_CYCLES
 		*gpu.current_line += 1
-		if *gpu.current_line < DISPLAY_HEIGHT {
+		if *gpu.current_line < display.HEIGHT {
 			gpu.setMode(OAM_MODE)
 		} else {
 			gpu.setMode(VBLANK_MODE)
@@ -137,6 +142,8 @@ func (gpu *gpu) step() {
 
 	case gpu.mode() == VBLANK_MODE:
 		gpu.log.Println("VBLANK")
+		gpu.display.Refresh()
+		gpu.irqHandler.RequestInterrupt(VBLANK_IRQ)
 		gpu.clock.Cycles += VBLANK_MODE_CYCLES
 		*gpu.current_line = 0
 		gpu.setMode(OAM_MODE)
@@ -153,6 +160,7 @@ func (gpu *gpu) step() {
 
 func (gpu *gpu) Run(wg *sync.WaitGroup) {
 	gpu.log.Println("GPU started.")
+
 	for {
 		gpu.clock.WaitNextCycle()
 
@@ -163,7 +171,8 @@ func (gpu *gpu) Run(wg *sync.WaitGroup) {
 		}
 
 		gpu.step()
-		//time.Sleep(1 * time.Second)
 	}
+
+	gpu.display.Disconnect(wg)
 	wg.Done()
 }

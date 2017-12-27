@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	MIN_ADDRESS = 0x0000
-	MAX_ADDRESS = 0xFFFF
+	MIN_ADDRESS         = 0x0000
+	MAX_ADDRESS         = 0xFFFF
+	INTERRUPT_FLAG_ADDR = types.Word(0xFF0F)
 )
 
 type mmu struct {
@@ -177,9 +178,10 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 }
 
 func (mmu *mmu) RequestInterrupt(interrupt byte) {
-	mmu.memoryLock.Lock()
+	iflag := mmu.ReadByte(INTERRUPT_FLAG_ADDR.AsAddress())
+	iflag |= interrupt
+	mmu.WriteByte(INTERRUPT_FLAG_ADDR.AsAddress(), iflag)
 	mmu.log.Printf("Interruption %x", interrupt)
-	mmu.memoryLock.Unlock()
 }
 
 func (mmu *mmu) MapMemoryRegion(p Peripheral, begin types.Address, end types.Address) {

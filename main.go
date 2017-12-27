@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"github.com/lbarrios/yesSGMB/cartridge"
+	"github.com/lbarrios/yesSGMB/clock"
 	"github.com/lbarrios/yesSGMB/cpu"
+	"github.com/lbarrios/yesSGMB/display"
 	"github.com/lbarrios/yesSGMB/gpu"
 	"github.com/lbarrios/yesSGMB/logger"
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/timer"
 	"sync"
-	"github.com/lbarrios/yesSGMB/clock"
 )
 
 var (
@@ -64,12 +65,18 @@ func main() {
 	Clock.ConnectPeripheral(Timer)
 	Clock.ConnectPeripheral(GPU)
 
+	// Initialize the Display
+	Display := display.Display{}
+	Display.Init()
+	GPU.ConnectDisplay(&Display)
+
 	// Run all the components
-	wg.Add(4)
+	wg.Add(5)
 	go CPU.Run(&wg)
 	go GPU.Run(&wg)
 	go Timer.Run(&wg)
 	go Clock.Run(&wg)
+	go Display.Run(&wg)
 
 	// Wait to exit the program
 	wg.Wait()

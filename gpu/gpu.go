@@ -10,7 +10,8 @@ import (
 	"sync"
 )
 
-const (
+const ( // Memory Mapped
+	// Video Ram
 	VIDEO_RAM_START types.Word = 0x8000
 	VIDEO_RAM_END   types.Word = 0x9FFF
 	// Video Ram Detail
@@ -32,6 +33,16 @@ const (
 	LYC_ADDRESS  types.Word = 0xFF45
 )
 
+const (
+	LINE_TILES         = 32 // 32 tiles per line
+	TILE_WIDTH_PIXELS  = 8  // 8 pixels per tile
+	LINE_WIDTH_PIXELS  = LINE_TILES * TILE_WIDTH_PIXELS
+	TILE_WIDTH_BYTES   = 2 // 16 bytes per tile
+	TILE_HEIGHT_PIXELS = 8
+	TILE_HEIGHT_BYTES  = 2
+	LINE_COUNT         = 256
+)
+
 const ( // Video modes
 	STAT_MODE_MASK = 0x03 // bit-mask to obtain the mode from the the stat register
 	HBLANK_MODE    = 0x00
@@ -48,7 +59,8 @@ const ( // Video modes cycles
 )
 
 const ( // Interruptions
-	VBLANK_IRQ = 0
+	VBLANK_IRQ = 0x01 // bit 1
+	LCD_IRQ    = 0x02 // bit 2
 )
 
 type gpu struct {
@@ -62,12 +74,14 @@ type gpu struct {
 	scrollX     *byte // scx = 0xFF43
 	currentLine *byte // ly = 0xFF44
 	lyc         *byte // lyc = 0xFF45
-	video_ram   [1 + VIDEO_RAM_END - VIDEO_RAM_START]*byte
+	videoRam    [1 + VIDEO_RAM_END - VIDEO_RAM_START]*byte
 	oam         [1 + OAM_END - OAM_START]*byte
 	tileMap0    [TILEMAP_SIZE]*byte
 	tileMap1    [TILEMAP_SIZE]*byte
 	tileData0   [TILEDATA_SIZE]*byte
 	tileData1   [TILEDATA_SIZE]*byte
+
+	internalData [LINE_WIDTH_PIXELS][LINE_COUNT]byte
 
 	displayOn    bool
 	backgroundOn bool
@@ -112,7 +126,7 @@ func (gpu *gpu) MapByte(logical_address types.Address, physical_address *byte) {
 	case addr == LYC_ADDRESS:
 		gpu.lyc = physical_address
 	case addr >= VIDEO_RAM_START && addr <= VIDEO_RAM_END:
-		gpu.video_ram[addr-VIDEO_RAM_START] = physical_address
+		gpu.videoRam[addr-VIDEO_RAM_START] = physical_address
 		if addr >= TILEDATA1_START && addr < TILEDATA1_START+TILEDATA_SIZE {
 			gpu.tileData1[addr-TILEDATA1_START] = physical_address
 		}
@@ -134,6 +148,7 @@ func (gpu *gpu) MapByte(logical_address types.Address, physical_address *byte) {
 
 func (gpu *gpu) Reset() {
 	gpu.log.Println("GPU reset triggered.")
+	gpu.backgroundOn = true
 }
 
 func (gpu *gpu) mode() byte {
@@ -158,13 +173,13 @@ func (gpu *gpu) setMode(mode byte) {
 }
 
 func (gpu *gpu) step() {
-	gpu.log.Printf("mode: %.2x", gpu.mode())
+	//gpu.log.Printf("mode: %.2x", gpu.mode())
 	switch {
 	case gpu.mode() == HBLANK_MODE:
-		gpu.log.Println("HBLANK")
+		//gpu.log.Println("HBLANK")
 		// render the current line
 		if gpu.backgroundOn {
-
+			gpu.renderBackgroundOnLine()
 		}
 		if gpu.windowOn {
 
@@ -184,7 +199,7 @@ func (gpu *gpu) step() {
 
 	case gpu.mode() == VBLANK_MODE:
 		gpu.log.Println("VBLANK")
-		gpu.display.Refresh()
+		gpu.display.Refresh(gpu.currentViewportData())
 		gpu.irqHandler.RequestInterrupt(VBLANK_IRQ)
 		gpu.clock.Cycles += VBLANK_MODE_CYCLES
 		*gpu.currentLine = 0
@@ -200,8 +215,26 @@ func (gpu *gpu) step() {
 	}
 }
 
-func (gpu *gpu) renderBackgroundOnLine() {
+func (gpu *gpu) currentViewportData() [display.WIDTH * display.HEIGHT]byte {
+	var result [display.WIDTH * display.HEIGHT]byte
+	for line := 0; line < display.HEIGHT; line++ {
+		for column := 0; column < display.WIDTH; column++ {
+			result[line*display.WIDTH+column] = gpu.internalData[column][line]
+		}
+	}
+	return result
+}
 
+func (gpu *gpu) renderBackgroundOnLine() {
+	backgroundTileMap := gpu.getBackgroundTileMap()
+	baseTileIndex := int(*gpu.currentLine/TILE_HEIGHT_PIXELS) * LINE_TILES
+	for i := 0; i < LINE_TILES; i++ {
+		tileIndex := int(*backgroundTileMap[baseTileIndex+i])
+		tileData := gpu.getTileDataForCurrentLine(tileIndex)
+		for j := 0; j < TILE_WIDTH_PIXELS; j++ {
+			gpu.internalData[i*TILE_WIDTH_PIXELS+j][*gpu.currentLine] = tileData[j]
+		}
+	}
 }
 
 func (gpu *gpu) renderWindowOnLine() {
@@ -210,6 +243,76 @@ func (gpu *gpu) renderWindowOnLine() {
 
 func (gpu *gpu) renderSpritesOnLine() {
 
+}
+
+func (gpu *gpu) getWindowTileMap() [TILEMAP_SIZE]*byte {
+	// lcdControl (LCDC - 0xFF40)
+	// Bit 6: Window Tile Map Display Select
+	// 0: tilemap0 ( 0x9800 to 0x9BFF )
+	// 1: tilemap1 ( 0x9C00 to 0x9FFF )
+	if types.BitIsSet(*gpu.lcdControl, 6) {
+		return gpu.tileMap1
+	} else {
+		return gpu.tileMap0
+	}
+}
+
+// Returns the data (2 bytes) corresponding to
+// the parameter tile at the GPU current line
+func (gpu *gpu) getTileDataForCurrentLine(tileIndex int) [TILE_WIDTH_PIXELS]byte {
+	// The indexes are used as follow.
+	// tileData 0: indexes from -128 to 127
+	// tileData 1: indexes from 0 to 255
+	//
+	// lcdControl (LCDC - 0xFF40)
+	// Bit 4: BG & Window Tile Data Select
+	// 0: tiledata0 ( $8800 to $97FF )
+	// 1: tiledata1 ( $8000 to $8FFF ) (Same area as OBJ)
+	var result [TILE_WIDTH_PIXELS]byte
+
+	var tileData *[TILEDATA_SIZE]*byte
+	if !types.BitIsSet(*gpu.lcdControl, 4) {
+		tileIndex += 128
+		tileData = &gpu.tileData0
+	} else {
+		tileData = &gpu.tileData1
+	}
+
+	tileIndex *= TILE_WIDTH_BYTES
+	tileLine := int(TILE_HEIGHT_BYTES * (*gpu.currentLine % TILE_HEIGHT_PIXELS))
+	lowBits := *(tileData[tileIndex+tileLine])
+	highBits := *(tileData[tileIndex+tileLine+1])
+	for i := uint(0); i < TILE_WIDTH_PIXELS; i++ {
+		lowBit := byte((lowBits & (1 << i)) >> i)
+		highBit := byte((highBits & (1 << i)) >> i)
+		result[i] = highBit<<1 + lowBit // result = 0000 00HL
+	}
+
+	return result
+}
+
+func (gpu *gpu) getBackgroundAndWindowTileData() *[TILEDATA_SIZE]*byte {
+	// lcdControl (LCDC - 0xFF40)
+	// Bit 4: BG & Window Tile Data Select
+	// 0: tiledata0 ( $8800 to $97FF )
+	// 1: tiledata1 ( $8000 to $8FFF ) (Same area as OBJ)
+	if types.BitIsSet(*gpu.lcdControl, 4) {
+		return &gpu.tileData0
+	} else {
+		return &gpu.tileData1
+	}
+}
+
+func (gpu *gpu) getBackgroundTileMap() *[TILEMAP_SIZE]*byte {
+	// lcdControl (LCDC - 0xFF40)
+	// Bit 3: BG Tile Map Display Select
+	// 0: tilemap0 ( 0x9800 to 0x9BFF )
+	// 1: tilemap1 ( 0x9C00 to 0x9FFF )
+	if types.BitIsSet(*gpu.lcdControl, 3) {
+		return &gpu.tileMap1
+	} else {
+		return &gpu.tileMap0
+	}
 }
 
 func (gpu *gpu) Run(wg *sync.WaitGroup) {

@@ -43,3 +43,11 @@ func (w Word) High() byte {
 func (w Word) AsAddress() Address {
 	return Address{High: w.High(), Low: w.Low()}
 }
+
+func WordFromBytes(high byte, low byte) Word {
+	return (Word(high)<<8 + Word(low))
+}
+
+func BitIsSet(b byte, pos uint) bool {
+	return b&(1<<pos) == (1 << pos)
+}

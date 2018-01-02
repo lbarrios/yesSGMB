@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	MIN_ADDRESS         = 0x0000
-	MAX_ADDRESS         = 0xFFFF
-	INTERRUPT_FLAG_ADDR = types.Word(0xFF0F)
+	MIN_ADDRESS               = 0x0000
+	MAX_ADDRESS               = 0xFFFF
+	INTERRUPT_FLAG_ADDR       = types.Word(0xFF0F)
+	INTERRUPT_ENABLE_REGISTER = types.Word(0xFFFF)
 )
 
 type mmu struct {
@@ -50,7 +51,6 @@ const (
 	IO_PORTS                    = 0xFF00
 	EMPTY_BUT_UNUSABLE_FOR_IO_2 = 0xFF4C
 	HIGH_RAM                    = 0xFF80
-	INTERRUPT_ENABLE_REGISTER   = 0xFFFF
 )
 
 func (mmu *mmu) ReadByte(address types.Address) byte {
@@ -68,7 +68,7 @@ func (mmu *mmu) ReadByte(address types.Address) byte {
 
 	case address.AsWord() >= VIDEO_RAM_8KB && address.AsWord() < SWITCHABLE_RAM_BANK_8KB:
 		// VIDEO_RAM_8KB
-		mmu.log.Printf("Attemping to read from unimplemented address %x (VIDEO_RAM_8KB)", address.AsWord())
+		mmu.log.Fatalf("Attemping to read from unimplemented address %x (VIDEO_RAM_8KB)", address.AsWord())
 
 	case address.AsWord() >= SWITCHABLE_RAM_BANK_8KB && address.AsWord() < INTERNAL_RAM_8KB:
 		// SWITCHABLE_RAM_BANK_8KB
@@ -85,7 +85,7 @@ func (mmu *mmu) ReadByte(address types.Address) byte {
 
 	case address.AsWord() >= SPRITE_ATTRIB_MEMORY_OAM && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_1:
 		// SPRITE_ATTRIB_MEMORY_OAM
-		mmu.log.Printf("Attemping to read from unimplemented address %x (SPRITE_ATTRIB_MEMORY_OAM)", address.AsWord())
+		mmu.log.Fatalf("Attemping to read from unimplemented address %x (SPRITE_ATTRIB_MEMORY_OAM)", address.AsWord())
 
 	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_1 && address.AsWord() < IO_PORTS:
 		// EMPTY_BUT_UNUSABLE_FOR_IO_1
@@ -105,10 +105,10 @@ func (mmu *mmu) ReadByte(address types.Address) byte {
 
 	case address.AsWord() >= INTERRUPT_ENABLE_REGISTER:
 		// INTERRUPT_ENABLE_REGISTER
-		mmu.log.Printf("Attemping to read from unimplemented address %x (INTERRUPT_ENABLE_REGISTER)", address.AsWord())
+		ret = mmu.memory[address.AsWord()]
 
 	default:
-		mmu.log.Printf("Attemping to read from invalid address %x", address.AsWord())
+		mmu.log.Fatalf("Attemping to read from invalid address %x", address.AsWord())
 		ret = mmu.memory[address.AsWord()]
 	}
 
@@ -130,7 +130,7 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 
 	case address.AsWord() >= VIDEO_RAM_8KB && address.AsWord() < SWITCHABLE_RAM_BANK_8KB:
 		// VIDEO_RAM_8KB
-		mmu.log.Printf("Attemping to write to unimplemented address %x (VIDEO_RAM_8KB)", address.AsWord())
+		mmu.log.Fatalf("Attemping to write to unimplemented address %x (VIDEO_RAM_8KB)", address.AsWord())
 
 	case address.AsWord() >= SWITCHABLE_RAM_BANK_8KB && address.AsWord() < INTERNAL_RAM_8KB:
 		// SWITCHABLE_RAM_BANK_8KB
@@ -147,7 +147,7 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 
 	case address.AsWord() >= SPRITE_ATTRIB_MEMORY_OAM && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_1:
 		// SPRITE_ATTRIB_MEMORY_OAM
-		mmu.log.Printf("Attemping to write to unimplemented address %x (SPRITE_ATTRIB_MEMORY_OAM)", address.AsWord())
+		mmu.log.Fatalf("Attemping to write to unimplemented address %x (SPRITE_ATTRIB_MEMORY_OAM)", address.AsWord())
 
 	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_1 && address.AsWord() < IO_PORTS:
 		// EMPTY_BUT_UNUSABLE_FOR_IO_1
@@ -169,8 +169,9 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 		// INTERRUPT_ENABLE_REGISTER
 		mmu.memory[address.AsWord()] = value
 		mmu.log.Printf("Writing value %.2x to INTERRUPT_ENABLE_REGISTER", value)
+
 	default:
-		mmu.log.Printf("Attemping to read from invalid address %x", address.AsWord())
+		mmu.log.Fatalf("Attemping to write to invalid address %x", address.AsWord())
 		mmu.memory[address.AsWord()] = value
 	}
 

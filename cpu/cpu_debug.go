@@ -16,19 +16,19 @@ func (cpu *cpu) StepDebug() {
 func (cpu *cpu) fetchDebug() byte {
 	address := types.Address{High: cpu.r.pc.High(), Low: cpu.r.pc.Low()}
 	opcode := cpu.mmu.ReadByte(address)
-	cpu.log.Printf("fetch(0x%.2x%.2x) = 0x%.4x.", cpu.r.pc.High(), cpu.r.pc.Low(), opcode)
+	cpu.log.Printf("%d: fetch(0x%.2x%.2x) = 0x%.4x.", cpu.clock.Cycles, cpu.r.pc.High(), cpu.r.pc.Low(), opcode)
 	cpu.r.pc++
 	return opcode
 }
 
 func (cpu *cpu) decodeDebug(op byte) instruction {
 	instr := operations[op]
-	cpu.log.Printf("decode = %s", instructions_debug[op])
+	cpu.log.Printf("%d: decode = %s", cpu.clock.Cycles, instructions_debug[op])
 	return instr
 }
 
 func (cpu *cpu) executeDebug(instr instruction) cycleCount {
 	cycles := instr(cpu)
-	cpu.log.Printf("execute = %d cycles", cycles)
+	cpu.log.Printf("%d: execute = %d cycles", cpu.clock.Cycles, cycles)
 	return cycles
 }

@@ -7,6 +7,8 @@ import (
 	"github.com/lbarrios/yesSGMB/mmu"
 	"github.com/lbarrios/yesSGMB/types"
 	"sync"
+	"github.com/lbarrios/yesSGMB/gpu"
+	"log"
 )
 
 type cpu struct {
@@ -83,6 +85,8 @@ func (cpu *cpu) Reset() {
 	cpu.mmu.WriteByte(types.Address{High: 0xFF, Low: 0x4A}, 0x00) // WY
 	cpu.mmu.WriteByte(types.Address{High: 0xFF, Low: 0x4B}, 0x00) // WX
 	cpu.mmu.WriteByte(types.Address{High: 0xFF, Low: 0xFF}, 0x00) // IE
+
+	cpu.interruptsEnabled = true
 }
 
 func (cpu *cpu) Stop() {
@@ -91,10 +95,39 @@ func (cpu *cpu) Stop() {
 }
 
 func (cpu *cpu) Step() {
+	cpu.checkInterrupts()
 	op := cpu.fetch()
 	instr := cpu.decode(op)
 	cycles := cpu.execute(instr)
 	cpu.clock.Cycles += uint64(cycles)
+}
+
+func (cpu *cpu) checkInterrupts() bool {
+	if !cpu.interruptsEnabled {
+		return false
+	}
+
+	interruptEnable := cpu.mmu.ReadByte(mmu.INTERRUPT_ENABLE_REGISTER.AsAddress())
+	interruptFlag := cpu.mmu.ReadByte(mmu.INTERRUPT_FLAG_ADDR.AsAddress())
+	interrupt := interruptFlag & interruptEnable
+
+	if interrupt == 0x00 {
+		return false
+	}
+
+	// Disable the interrupt, then push the current PC to stack
+	// and jump to the corresponding interruption handler
+	switch {
+	case interrupt&gpu.VBLANK_IRQ == gpu.VBLANK_IRQ:
+		cpu.mmu.WriteByte(mmu.INTERRUPT_FLAG_ADDR.AsAddress(), interruptFlag^gpu.VBLANK_IRQ)
+		cpu.jumpToInterruptHandler(V_BLANK_IR_ADDR)
+		cpu.interruptsEnabled = false
+	default:
+		log.Fatalf("Can't recognize interrupt %.2x", interrupt)
+		return false
+	}
+
+	return true
 }
 
 func (cpu *cpu) fetch() byte {
@@ -119,8 +152,8 @@ func (cpu *cpu) Run(wg *sync.WaitGroup) {
 	for {
 		cpu.clock.WaitNextCycle()
 
-		cpu.StepDebug()
-		if cpu.r.pc == 0x02b2 {
+		cpu.Step()
+		if cpu.clock.Cycles >= 10000000 { //if cpu.r.pc == 0x02b2 {
 			cpu.log.Println("\033[1;31mBreakpoint at 0x02b2.")
 			cpu.StepDebug()
 			cpu.StepDebug()
@@ -129,6 +162,8 @@ func (cpu *cpu) Run(wg *sync.WaitGroup) {
 			cpu.log.Println("writing 0xff to 0xff07 (this will stop the timer)")
 			cpu.mmu.WriteByte(types.Address{0xff, 0x07}, 0xff)
 			cpu.clock.Disconnect(cpu)
+			a := cpu.mmu.ReadByte(types.Address{0x80, 0x00})
+			cpu.log.Println(a)
 			break
 		}
 	}

@@ -54,17 +54,33 @@ func (d *Display) Disconnect(wg *sync.WaitGroup) {
 	wg.Done()
 }
 
-func (d *Display) Refresh() {
+func (d *Display) Refresh(pixelsGrid [HEIGHT * WIDTH]byte) {
 	for i := 0; i < HEIGHT; i++ {
 		for j := 0; j < WIDTH; j++ {
-			r := PIXEL_SIZE*(i*WIDTH+ j)
-			g := PIXEL_SIZE*(i*WIDTH + j) + 1
-			b := PIXEL_SIZE*(i*WIDTH + j) + 2
-			a := PIXEL_SIZE*(i*WIDTH + j) + 3
-			d.data[r] = byte((i+j)*int(d.cycle))
-			d.data[g] = byte((i+j+2)*2*int(d.cycle))
-			d.data[b] = byte((i+j+5)*3*int(d.cycle))
-			d.data[a] = byte(255)
+			baseIndex := i*WIDTH + j
+			pixel := pixelsGrid[baseIndex]
+			var color byte
+			switch pixel {
+			case 0:
+				color = 255
+			case 1:
+				color = 196
+			case 2:
+				color = 64
+			case 3:
+				color = 0
+			default:
+				panic("can't recognize the pixel value")
+			}
+			outputIndex := PIXEL_SIZE * baseIndex
+			r_index := outputIndex + 0
+			g_index := outputIndex + 1
+			b_index := outputIndex + 2
+			a_index := outputIndex + 3
+			d.data[r_index] = 64
+			d.data[g_index] = color
+			d.data[b_index] = 64
+			d.data[a_index] = byte(255)
 		}
 	}
 	d.texture.Update(nil, d.data, WIDTH*4)

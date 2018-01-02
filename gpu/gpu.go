@@ -11,24 +11,33 @@ import (
 )
 
 const (
-	VIDEO_RAM_START = types.Word(0x8000)
-	VIDEO_RAM_END   = types.Word(0x9FFF)
-	OAM_START       = types.Word(0xFE00) // Sprite Attribute Table
-	OAM_END         = types.Word(0xFE9F) // Sprite Attribute Table
-	LCDC_ADDRESS    = types.Word(0xFF40)
-	STAT_ADDRESS    = types.Word(0xFF41)
-	STAT_MODE_MASK  = 0x03
-	SCY_ADDRESS     = types.Word(0xFF42)
-	SCX_ADDRESS     = types.Word(0xFF43)
-	LY_ADDRESS      = types.Word(0xFF44)
-	LYC_ADDRESS     = types.Word(0xFF45)
+	VIDEO_RAM_START types.Word = 0x8000
+	VIDEO_RAM_END   types.Word = 0x9FFF
+	// Video Ram Detail
+	TILEDATA1_START types.Word = 0x8000
+	TILEDATA0_START types.Word = 0x8800
+	TILEDATA_SIZE   types.Word = 0x1000 // 4KB = 256x256
+	TILEMAP0_START  types.Word = 0x9800
+	TILEMAP1_START  types.Word = 0x9C00
+	TILEMAP_SIZE    types.Word = 0x400 // 32*32 = 1024 tiles
+	// Sprite Attribute Table
+	OAM_START types.Word = 0xFE00
+	OAM_END   types.Word = 0xFE9F
+	// Flags
+	LCDC_ADDRESS types.Word = 0xFF40
+	STAT_ADDRESS types.Word = 0xFF41
+	SCY_ADDRESS  types.Word = 0xFF42
+	SCX_ADDRESS  types.Word = 0xFF43
+	LY_ADDRESS   types.Word = 0xFF44
+	LYC_ADDRESS  types.Word = 0xFF45
 )
 
 const ( // Video modes
-	HBLANK_MODE = 0x00
-	VBLANK_MODE = 0x01
-	OAM_MODE    = 0x02
-	VRAM_MODE   = 0x03
+	STAT_MODE_MASK = 0x03 // bit-mask to obtain the mode from the the stat register
+	HBLANK_MODE    = 0x00
+	VBLANK_MODE    = 0x01
+	OAM_MODE       = 0x02
+	VRAM_MODE      = 0x03
 )
 
 const ( // Video modes cycles
@@ -43,18 +52,27 @@ const ( // Interruptions
 )
 
 type gpu struct {
-	clock        clock.ClockCounter
-	irqHandler   mmu.IRQHandler
-	display      *display.Display
-	log          logger.Logger
-	lcdc         *byte
-	stat         *byte
-	scy          *byte
-	scx          *byte
-	current_line *byte
-	lyc          *byte
-	video_ram    [1 + VIDEO_RAM_END - VIDEO_RAM_START]*byte
-	oam          [1 + OAM_END - OAM_START]*byte
+	clock       clock.ClockCounter
+	irqHandler  mmu.IRQHandler
+	display     *display.Display
+	log         logger.Logger
+	lcdControl  *byte // lcdc = 0xFF40
+	stat        *byte // stat = 0xFF41
+	scrollY     *byte // scy = 0xFF42
+	scrollX     *byte // scx = 0xFF43
+	currentLine *byte // ly = 0xFF44
+	lyc         *byte // lyc = 0xFF45
+	video_ram   [1 + VIDEO_RAM_END - VIDEO_RAM_START]*byte
+	oam         [1 + OAM_END - OAM_START]*byte
+	tileMap0    [TILEMAP_SIZE]*byte
+	tileMap1    [TILEMAP_SIZE]*byte
+	tileData0   [TILEDATA_SIZE]*byte
+	tileData1   [TILEDATA_SIZE]*byte
+
+	displayOn    bool
+	backgroundOn bool
+	windowOn     bool
+	spritesOn    bool
 }
 
 func NewGpu(mmu mmu.IRQHandler, l *logger.Logger) *gpu {
@@ -82,19 +100,31 @@ func (gpu *gpu) MapByte(logical_address types.Address, physical_address *byte) {
 	addr := logical_address.AsWord()
 	switch {
 	case addr == LCDC_ADDRESS:
-		gpu.lcdc = physical_address
+		gpu.lcdControl = physical_address
 	case addr == STAT_ADDRESS:
 		gpu.stat = physical_address
 	case addr == SCY_ADDRESS:
-		gpu.scy = physical_address
+		gpu.scrollY = physical_address
 	case addr == SCX_ADDRESS:
-		gpu.scx = physical_address
+		gpu.scrollX = physical_address
 	case addr == LY_ADDRESS:
-		gpu.current_line = physical_address
+		gpu.currentLine = physical_address
 	case addr == LYC_ADDRESS:
 		gpu.lyc = physical_address
 	case addr >= VIDEO_RAM_START && addr <= VIDEO_RAM_END:
 		gpu.video_ram[addr-VIDEO_RAM_START] = physical_address
+		if addr >= TILEDATA1_START && addr < TILEDATA1_START+TILEDATA_SIZE {
+			gpu.tileData1[addr-TILEDATA1_START] = physical_address
+		}
+		if addr >= TILEDATA0_START && addr < TILEDATA0_START+TILEDATA_SIZE {
+			gpu.tileData0[addr-TILEDATA0_START] = physical_address
+		}
+		if addr >= TILEMAP0_START && addr < TILEMAP0_START+TILEMAP_SIZE {
+			gpu.tileMap0[addr-TILEMAP0_START] = physical_address
+		}
+		if addr >= TILEMAP1_START && addr < TILEMAP1_START+TILEMAP_SIZE {
+			gpu.tileMap1[addr-TILEMAP1_START] = physical_address
+		}
 	case addr >= OAM_START && addr <= OAM_END:
 		gpu.oam[addr-OAM_START] = physical_address
 	default:
@@ -132,9 +162,21 @@ func (gpu *gpu) step() {
 	switch {
 	case gpu.mode() == HBLANK_MODE:
 		gpu.log.Println("HBLANK")
+		// render the current line
+		if gpu.backgroundOn {
+
+		}
+		if gpu.windowOn {
+
+		}
+		if gpu.spritesOn {
+
+		}
+
+		// go to the next line
 		gpu.clock.Cycles += HBLANK_MODE_CYCLES
-		*gpu.current_line += 1
-		if *gpu.current_line < display.HEIGHT {
+		*gpu.currentLine += 1
+		if *gpu.currentLine < display.HEIGHT {
 			gpu.setMode(OAM_MODE)
 		} else {
 			gpu.setMode(VBLANK_MODE)
@@ -145,7 +187,7 @@ func (gpu *gpu) step() {
 		gpu.display.Refresh()
 		gpu.irqHandler.RequestInterrupt(VBLANK_IRQ)
 		gpu.clock.Cycles += VBLANK_MODE_CYCLES
-		*gpu.current_line = 0
+		*gpu.currentLine = 0
 		gpu.setMode(OAM_MODE)
 
 	case gpu.mode() == OAM_MODE:
@@ -158,13 +200,25 @@ func (gpu *gpu) step() {
 	}
 }
 
+func (gpu *gpu) renderBackgroundOnLine() {
+
+}
+
+func (gpu *gpu) renderWindowOnLine() {
+
+}
+
+func (gpu *gpu) renderSpritesOnLine() {
+
+}
+
 func (gpu *gpu) Run(wg *sync.WaitGroup) {
 	gpu.log.Println("GPU started.")
 
 	for {
 		gpu.clock.WaitNextCycle()
 
-		if *gpu.lcdc == 0xff {
+		if *gpu.lcdControl == 0xff {
 			gpu.log.Println("lcdc=0xff, stopping GPU.")
 			gpu.clock.Disconnect(gpu)
 			break

@@ -6,12 +6,13 @@ import (
 )
 
 const (
-	WIDTH  = 160
-	HEIGHT = 144
+	WIDTH      = 160
+	HEIGHT     = 144
+	PIXEL_SIZE = 4
 )
 
 type Display struct {
-	data     [HEIGHT][WIDTH]int
+	data     []byte
 	window   *sdl.Window
 	renderer *sdl.Renderer
 	texture  *sdl.Texture
@@ -43,6 +44,8 @@ func (d *Display) Init() {
 		panic(err)
 	}
 	d.texture = texture
+
+	d.data = make([]byte, HEIGHT*WIDTH*PIXEL_SIZE)
 }
 
 func (d *Display) Disconnect(wg *sync.WaitGroup) {
@@ -52,14 +55,19 @@ func (d *Display) Disconnect(wg *sync.WaitGroup) {
 }
 
 func (d *Display) Refresh() {
-	var pixels []byte
-	for i := 0; i < WIDTH*HEIGHT; i++ {
-		r := byte(i * int(d.cycle))
-		g := byte(i * 2 * int(d.cycle))
-		b := byte(i * 3 * int(d.cycle))
-		pixels = append(pixels, r, g, b, 255)
+	for i := 0; i < HEIGHT; i++ {
+		for j := 0; j < WIDTH; j++ {
+			r := PIXEL_SIZE*(i*WIDTH+ j)
+			g := PIXEL_SIZE*(i*WIDTH + j) + 1
+			b := PIXEL_SIZE*(i*WIDTH + j) + 2
+			a := PIXEL_SIZE*(i*WIDTH + j) + 3
+			d.data[r] = byte((i+j)*int(d.cycle))
+			d.data[g] = byte((i+j+2)*2*int(d.cycle))
+			d.data[b] = byte((i+j+5)*3*int(d.cycle))
+			d.data[a] = byte(255)
+		}
 	}
-	d.texture.Update(nil, pixels, WIDTH*4)
+	d.texture.Update(nil, d.data, WIDTH*4)
 	d.renderer.Copy(d.texture, nil, nil)
 	d.renderer.Present()
 	d.cycle++

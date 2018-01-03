@@ -68,7 +68,9 @@ func (mmu *mmu) ReadByte(address types.Address) byte {
 
 	case address.AsWord() >= VIDEO_RAM_8KB && address.AsWord() < SWITCHABLE_RAM_BANK_8KB:
 		// VIDEO_RAM_8KB
-		mmu.log.Fatalf("Attemping to read from unimplemented address %x (VIDEO_RAM_8KB)", address.AsWord())
+		ret = mmu.memory[address.AsWord()]
+		// TODO: To check
+		//mmu.log.Fatalf("Attemping to read from unimplemented address %x (VIDEO_RAM_8KB)", address.AsWord())
 
 	case address.AsWord() >= SWITCHABLE_RAM_BANK_8KB && address.AsWord() < INTERNAL_RAM_8KB:
 		// SWITCHABLE_RAM_BANK_8KB
@@ -85,11 +87,15 @@ func (mmu *mmu) ReadByte(address types.Address) byte {
 
 	case address.AsWord() >= SPRITE_ATTRIB_MEMORY_OAM && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_1:
 		// SPRITE_ATTRIB_MEMORY_OAM
-		mmu.log.Fatalf("Attemping to read from unimplemented address %x (SPRITE_ATTRIB_MEMORY_OAM)", address.AsWord())
+		ret = mmu.memory[address.AsWord()]
+		// TODO: To check
+		//mmu.log.Fatalf("Attemping to read from unimplemented address %x (SPRITE_ATTRIB_MEMORY_OAM)", address.AsWord())
 
 	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_1 && address.AsWord() < IO_PORTS:
 		// EMPTY_BUT_UNUSABLE_FOR_IO_1
-		mmu.log.Fatalf("Attemping to read from unimplemented address %x (EMPTY_BUT_UNUSABLE_FOR_IO_1)", address.AsWord())
+		ret = mmu.memory[address.AsWord()]
+		// TODO: To check
+		//mmu.log.Fatalf("Attemping to read from unimplemented address %x (EMPTY_BUT_UNUSABLE_FOR_IO_1)", address.AsWord())
 
 	case address.AsWord() >= IO_PORTS && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_2:
 		// IO_PORTS, this case write to memory that is mapped to peripherals
@@ -97,7 +103,9 @@ func (mmu *mmu) ReadByte(address types.Address) byte {
 
 	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_2 && address.AsWord() < HIGH_RAM:
 		// EMPTY_BUT_UNUSABLE_FOR_IO_2
-		mmu.log.Fatalf("Attemping to read from unimplemented address %x (EMPTY_BUT_UNUSABLE_FOR_IO_2)", address.AsWord())
+		ret = mmu.memory[address.AsWord()]
+		// TODO: To check
+		//mmu.log.Fatalf("Attemping to read from unimplemented address %x (EMPTY_BUT_UNUSABLE_FOR_IO_2)", address.AsWord())
 
 	case address.AsWord() >= HIGH_RAM && address.AsWord() < INTERRUPT_ENABLE_REGISTER:
 		// HIGH_RAM
@@ -130,7 +138,9 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 
 	case address.AsWord() >= VIDEO_RAM_8KB && address.AsWord() < SWITCHABLE_RAM_BANK_8KB:
 		// VIDEO_RAM_8KB
-		mmu.log.Fatalf("Attemping to write to unimplemented address %x (VIDEO_RAM_8KB)", address.AsWord())
+		mmu.memory[address.AsWord()] = value
+		// TODO: To check
+		//mmu.log.Fatalf("Attemping to write to unimplemented address %x (VIDEO_RAM_8KB)", address.AsWord())
 
 	case address.AsWord() >= SWITCHABLE_RAM_BANK_8KB && address.AsWord() < INTERNAL_RAM_8KB:
 		// SWITCHABLE_RAM_BANK_8KB
@@ -147,11 +157,15 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 
 	case address.AsWord() >= SPRITE_ATTRIB_MEMORY_OAM && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_1:
 		// SPRITE_ATTRIB_MEMORY_OAM
-		mmu.log.Fatalf("Attemping to write to unimplemented address %x (SPRITE_ATTRIB_MEMORY_OAM)", address.AsWord())
+		mmu.memory[address.AsWord()] = value
+		// TODO: To check
+		//mmu.log.Fatalf("Attemping to write to unimplemented address %x (SPRITE_ATTRIB_MEMORY_OAM)", address.AsWord())
 
 	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_1 && address.AsWord() < IO_PORTS:
 		// EMPTY_BUT_UNUSABLE_FOR_IO_1
-		mmu.log.Fatalf("Attemping to write to unimplemented address %x (EMPTY_BUT_UNUSABLE_FOR_IO_1)", address.AsWord())
+		mmu.memory[address.AsWord()] = value
+		// TODO: To check
+		//mmu.log.Fatalf("Attemping to write to unimplemented address %x (EMPTY_BUT_UNUSABLE_FOR_IO_1)", address.AsWord())
 
 	case address.AsWord() >= IO_PORTS && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_2:
 		// IO_PORTS, this case write to memory that is mapped to peripherals
@@ -159,7 +173,9 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 
 	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_2 && address.AsWord() < HIGH_RAM:
 		// EMPTY_BUT_UNUSABLE_FOR_IO_2
-		mmu.log.Fatalf("Attemping to write to unimplemented address %x (EMPTY_BUT_UNUSABLE_FOR_IO_2)", address.AsWord())
+		mmu.memory[address.AsWord()] = value
+		// TODO: To check
+		//mmu.log.Fatalf("Attemping to write to unimplemented address %x (EMPTY_BUT_UNUSABLE_FOR_IO_2)", address.AsWord())
 
 	case address.AsWord() >= HIGH_RAM && address.AsWord() < INTERRUPT_ENABLE_REGISTER:
 		// INTERNAL_RAM

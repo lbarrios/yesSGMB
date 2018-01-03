@@ -53,7 +53,7 @@ const ( // Video modes
 
 const ( // Video modes cycles
 	HBLANK_MODE_CYCLES = 204
-	VBLANK_MODE_CYCLES = 4560
+	VBLANK_MODE_CYCLES = 456
 	OAM_MODE_CYCLES    = 80
 	VRAM_MODE_CYCLES   = 172
 )
@@ -202,8 +202,12 @@ func (gpu *gpu) step() {
 		gpu.display.Refresh(gpu.currentViewportData())
 		gpu.irqHandler.RequestInterrupt(VBLANK_IRQ)
 		gpu.clock.Cycles += VBLANK_MODE_CYCLES
-		*gpu.currentLine = 0
-		gpu.setMode(OAM_MODE)
+		*gpu.currentLine++
+		if *gpu.currentLine == 153 {
+			gpu.log.Println("END OF VBLANK")
+			*gpu.currentLine = 0
+			gpu.setMode(OAM_MODE)
+		}
 
 	case gpu.mode() == OAM_MODE:
 		gpu.clock.Cycles += OAM_MODE_CYCLES

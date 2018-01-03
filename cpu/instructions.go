@@ -1151,8 +1151,8 @@ func ldiAMemHl(cpu *cpu) cycleCount {
 	// Then, increment  HL.
 	cpu.r.af.a = cpu.mmu.ReadByte(cpu.r.hlAsAddress())
 	hl := cpu.r.hlAsWord() + 0x0001
-	cpu.r.hl.h = byte(hl >> 4)
-	cpu.r.hl.l = byte(hl & 0x0F)
+	cpu.r.hl.h = hl.High()
+	cpu.r.hl.l = hl.Low()
 	return ldiAMemHlCycles
 }
 
@@ -1172,8 +1172,8 @@ func ldiMemHlA(cpu *cpu) cycleCount {
 	// Then, increment HL.
 	cpu.mmu.WriteByte(cpu.r.hlAsAddress(), cpu.r.af.a)
 	hl := cpu.r.hlAsWord() + 0x0001
-	cpu.r.hl.h = byte(hl >> 4)
-	cpu.r.hl.l = byte(hl & 0x0F)
+	cpu.r.hl.h = hl.High()
+	cpu.r.hl.l = hl.Low()
 	return ldiMemHlACycles
 }
 
@@ -2614,24 +2614,24 @@ func incBc(cpu *cpu) cycleCount {
 	// Increment register BC
 	bc := cpu.r.bcAsWord()
 	bc++
-	cpu.r.bc.c = byte(bc & 0xff)
-	cpu.r.bc.b = byte(bc >> 8)
+	cpu.r.bc.b = bc.High()
+	cpu.r.bc.c = bc.Low()
 	return incBcCycles
 }
 func incDe(cpu *cpu) cycleCount {
 	// Increment register DE
 	de := cpu.r.deAsWord()
 	de++
-	cpu.r.de.e = byte(de & 0xff)
-	cpu.r.de.d = byte(de >> 8)
+	cpu.r.de.d = de.High()
+	cpu.r.de.e = de.Low()
 	return incDeCycles
 }
 func incHl(cpu *cpu) cycleCount {
 	// Increment register HL
 	hl := cpu.r.hlAsWord()
 	hl++
-	cpu.r.hl.l = byte(hl & 0xff)
-	cpu.r.hl.h = byte(hl >> 8)
+	cpu.r.hl.h = hl.High()
+	cpu.r.hl.l = hl.Low()
 	return incHlCycles
 }
 func incSp(cpu *cpu) cycleCount {
@@ -2658,24 +2658,24 @@ func decBc(cpu *cpu) cycleCount {
 	// Decrement register BC
 	bc := cpu.r.bcAsWord()
 	bc--
-	cpu.r.bc.c = byte(bc & 0xff)
-	cpu.r.bc.b = byte(bc >> 8)
+	cpu.r.bc.b = bc.High()
+	cpu.r.bc.c = bc.Low()
 	return decBcCycles
 }
 func decDe(cpu *cpu) cycleCount {
 	// Decrement register DE
 	de := cpu.r.deAsWord()
 	de--
-	cpu.r.de.e = byte(de & 0xff)
-	cpu.r.de.d = byte(de >> 8)
+	cpu.r.de.d = de.High()
+	cpu.r.de.e = de.Low()
 	return decDeCycles
 }
 func decHl(cpu *cpu) cycleCount {
 	// Decrement register HL
 	hl := cpu.r.hlAsWord()
 	hl--
-	cpu.r.hl.l = byte(hl & 0xff)
-	cpu.r.hl.h = byte(hl >> 8)
+	cpu.r.hl.h = hl.High()
+	cpu.r.hl.l = hl.Low()
 	return decHlCycles
 }
 func decSp(cpu *cpu) cycleCount {

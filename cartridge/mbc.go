@@ -56,8 +56,6 @@ func (mbc *MBCRomOnly) Write(address types.Address, value byte) {
 		mbc.log.Fatalf("Cannot write to address: %.4x!", address.AsWord())
 		return
 	}
-	// TODO: Check this
-	mbc.log.Printf("Cannot write to address: %.4x!", address.AsWord())
 }
 
 func (mbc *MBCRomOnly) Read(address types.Address) byte {

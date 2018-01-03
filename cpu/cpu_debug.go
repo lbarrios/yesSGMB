@@ -5,7 +5,12 @@ import (
 )
 
 func (cpu *cpu) StepDebug() {
-	cpu.checkInterrupts()
+	cpu.log.Println(cpu.r)
+	interrupts := cpu.checkInterrupts()
+	if interrupts {
+		cpu.log.Println("there are interruptions!")
+		cpu.log.Println(cpu.r)
+	}
 	op := cpu.fetchDebug()
 	instr := cpu.decodeDebug(op)
 	cycles := cpu.executeDebug(instr)

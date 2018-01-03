@@ -12,7 +12,8 @@ const (
 
 func (cpu *cpu) jumpToInterruptHandler(address types.Word) {
 	cpu.r.sp--
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), address.High())
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.High())
 	cpu.r.sp--
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), address.Low())
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.Low())
+	cpu.r.pc = types.Address{High: address.High(), Low: address.Low()}.AsWord()
 }

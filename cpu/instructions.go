@@ -532,12 +532,12 @@ func nonImplemented(cpu *cpu) cycleCount {
 	// This function is not intended to be implemented
 	// if the execution of the rom reaches this point
 	// then whe have a problem..!!
-	cpu.log.Println("Non implemented function executed.")
 	var cycles cycleCount
 	cycles = 0xDEAD // lol
 	// ret is the sum of all the unused cycles-constants... just to use them and prevent the compiler to detect it as a warning
 	cycles += xDThreeCycles + xDBCycles + xDDCycles + xEThreeCycles + xEFourCycles + xEBCycles + xECCycles + xEDCycles + xFFourCycles + xFCCycles + xFDCycles
 	cpu.Stop()
+	cpu.log.Fatalln("Non implemented function executed.")
 	return cycles
 }
 
@@ -1379,9 +1379,9 @@ func pushHl(cpu *cpu) cycleCount {
 func popAf(cpu *cpu) cycleCount {
 	// Take two bytes from the stack into register AF
 	// Then, increment SP twice
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.af.a)
+	cpu.r.af.f.loadByte(cpu.mmu.ReadByte(cpu.r.spAsAddress()))
 	cpu.r.sp++
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.af.f.asByte())
+	cpu.r.af.a = cpu.mmu.ReadByte(cpu.r.spAsAddress())
 	cpu.r.sp++
 	return popAfCycles
 }
@@ -1389,9 +1389,9 @@ func popAf(cpu *cpu) cycleCount {
 func popBc(cpu *cpu) cycleCount {
 	// Take two bytes from the stack into register BC
 	// Then, increment SP twice
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.bc.b)
+	cpu.r.bc.c = cpu.mmu.ReadByte(cpu.r.spAsAddress())
 	cpu.r.sp++
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.bc.c)
+	cpu.r.bc.b = cpu.mmu.ReadByte(cpu.r.spAsAddress())
 	cpu.r.sp++
 	return popBcCycles
 }
@@ -1399,9 +1399,9 @@ func popBc(cpu *cpu) cycleCount {
 func popDe(cpu *cpu) cycleCount {
 	// Take two bytes from the stack into register DE
 	// Then, increment SP twice
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.de.d)
+	cpu.r.de.e = cpu.mmu.ReadByte(cpu.r.spAsAddress())
 	cpu.r.sp++
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.de.e)
+	cpu.r.de.d = cpu.mmu.ReadByte(cpu.r.spAsAddress())
 	cpu.r.sp++
 	return popDeCycles
 }
@@ -1409,9 +1409,9 @@ func popDe(cpu *cpu) cycleCount {
 func popHl(cpu *cpu) cycleCount {
 	// Take two bytes from the stack into register HL
 	// Then, increment SP twice
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.hl.h)
+	cpu.r.hl.l = cpu.mmu.ReadByte(cpu.r.spAsAddress())
 	cpu.r.sp++
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.hl.l)
+	cpu.r.hl.h = cpu.mmu.ReadByte(cpu.r.spAsAddress())
 	cpu.r.sp++
 	return popHlCycles
 }
@@ -5718,12 +5718,11 @@ func call(cpu *cpu) cycleCount {
 	// (nn: parameter from immediate value)
 	low := cpu.fetch()
 	high := cpu.fetch()
-	nextInstruction := cpu.r.pc + 1
 	cpu.r.sp--
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.High())
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.High())
 	cpu.r.sp--
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.Low())
-	cpu.r.pc = types.Address{High:high, Low:low}.AsWord()
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.Low())
+	cpu.r.pc = types.Address{High: high, Low: low}.AsWord()
 	return callCycles
 }
 
@@ -5751,11 +5750,10 @@ func callNZ(cpu *cpu) cycleCount {
 	low := cpu.fetch()
 	high := cpu.fetch()
 	if !cpu.r.af.f.z {
-		nextInstruction := cpu.r.pc + 1
 		cpu.r.sp--
-		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.High())
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.High())
 		cpu.r.sp--
-		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.Low())
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.Low())
 		cpu.r.pc = types.Word(high)<<8 + types.Word(low&0xFF)
 		return callCycles
 	}
@@ -5769,11 +5767,10 @@ func callZ(cpu *cpu) cycleCount {
 	low := cpu.fetch()
 	high := cpu.fetch()
 	if cpu.r.af.f.z {
-		nextInstruction := cpu.r.pc + 1
 		cpu.r.sp--
-		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.High())
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.High())
 		cpu.r.sp--
-		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.Low())
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.Low())
 		cpu.r.pc = types.Word(high)<<8 + types.Word(low&0xFF)
 		return callCycles
 	}
@@ -5787,11 +5784,10 @@ func callNC(cpu *cpu) cycleCount {
 	low := cpu.fetch()
 	high := cpu.fetch()
 	if !cpu.r.af.f.c {
-		nextInstruction := cpu.r.pc + 1
 		cpu.r.sp--
-		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.High())
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.High())
 		cpu.r.sp--
-		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.Low())
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.Low())
 		cpu.r.pc = types.Word(high)<<8 + types.Word(low&0xFF)
 		return callCycles
 	}
@@ -5805,11 +5801,10 @@ func callC(cpu *cpu) cycleCount {
 	low := cpu.fetch()
 	high := cpu.fetch()
 	if cpu.r.af.f.c {
-		nextInstruction := cpu.r.pc + 1
 		cpu.r.sp--
-		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.High())
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.High())
 		cpu.r.sp--
-		cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.Low())
+		cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.Low())
 		cpu.r.pc = types.Word(high)<<8 + types.Word(low&0xFF)
 		return callCycles
 	}

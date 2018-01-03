@@ -558,14 +558,14 @@ func callDebug(cpu *cpu) cycleCount {
 	// and jump to address nn
 	// (nn: parameter from immediate value)
 	low := cpu.fetch()
+	cpu.log.Printf("fetching parameter l=0x%.2x, pc=0x%.2x", low, cpu.r.pc)
 	high := cpu.fetch()
-	cpu.log.Printf("fetching parameter l=0x%.2x, h=0x%.2x", low, high)
-	nextInstruction := cpu.r.pc + 1
+	cpu.log.Printf("fetching parameter h=0x%.2x, pc=0x%.2x", high, cpu.r.pc)
 	cpu.r.sp--
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.High())
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.High())
 	cpu.r.sp--
-	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.Low())
-	cpu.r.pc = types.Address{High: high, Low: low}.AsWord()
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), cpu.r.pc.Low())
+	cpu.r.pc = types.Address{High:high, Low:low}.AsWord()
 	return callCycles
 }
 

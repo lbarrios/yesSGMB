@@ -149,6 +149,7 @@ func (gpu *gpu) MapByte(logical_address types.Address, physical_address *byte) {
 func (gpu *gpu) Reset() {
 	gpu.log.Println("GPU reset triggered.")
 	gpu.backgroundOn = true
+	*gpu.currentLine = 0
 }
 
 func (gpu *gpu) mode() byte {
@@ -166,7 +167,9 @@ func (gpu *gpu) setMode(mode byte) {
 	case OAM_MODE:
 
 	case VBLANK_MODE:
-
+		//gpu.log.Println("VBLANK")
+		gpu.display.Refresh(gpu.currentViewportData())
+		gpu.irqHandler.RequestInterrupt(VBLANK_IRQ)
 	case VRAM_MODE:
 
 	}
@@ -198,13 +201,10 @@ func (gpu *gpu) step() {
 		}
 
 	case gpu.mode() == VBLANK_MODE:
-		gpu.log.Println("VBLANK")
-		gpu.display.Refresh(gpu.currentViewportData())
-		gpu.irqHandler.RequestInterrupt(VBLANK_IRQ)
 		gpu.clock.Cycles += VBLANK_MODE_CYCLES
 		*gpu.currentLine++
 		if *gpu.currentLine == 153 {
-			gpu.log.Println("END OF VBLANK")
+			//gpu.log.Println("END OF VBLANK")
 			*gpu.currentLine = 0
 			gpu.setMode(OAM_MODE)
 		}

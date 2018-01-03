@@ -33,6 +33,13 @@ func (f *Flags) asByte() byte {
 	return r
 }
 
+func (f *Flags) loadByte(b byte) {
+	f.z = types.BitIsSet(b, 8)
+	f.n = types.BitIsSet(b, 7)
+	f.h = types.BitIsSet(b, 6)
+	f.c = types.BitIsSet(b, 5)
+}
+
 func (f Flags) String() string {
 	z := 0
 	n := 0

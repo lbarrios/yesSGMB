@@ -1251,7 +1251,7 @@ func ldSpNn(cpu *cpu) cycleCount {
 	// (LS byte comes first!)
 	low := cpu.fetch()
 	high := cpu.fetch()
-	cpu.r.sp = types.Word(high<<8) + types.Word(low)
+	cpu.r.sp = types.Address{High: high, Low: low}.AsWord()
 	return ldSpNnCycles
 }
 
@@ -5723,7 +5723,7 @@ func call(cpu *cpu) cycleCount {
 	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.High())
 	cpu.r.sp--
 	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.Low())
-	cpu.r.pc = types.Word(high)<<8 + types.Word(low&0xFF)
+	cpu.r.pc = types.Address{High:high, Low:low}.AsWord()
 	return callCycles
 }
 

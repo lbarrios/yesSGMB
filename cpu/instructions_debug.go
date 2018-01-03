@@ -313,7 +313,7 @@ var operationsDebug = [0x100]instruction{
 	ldLN,           // 0x2E
 	cplA,           // 0x2F
 	jrNC,           // 0x30
-	ldSpNn,         // 0x31
+	ldSpNnDebug,    // 0x31
 	lddMemHlA,      // 0x32
 	incSp,          // 0x33
 	incMemHl,       // 0x34
@@ -469,7 +469,7 @@ var operationsDebug = [0x100]instruction{
 	jpZ,            // 0xCA
 	rxN,            // 0xCB
 	callZ,          // 0xCC
-	call,           // 0xCD
+	callDebug,      // 0xCD
 	adcANn,         // 0xCE
 	rst08H,         // 0xCF
 	retNC,          // 0xD0
@@ -551,4 +551,29 @@ func ldiAMemHlDebug(cpu *cpu) cycleCount {
 	cpu.r.hl.l = hl.Low()
 	cpu.log.Printf("incrementing hl, newhl=0x%.4x, newh=0x%.2x, newl=0x%.2x", hl, cpu.r.hl.h, cpu.r.hl.l)
 	return ldiAMemHlCycles
+}
+
+func callDebug(cpu *cpu) cycleCount {
+	// Push the address of the next instruction onto stack
+	// and jump to address nn
+	// (nn: parameter from immediate value)
+	low := cpu.fetch()
+	high := cpu.fetch()
+	cpu.log.Printf("fetching parameter l=0x%.2x, h=0x%.2x", low, high)
+	nextInstruction := cpu.r.pc + 1
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.High())
+	cpu.r.sp--
+	cpu.mmu.WriteByte(cpu.r.spAsAddress(), nextInstruction.Low())
+	cpu.r.pc = types.Address{High: high, Low: low}.AsWord()
+	return callCycles
+}
+
+func ldSpNnDebug(cpu *cpu) cycleCount {
+	// Takes a 16-bit immediate value and put it into the register SP.
+	// (LS byte comes first!)
+	low := cpu.fetch()
+	high := cpu.fetch()
+	cpu.r.sp = types.Address{High: high, Low: low}.AsWord()
+	return ldSpNnCycles
 }

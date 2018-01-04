@@ -34,9 +34,9 @@ const ( // Memory Mapped
 )
 
 const (
-	LINE_TILES         = 32 // 32 tiles per line
+	TILES_PER_LINE     = 32 // 32 tiles per line
 	TILE_WIDTH_PIXELS  = 8  // 8 pixels per tile
-	LINE_WIDTH_PIXELS  = LINE_TILES * TILE_WIDTH_PIXELS
+	LINE_WIDTH_PIXELS  = TILES_PER_LINE * TILE_WIDTH_PIXELS
 	TILE_WIDTH_BYTES   = 2 // 16 bytes per tile
 	TILE_HEIGHT_PIXELS = 8
 	TILE_HEIGHT_BYTES  = 2
@@ -231,9 +231,10 @@ func (gpu *gpu) currentViewportData() [display.WIDTH * display.HEIGHT]byte {
 
 func (gpu *gpu) renderBackgroundOnLine() {
 	backgroundTileMap := gpu.getBackgroundTileMap()
-	baseTileIndex := int(*gpu.currentLine/TILE_HEIGHT_PIXELS) * LINE_TILES
-	for i := 0; i < LINE_TILES; i++ {
-		tileIndex := int(*backgroundTileMap[baseTileIndex+i])
+	baseTileIndex := int(*gpu.currentLine/TILE_HEIGHT_PIXELS) * TILES_PER_LINE
+	// Render all the tiles for the current line
+	for i := 0; i < TILES_PER_LINE; i++ {
+		tileIndex := byte(*backgroundTileMap[baseTileIndex+i])
 		tileData := gpu.getTileDataForCurrentLine(tileIndex)
 		for j := 0; j < TILE_WIDTH_PIXELS; j++ {
 			gpu.internalData[i*TILE_WIDTH_PIXELS+j][*gpu.currentLine] = tileData[j]
@@ -263,7 +264,7 @@ func (gpu *gpu) getWindowTileMap() [TILEMAP_SIZE]*byte {
 
 // Returns the data (2 bytes) corresponding to
 // the parameter tile at the GPU current line
-func (gpu *gpu) getTileDataForCurrentLine(tileIndex int) [TILE_WIDTH_PIXELS]byte {
+func (gpu *gpu) getTileDataForCurrentLine(tileIndexByte byte) [TILE_WIDTH_PIXELS]byte {
 	// The indexes are used as follow.
 	// tileData 0: indexes from -128 to 127
 	// tileData 1: indexes from 0 to 255
@@ -274,22 +275,35 @@ func (gpu *gpu) getTileDataForCurrentLine(tileIndex int) [TILE_WIDTH_PIXELS]byte
 	// 1: tiledata1 ( $8000 to $8FFF ) (Same area as OBJ)
 	var result [TILE_WIDTH_PIXELS]byte
 
+	var tileIndex int
 	var tileData *[TILEDATA_SIZE]*byte
 	if !types.BitIsSet(*gpu.lcdControl, 4) {
+		tileIndexInt8 := int8(tileIndexByte)
+		tileIndex = int(tileIndexInt8)
 		tileIndex += 128
 		tileData = &gpu.tileData0
 	} else {
+		tileIndex = int(tileIndexByte)
 		tileData = &gpu.tileData1
 	}
 
-	tileIndex *= TILE_WIDTH_BYTES
+	if tileIndex < 0 || tileIndex > 255 {
+		gpu.log.Fatalf("Tile index %d not valid", tileIndex)
+	}
+
+	tileIndex *= TILE_WIDTH_BYTES*8
 	tileLine := int(TILE_HEIGHT_BYTES * (*gpu.currentLine % TILE_HEIGHT_PIXELS))
+
+	if tileIndex+tileLine < 0 || tileIndex+tileLine+1 >= 0x1000 {
+		gpu.log.Fatalf("Tile index %d not valid", tileIndex)
+	}
+
 	lowBits := *(tileData[tileIndex+tileLine])
 	highBits := *(tileData[tileIndex+tileLine+1])
 	for i := uint(0); i < TILE_WIDTH_PIXELS; i++ {
 		lowBit := byte((lowBits & (1 << i)) >> i)
 		highBit := byte((highBits & (1 << i)) >> i)
-		result[i] = highBit<<1 + lowBit // result = 0000 00HL
+		result[TILE_WIDTH_PIXELS-1-i] = highBit<<1 | lowBit // result = 0000 00HL
 	}
 
 	return result

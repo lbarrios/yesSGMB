@@ -61,3 +61,23 @@ func (mbc *MBCRomOnly) Write(address types.Address, value byte) {
 func (mbc *MBCRomOnly) Read(address types.Address) byte {
 	return mbc.romBank[address.AsWord()]
 }
+
+type MBC1 struct {
+	romBank []byte
+	log     logger.Logger
+}
+
+func (mbc *MBC1) Init(data []byte) {
+	mbc.romBank = data[0x0000:0x8000]
+}
+
+func (mbc *MBC1) Write(address types.Address, value byte) {
+	if address.High >= 0x80 {
+		mbc.log.Fatalf("Cannot write to address: %.4x!", address.AsWord())
+		return
+	}
+}
+
+func (mbc *MBC1) Read(address types.Address) byte {
+	return mbc.romBank[address.AsWord()]
+}

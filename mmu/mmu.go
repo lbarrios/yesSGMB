@@ -99,7 +99,12 @@ func (mmu *mmu) ReadByte(address types.Address) byte {
 
 	case address.AsWord() >= IO_PORTS && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_2:
 		// IO_PORTS, this case write to memory that is mapped to peripherals
-		ret = mmu.memory[address.AsWord()]
+		switch address.AsWord() {
+		case 0xff00: // joypad
+			ret = 0xff // for now, hardcoding no buttons pressed
+		default:
+			ret = mmu.memory[address.AsWord()]
+		}
 
 	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_2 && address.AsWord() < HIGH_RAM:
 		// EMPTY_BUT_UNUSABLE_FOR_IO_2
@@ -184,7 +189,7 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 	case address.AsWord() >= INTERRUPT_ENABLE_REGISTER:
 		// INTERRUPT_ENABLE_REGISTER
 		mmu.memory[address.AsWord()] = value
-		mmu.log.Printf("Writing value %.2x to INTERRUPT_ENABLE_REGISTER", value)
+		//mmu.log.Printf("Writing value %.2x to INTERRUPT_ENABLE_REGISTER", value)
 
 	default:
 		mmu.log.Fatalf("Attemping to write to invalid address %x", address.AsWord())
@@ -198,7 +203,6 @@ func (mmu *mmu) RequestInterrupt(interrupt byte) {
 	iflag := mmu.ReadByte(INTERRUPT_FLAG_ADDR.AsAddress())
 	iflag |= interrupt
 	mmu.WriteByte(INTERRUPT_FLAG_ADDR.AsAddress(), iflag)
-	mmu.log.Printf("Interruption %x", interrupt)
 }
 
 func (mmu *mmu) MapMemoryRegion(p Peripheral, begin types.Address, end types.Address) {

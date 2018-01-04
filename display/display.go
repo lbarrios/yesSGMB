@@ -62,9 +62,9 @@ func (d *Display) Refresh(pixelsGrid [HEIGHT * WIDTH]byte) {
 			var color byte
 			switch pixel {
 			case 0:
-				color = 255
-			case 1:
 				color = 196
+			case 1:
+				color = 128
 			case 2:
 				color = 64
 			case 3:
@@ -79,7 +79,7 @@ func (d *Display) Refresh(pixelsGrid [HEIGHT * WIDTH]byte) {
 			a_index := outputIndex + 3
 			d.data[r_index] = 64
 			d.data[g_index] = color
-			d.data[b_index] = 64
+			d.data[b_index] = color
 			d.data[a_index] = byte(255)
 		}
 	}

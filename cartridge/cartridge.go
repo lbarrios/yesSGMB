@@ -137,6 +137,8 @@ func (c *Cartridge) ParseHeader() error {
 	switch c.Type {
 	case MBC_ROMONLY:
 		c.MBC = &MBCRomOnly{log: c.log}
+	case MBC_1:
+		c.MBC = &MBC1{log: c.log}
 	default:
 		return errors.New(fmt.Sprintf("Unknown cartridge type for MBC: %X", c.Type))
 	}

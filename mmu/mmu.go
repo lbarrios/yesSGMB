@@ -6,6 +6,7 @@ import (
 	"github.com/lbarrios/yesSGMB/logger"
 	"github.com/lbarrios/yesSGMB/types"
 	"sync"
+	"os"
 )
 
 const (
@@ -21,6 +22,9 @@ type mmu struct {
 	memory     [MAX_ADDRESS + 1]byte
 	memoryLock sync.Mutex
 	log        logger.Logger
+	console struct {
+		f *os.File
+	}
 }
 
 type MMU interface {
@@ -32,6 +36,11 @@ func NewMMU(l *logger.Logger) *mmu {
 	mmu := new(mmu)
 	mmu.log = *l
 	mmu.log.SetPrefix("\033[0;33mMMU: ")
+	fo, err := os.Create("console.log")
+	if err != nil {
+		panic("Can't create file for console")
+	}
+	mmu.console.f = fo
 	return mmu
 }
 
@@ -100,7 +109,7 @@ func (mmu *mmu) ReadByte(address types.Address) byte {
 	case address.AsWord() >= IO_PORTS && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_2:
 		// IO_PORTS, this case write to memory that is mapped to peripherals
 		switch address.AsWord() {
-		case 0xff00: // joypad
+		case 0xff00:   // joypad
 			ret = 0xff // for now, hardcoding no buttons pressed
 		default:
 			ret = mmu.memory[address.AsWord()]
@@ -174,7 +183,16 @@ func (mmu *mmu) WriteByte(address types.Address, value byte) {
 
 	case address.AsWord() >= IO_PORTS && address.AsWord() < EMPTY_BUT_UNUSABLE_FOR_IO_2:
 		// IO_PORTS, this case write to memory that is mapped to peripherals
-		mmu.memory[address.AsWord()] = value
+		switch address.AsWord() {
+		case 0xFF02:
+			if value == 0x81 {
+				buffer := append(make([]byte,1), mmu.memory[0xFF01])
+				mmu.console.f.Write(buffer)
+			}
+			fallthrough
+		default:
+			mmu.memory[address.AsWord()] = value
+		}
 
 	case address.AsWord() >= EMPTY_BUT_UNUSABLE_FOR_IO_2 && address.AsWord() < HIGH_RAM:
 		// EMPTY_BUT_UNUSABLE_FOR_IO_2
